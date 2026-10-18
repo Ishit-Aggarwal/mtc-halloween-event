@@ -1,0 +1,75 @@
+rules_version = '2';
+
+// Wheel of Curses — Firestore security rules.
+//
+// ✏️  Replace host@example.com below with the email of the host account you
+//     create in Firebase Authentication (you can list several emails).
+//
+// What these rules enforce:
+//   • Anyone can READ the ledger (the wheels need it to strike out taken curses).
+//   • A phone can register a team name only if nobody has it yet.
+//   • A claim document's ID is "<characterId>__<problemNumber>", and a claim can
+//     only be CREATED if that ID doesn't exist — so one curse = one team, ever.
+//   • A phone can only claim for the team it registered, and can later add only
+//     its own hex/twist results to that claim and its team's progress.
+//   • Only the host can delete claims/teams or change the event settings.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isHost() {
+      return request.auth != null
+        && request.auth.token.email in ['host@example.com'];
+    }
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    match /config/{doc} {
+      allow read: if true;
+      allow write: if isHost();
+    }
+
+    match /teams/{key} {
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['name', 'uid', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.at == request.time;
+      // the phone that registered the team saves its progress (for the judges' board)
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['stage', 'charId', 'problem', 'hex', 'hexAt', 'unlockAt',
+                       'twist', 'twistText', 'twistExtra', 'eggs', 'updatedAt']);
+      allow delete: if isHost();
+    }
+
+    match /claims/{id} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['team', 'teamKey', 'charId', 'problem', 'uid', 'at'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.charId is string
+        && request.resource.data.problem is int
+        && request.resource.data.problem >= 0
+        && request.resource.data.problem < 10
+        && id == request.resource.data.charId + '__' + string(request.resource.data.problem)
+        && request.resource.data.at == request.time
+        // the claiming phone must own the team it claims for
+        && get(/databases/$(database)/documents/teams/$(request.resource.data.teamKey)).data.uid == request.auth.uid;
+
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['hex', 'hexAt', 'twist', 'twistText', 'doneAt']);
+
+      allow delete: if isHost();
+    }
+  }
+}

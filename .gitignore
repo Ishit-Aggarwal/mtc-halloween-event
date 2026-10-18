@@ -1,0 +1,9 @@
+# local tooling
+node_modules/
+.firebase/
+*.log
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
