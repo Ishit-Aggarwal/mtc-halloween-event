@@ -195,13 +195,68 @@
   }
 
   /* ---------- lightning ---------- */
+  // A strike is a few hard flickers, not one smooth fade. Each step is
+  // [brightness 0–1, ms]. Everything that reacts to the flash (the sky, the
+  // hills, the figures on the hill, the bolt) reads the --lit variable.
+  var FLICKERS = [
+    [[1, 55], [0.12, 45], [0.85, 40], [0, 150], [0.5, 45], [0.15, 60]],
+    [[0.6, 35], [0, 70], [1, 75], [0.3, 45], [0.7, 40], [0.1, 70]],
+    [[1, 90], [0.25, 55], [0.6, 45], [0.1, 80]],
+    [[0.9, 45], [0, 110], [0.95, 50], [0.2, 40], [0.45, 35], [0, 160], [0.3, 40], [0.08, 60]]
+  ];
+  var striking = false;
+
+  // a jagged bolt with a few forks, behind the hills
+  function makeBolt() {
+    var atmo = document.querySelector(".atmo"), hills = document.querySelector(".graveyard");
+    if (!atmo || !hills) return null;
+    var W = window.innerWidth, H = window.innerHeight;
+    var x = W * (0.12 + Math.random() * 0.76), y = -10, end = H * (0.6 + Math.random() * 0.15);
+    var main = "M" + x.toFixed(1) + " " + y, forks = "";
+    while (y < end) {
+      y += 12 + Math.random() * 26;
+      x += (Math.random() - 0.5) * 46;
+      main += "L" + x.toFixed(1) + " " + y.toFixed(1);
+      if (Math.random() < 0.16) {
+        var fx = x, fy = y, dir = Math.random() < 0.5 ? -1 : 1, n = 3 + Math.floor(Math.random() * 6);
+        forks += "M" + fx.toFixed(1) + " " + fy.toFixed(1);
+        for (var i = 0; i < n; i++) {
+          fx += dir * (6 + Math.random() * 20); fy += 8 + Math.random() * 20;
+          forks += "L" + fx.toFixed(1) + " " + fy.toFixed(1);
+        }
+      }
+    }
+    var svg = document.createElementNS(SVGNS, "svg");
+    svg.setAttribute("class", "bolt");
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("preserveAspectRatio", "none");
+    svg.innerHTML = "<path class=\"bolt-fork\" d=\"" + forks + "\"/><path class=\"bolt-core\" d=\"" + main + "\"/>";
+    atmo.insertBefore(svg, hills);
+    return svg;
+  }
+
   // noReveal: the caller shows its own figures in this flash
   function strike(noReveal) {
-    var el = document.getElementById("lightning");
-    if (!el || reduceMotion) return;
-    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+    if (reduceMotion || striking || !document.getElementById("lightning")) return;
+    striking = true;
+    var root = document.documentElement;
+    var steps = FLICKERS[Math.floor(Math.random() * FLICKERS.length)];
+    var bolt = Math.random() < 0.8 ? makeBolt() : null;
     document.body.classList.add("lit");
-    setTimeout(function () { document.body.classList.remove("lit"); }, 520);
+    var i = 0;
+    (function next() {
+      if (i >= steps.length) {
+        root.style.setProperty("--lit", "0");
+        document.body.classList.remove("lit");
+        if (bolt) bolt.remove();
+        striking = false;
+        return;
+      }
+      var s = steps[i++];
+      root.style.setProperty("--lit", s[0]);
+      if (bolt && i > 3) bolt.style.opacity = "0"; // the bolt is only in the first flickers
+      setTimeout(next, s[1]);
+    })();
     if (window.Sound) window.Sound.thunder();
     // shadow figures can only be seen in the flash
     if (noReveal !== true) { try { window.dispatchEvent(new Event("woc:lightning")); } catch (e) {} }
@@ -269,14 +324,112 @@
   }
 
   /* ---------- the spider ---------- */
+  // Click it and it jumps at your face (or just scuttles off when jump
+  // scares are turned off).
+
+  // a big hairy spider, seen from above, head up
+  function bigSpider() {
+    var legs = "", joints = "";
+    // bristles: short strokes sticking out along a line, leaning toward its end
+    function bristles(p, q, w) {
+      var dx = q[0] - p[0], dy = q[1] - p[1], len = Math.sqrt(dx * dx + dy * dy) || 1;
+      var ux = dx / len, uy = dy / len, n = Math.round(len / 5), d = "";
+      for (var b = 0; b < n; b++) {
+        var s = (b + 0.5) / n, side = b % 2 ? 1 : -1, h = w * 0.5 + 3 + Math.random() * 5;
+        var x = p[0] + dx * s + -uy * side * w * 0.4, y = p[1] + dy * s + ux * side * w * 0.4;
+        d += "M" + x.toFixed(1) + " " + y.toFixed(1) + "l" + ((-uy * side + ux * 0.8) * h).toFixed(1) + " " + ((ux * side + uy * 0.8) * h).toFixed(1);
+      }
+      return "<path d=\"" + d + "\" stroke-width=\"1.3\"/>";
+    }
+    // fur around an ellipse
+    function fur(cx, cy, rx, ry, n) {
+      var d = "";
+      for (var b = 0; b < n; b++) {
+        var a = b / n * Math.PI * 2 + Math.random() * 0.05, h = 4 + Math.random() * 6;
+        var x = cx + Math.cos(a) * rx * 0.97, y = cy + Math.sin(a) * ry * 0.97;
+        d += "M" + x.toFixed(1) + " " + y.toFixed(1) + "l" + (Math.cos(a) * h).toFixed(1) + " " + (Math.sin(a) * h + 1.5).toFixed(1);
+      }
+      return "<path d=\"" + d + "\" stroke=\"#140b07\" stroke-width=\"1.4\" stroke-linecap=\"round\" fill=\"none\"/>";
+    }
+    var ANG = [-58, -22, 16, 50], LEN = [1.18, 1, 0.92, 1.08];
+    [-1, 1].forEach(function (side) {
+      ANG.forEach(function (a, i) {
+        var k = LEN[i], ax = side * 22, ay = -20 + i * 9;
+        function step(x, y, len, deg) { var r = deg * Math.PI / 180; return [x + side * Math.cos(r) * len, y + Math.sin(r) * len]; }
+        var p1 = step(ax, ay, 62 * k, a * 0.55 - 12);
+        var p2 = step(p1[0], p1[1], 78 * k, a * 1.05);
+        var p3 = step(p2[0], p2[1], 46 * k, a * 1.5 + (a < 0 ? -10 : 14));
+        var seg = function (p, q, w) { return "<path d=\"M" + p[0].toFixed(1) + " " + p[1].toFixed(1) + "L" + q[0].toFixed(1) + " " + q[1].toFixed(1) + "\" stroke-width=\"" + w + "\"/>"; };
+        legs += "<g class=\"sleg\" style=\"--d:" + (i * 0.07 + (side > 0 ? 0.04 : 0)).toFixed(2) + "s;transform-origin:" + ax + "px " + ay + "px\">" +
+          seg([ax, ay], p1, 12) + seg(p1, p2, 9) + seg(p2, p3, 5) +
+          bristles([ax, ay], p1, 12) + bristles(p1, p2, 9) + bristles(p2, p3, 5) + "</g>";
+        joints += "<circle cx=\"" + p1[0].toFixed(1) + "\" cy=\"" + p1[1].toFixed(1) + "\" r=\"6\"/><circle cx=\"" + p2[0].toFixed(1) + "\" cy=\"" + p2[1].toFixed(1) + "\" r=\"4.2\"/>";
+      });
+    });
+    return "<svg viewBox=\"-230 -230 460 460\" xmlns=\"http://www.w3.org/2000/svg\">" +
+      "<defs><radialGradient id=\"spAbd\" cx=\".42\" cy=\".35\" r=\".7\"><stop offset=\"0\" stop-color=\"#3b2618\"/><stop offset=\".55\" stop-color=\"#1a0f0a\"/><stop offset=\"1\" stop-color=\"#070403\"/></radialGradient>" +
+      "<radialGradient id=\"spEye\" cx=\".35\" cy=\".3\" r=\".7\"><stop offset=\"0\" stop-color=\"#ff6a5a\"/><stop offset=\".35\" stop-color=\"#7a0008\"/><stop offset=\"1\" stop-color=\"#120001\"/></radialGradient>" +
+      "<filter id=\"spHair\" x=\"-10%\" y=\"-10%\" width=\"120%\" height=\"120%\"><feTurbulence type=\"fractalNoise\" baseFrequency=\".9\" numOctaves=\"2\" seed=\"4\"/><feDisplacementMap in=\"SourceGraphic\" scale=\"5\"/></filter></defs>" +
+      "<g filter=\"url(#spHair)\">" +
+        "<g stroke=\"#120a07\" stroke-linecap=\"round\" fill=\"none\">" + legs + "</g>" +
+        "<g fill=\"#0c0705\">" + joints + "</g>" +
+        // pedipalps + fangs
+        "<g stroke=\"#120a07\" stroke-linecap=\"round\" fill=\"none\"><path d=\"M-10 -42 Q-22 -54 -17 -68\" stroke-width=\"9\"/><path d=\"M10 -42 Q22 -54 17 -68\" stroke-width=\"9\"/></g>" +
+        "<path d=\"M-11 -50 q-3 14 5 22 l4 -16z M11 -50 q3 14 -5 22 l-4 -16z\" fill=\"#1d0d08\"/>" +
+        // abdomen with chevrons, then the head
+        fur(0, 52, 46, 64, 90) + "<ellipse cx=\"0\" cy=\"52\" rx=\"46\" ry=\"64\" fill=\"url(#spAbd)\"/>" +
+        "<path d=\"M-20 30 L0 44 L20 30 M-24 58 L0 74 L24 58 M-20 86 L0 100 L20 86\" stroke=\"#4a2c1a\" stroke-width=\"4\" fill=\"none\" opacity=\".3\"/>" +
+        fur(0, -14, 30, 34, 60) + "<ellipse cx=\"0\" cy=\"-14\" rx=\"30\" ry=\"34\" fill=\"url(#spAbd)\"/>" +
+      "</g>" +
+      // eight eyes, two big ones in front
+      "<g fill=\"url(#spEye)\"><circle cx=\"-6.5\" cy=\"-38\" r=\"6\"/><circle cx=\"6.5\" cy=\"-38\" r=\"6\"/>" +
+        "<circle cx=\"-16\" cy=\"-33\" r=\"3.4\"/><circle cx=\"16\" cy=\"-33\" r=\"3.4\"/><circle cx=\"-9\" cy=\"-27\" r=\"2.6\"/><circle cx=\"9\" cy=\"-27\" r=\"2.6\"/><circle cx=\"-19\" cy=\"-25\" r=\"2.2\"/><circle cx=\"19\" cy=\"-25\" r=\"2.2\"/></g>" +
+      "<g fill=\"#fff\" opacity=\".8\"><circle cx=\"-8.5\" cy=\"-40\" r=\"1.6\"/><circle cx=\"4.5\" cy=\"-40\" r=\"1.6\"/></g>" +
+      "</svg>";
+  }
+
+  function spiderJump(sp) {
+    var r = sp.querySelector(".spider-body").getBoundingClientRect();
+    var big = document.createElement("div");
+    big.className = "spider-jump";
+    big.innerHTML = bigSpider();
+    document.body.appendChild(big);
+    var size = big.getBoundingClientRect().width || 600;
+    var sx = r.left + r.width / 2 - window.innerWidth / 2, sy = r.top + r.height / 2 - window.innerHeight / 2;
+    var s0 = (r.width * 1.6) / size;
+    var dim = document.createElement("div");
+    dim.className = "spider-dim";
+    document.body.appendChild(dim);
+    if (window.Sound) { window.Sound.whoosh(); if (window.Sound.hiss) window.Sound.hiss(); }
+    var anim = big.animate([
+      { transform: "translate(" + sx + "px," + sy + "px) scale(" + s0 + ") rotate(-20deg)", offset: 0 },
+      { transform: "translate(" + (sx * 0.5) + "px," + (sy * 0.5 - 90) + "px) scale(.45) rotate(8deg)", offset: 0.16 },
+      { transform: "translate(0,0) scale(1.12) rotate(-4deg)", offset: 0.3 },
+      { transform: "translate(0,10px) scale(1) rotate(2deg)", offset: 0.38 },
+      { transform: "translate(6px,4px) scale(1.02) rotate(-2deg)", offset: 0.75 },
+      { transform: "translate(0,130vh) scale(1.1) rotate(30deg)", offset: 1 }
+    ], { duration: 2400, easing: "ease-in-out", fill: "forwards" });
+    setTimeout(function () {
+      document.body.classList.remove("quake"); void document.body.offsetWidth; document.body.classList.add("quake");
+      setTimeout(function () { document.body.classList.remove("quake"); }, 600);
+      if (window.Sound && window.Sound.scream) window.Sound.scream();
+      big.classList.add("landed");
+    }, 700);
+    anim.onfinish = function () { big.remove(); dim.remove(); };
+    setTimeout(function () { dim.classList.add("out"); }, 1900);
+  }
+
   function makeSpider() {
     var sp = document.getElementById("spider");
     if (!sp) return;
     sp.addEventListener("click", function () {
       if (sp.classList.contains("flee")) return;
+      var scares = !window.Creatures || window.Creatures.scaresOn;
+      var jump = scares && !reduceMotion;
+      if (jump) spiderJump(sp); else if (window.Sound) window.Sound.whoosh();
       sp.classList.add("flee");
-      if (window.Sound) window.Sound.whoosh();
-      setTimeout(function () { sp.classList.remove("flee"); }, 25000);
+      if (jump) sp.classList.add("leapt");
+      setTimeout(function () { sp.classList.remove("flee", "leapt"); }, 25000);
     });
   }
 

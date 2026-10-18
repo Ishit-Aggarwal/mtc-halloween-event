@@ -40,6 +40,8 @@ The wheel stops slowly, like a casino wheel. The flapper arrow is knocked by eve
   - Sound only plays if teams tap **Enter the Crypt**. "Enter quietly" or the speaker button turns it all off.
 
 ## Easter eggs 🤫
+> **Switched off for now.** Set `eggsEnabled: true` in `js/data.js` to bring back everything in this section (the secrets, the pumpkins and the judges' bonus row).
+
 | Do this | What happens |
 |---|---|
 | ↑ ↑ ↓ ↓ ← → ← → B A | The blood moon rises |
@@ -67,6 +69,12 @@ Each team can earn up to **9 bonus points**. Each one counts once per team, is s
 - **Read the source:** a riddle in an HTML comment at the top of `index.html` points to a word. Typing it anywhere on the page earns the point. The word itself never appears in the code; only a scrambled fingerprint does.
 
 Teams see their count in the grimoire ("🎃 Hidden pumpkins: 2 / 9"). Pumpkins clicked before registering don't count.
+
+## Shadow figures
+The silhouettes in `assets/figures/` are CC0 (public domain) clipart from [openclipart.org](https://openclipart.org): Nosferatu shadows, a shambling zombie, a zombie horde, a contorted shadow, a crawling skeleton and a grim reaper. They are drawn pitch black, so any transparent PNG/SVG can be swapped in through `shadowFigures` in `js/data.js`.
+
+## Organisers: back to the sign-in page (temporary)
+On a laptop, type `mtchome` anywhere on the page (not inside a text box). This browser forgets its team and reloads on the team-name form. Every team stays in the ledger, so typing a team name again shows straight away whether it was registered ("That name is already written in the ledger"). Remove this before the event if you don't want it.
 
 ## Judges' board
 Entering the **secret team name** opens the judges' board instead of registering a team. Case, spaces and punctuation don't matter. The name is deliberately not written anywhere in this project, so keep it to the organisers. The board is also reachable at `judges.html`, which stays sealed until the secret name is entered there. A signed-in host can open it straight from the host ledger.

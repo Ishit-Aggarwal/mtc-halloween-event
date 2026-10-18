@@ -62,12 +62,12 @@
       row("curse", "Curse", p && p.t, p && p.d) +
       row("hex", "Hex", h && h.t, h && h.d, h && h.glyph) +
       row("twist", "Twist", tw && tw.t, tw && (t.twistText || tw.d), tw && tw.glyph) +
-      (function () {
+      (!D.eggsEnabled ? "" : (function () {
         var eggs = (t.eggs || []).filter(function (id) { return D.eggs && D.eggs[id]; });
         var total = Object.keys(D.eggs || {}).length;
         return '<div class="trow bonus"><span class="trow-label">Bonus</span><div><p class="trow-title"><span class="g">🎃</span>' + eggs.length + " / " + total + " hidden pumpkins</p>" +
           (eggs.length ? '<p class="trow-text">' + eggs.map(function (id) { return esc(D.eggs[id]); }).join(" · ") + "</p>" : "") + "</div></div>";
-      })() +
+      })()) +
       '<div class="tcard-foot">Signed in ' + time(t.at) + (t.hexAt ? " · hex " + time(t.hexAt) : "") + "</div>" +
       "</article>";
   }

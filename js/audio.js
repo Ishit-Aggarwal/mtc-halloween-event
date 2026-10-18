@@ -666,6 +666,16 @@
       n.connect(bp); bp.connect(g); g.connect(fxBus); n.start(t); n.stop(t + 0.6);
     },
 
+    // a spider's hiss
+    hiss: function () {
+      if (!enabled) return;
+      var t = ctx.currentTime;
+      var n = noise(false), hp = ctx.createBiquadFilter(), g = ctx.createGain();
+      hp.type = "highpass"; hp.frequency.setValueAtTime(2600, t); hp.frequency.linearRampToValueAtTime(4200, t + 0.6);
+      env(g, t, 0.02, 0.32, 0.7);
+      n.connect(hp); hp.connect(g); g.connect(fxBus); n.start(t); n.stop(t + 0.9);
+    },
+
     // jump-scare shriek
     scream: function () {
       if (!enabled) return;

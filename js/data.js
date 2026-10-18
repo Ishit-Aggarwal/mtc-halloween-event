@@ -32,6 +32,10 @@ window.CURSE_DATA = {
   // then paste the result here.
   judgeKey: "h0cgcvlf4s",
 
+  // Easter eggs and hidden pumpkins are switched off for now. Set this to true
+  // to bring them all back (js/eggs.js, the pumpkins, the judges' bonus row).
+  eggsEnabled: false,
+
   // Hidden bonus points. Each one can be claimed once per team.
   eggs: {
     gate:     "A pumpkin at the crypt door",
@@ -45,11 +49,24 @@ window.CURSE_DATA = {
     source:   "Read the source and spoke the word"
   },
 
-  // Your own shadow-figure art (transparent PNG/SVG), e.g.
-  //   shadowFigures: ["assets/figures/figure1.png", "assets/figures/figure2.png"]
-  // When this list has files, the lightning and the sky use them instead of
-  // the built-in zombie/ghost silhouettes.
-  shadowFigures: [],
+  // Shadow-figure art: CC0 silhouettes from openclipart.org, in assets/figures/.
+  // Every figure is drawn pure black, so any transparent PNG/SVG works.
+  // `scale` adjusts its height (the crawler is low, the horde is a group).
+  //   ground: seen on the hill in the lightning, and in the scares
+  //   sky:    glides across the sky
+  shadowFigures: {
+    ground: [
+      { name: "nosferatu-reach", src: "assets/figures/nosferatu-reach.svg" },
+      { name: "nosferatu-stand", src: "assets/figures/nosferatu-stand.svg" },
+      { name: "zombie-shambler", src: "assets/figures/zombie-shambler.svg" },
+      { name: "contorted",       src: "assets/figures/contorted.png" },
+      { name: "zombie-horde",    src: "assets/figures/zombie-horde.svg", scale: 1.15 },
+      { name: "crawler",         src: "assets/figures/crawler.png", scale: 0.45 }
+    ],
+    sky: [
+      { name: "reaper", src: "assets/figures/reaper.svg" }
+    ]
+  },
 
   characters: [
     {

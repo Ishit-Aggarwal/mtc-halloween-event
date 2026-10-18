@@ -92,201 +92,14 @@
 /* ---------- creatures ---------- */
 .creatures { position: fixed; inset: 0; z-index: 45; pointer-events: none; overflow: hidden; }
 .creature { position: absolute; }
-.creature svg { display: block; width: 100%; height: auto; overflow: visible; }
 /* back layer lives inside .atmo, behind the fog, so the figures sit IN the scene */
 .shadows { position: absolute; inset: 0; pointer-events: none; }
-.creature svg { width: auto; height: 100%; }
-.peek-hand svg { width: 100%; height: auto; }
-
-/* a faint cold backlight so a black shape reads against the night */
-.shambler, .moonwalker, .flashed, .leaner {
-  filter: drop-shadow(0 0 1px rgba(170, 160, 210, .55)) drop-shadow(0 0 16px rgba(110, 100, 170, .35));
-}
-
-/* zombie walk cycle: legs swing from the hip, the body lurches */
-.zleg { transform-box: view-box; animation: legSwing 1.7s ease-in-out infinite alternate; }
-.zleg-front { transform-origin: 88px 150px; }
-.zleg-back { transform-origin: 66px 150px; animation-direction: alternate-reverse; }
-@keyframes legSwing { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
-.zarms { transform-box: view-box; transform-origin: 88px 80px; animation: armsSway 3.4s ease-in-out infinite alternate; }
-@keyframes armsSway { from { transform: rotate(-4deg); } to { transform: rotate(5deg); } }
-.creature .zeye { animation: zEye 2.4s ease-in-out infinite alternate; }
-@keyframes zEye { from { opacity: .35; } to { opacity: 1; } }
-
-.shambler {
-  bottom: var(--b); left: 0;
-  height: var(--h); aspect-ratio: 170 / 260;
-  opacity: 0;
-  animation: shamble var(--d, 26s) linear forwards, lurch 1.7s ease-in-out infinite;
-}
-.shambler.rtl { animation-name: shambleBack, lurch; }
-.shambler.rtl svg { transform: scaleX(-1); }
-@keyframes shamble {
-  0% { transform: translateX(-12vw); opacity: 0; }
-  8% { opacity: .95; } 90% { opacity: .95; }
-  100% { transform: translateX(104vw); opacity: 0; }
-}
-@keyframes shambleBack {
-  0% { transform: translateX(104vw); opacity: 0; }
-  8% { opacity: .95; } 90% { opacity: .95; }
-  100% { transform: translateX(-12vw); opacity: 0; }
-}
-@keyframes lurch { 0%, 100% { translate: 0 0; rotate: -2deg; } 50% { translate: 0 -4px; rotate: 3deg; } }
-
-.moonwalker { position: fixed; aspect-ratio: 170 / 260; opacity: 0; animation: moonCross 16s linear forwards; }
-@keyframes moonCross {
-  0% { transform: translateX(0); opacity: 0; }
-  10% { opacity: .97; } 88% { opacity: .97; }
-  100% { transform: translateX(var(--w)); opacity: 0; }
-}
-
-/* a horde that's only there in the lightning */
-.flashed { left: var(--x); bottom: var(--b); height: var(--h); aspect-ratio: 170 / 260; opacity: .95; animation: flashedOut 1.2s steps(1) forwards; }
-.flashed.rtl svg { transform: scaleX(-1); }
-@keyframes flashedOut { 0% { opacity: .95; } 22% { opacity: 0; } 30% { opacity: .8; } 45%, 100% { opacity: 0; } }
-
-/* a zombie's shadow leans in from the edge — big, close and out of focus */
-.leaner { top: 18vh; height: 78vh; aspect-ratio: 170 / 260; opacity: 0; }
-.leaner svg { filter: blur(3px); }
-.leaner .zleg { animation: none; }
-.leaner.from-left { left: 0; animation: leanLeft 8s ease-in-out forwards; }
-.leaner.from-right { right: 0; animation: leanRight 8s ease-in-out forwards; }
-.leaner.from-right svg { transform: scaleX(-1); }
-@keyframes leanLeft {
-  0% { transform: translateX(-90%) rotate(12deg); opacity: 0; }
-  30%, 70% { transform: translateX(-48%) rotate(6deg); opacity: .9; }
-  100% { transform: translateX(-95%) rotate(12deg); opacity: 0; }
-}
-@keyframes leanRight {
-  0% { transform: translateX(90%) rotate(-12deg); opacity: 0; }
-  30%, 70% { transform: translateX(48%) rotate(-6deg); opacity: .9; }
-  100% { transform: translateX(95%) rotate(-12deg); opacity: 0; }
-}
-
-/* ghosts */
-.drifter {
-  bottom: var(--b); left: 0;
-  height: var(--h); aspect-ratio: 120 / 240;
-  opacity: 0;
-  filter: blur(.6px) drop-shadow(0 0 14px rgba(190, 200, 255, .45));
-  animation: drift 16s ease-in-out forwards;
-}
-.drifter.rtl { animation-name: driftBack; }
-@keyframes drift {
-  0% { transform: translate(-10vw, 0); opacity: 0; }
-  15% { opacity: .8; } 45% { opacity: .35; } 55% { opacity: .85; } 85% { opacity: .6; }
-  100% { transform: translate(70vw, -3vh); opacity: 0; }
-}
-@keyframes driftBack {
-  0% { transform: translate(100vw, 0); opacity: 0; }
-  15% { opacity: .8; } 45% { opacity: .35; } 55% { opacity: .85; } 85% { opacity: .6; }
-  100% { transform: translate(30vw, -3vh); opacity: 0; }
-}
-.in-window {
-  position: fixed; aspect-ratio: 60 / 70;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  filter: drop-shadow(0 0 6px rgba(220, 230, 255, .8));
-  animation: windowFace 7s ease-in-out forwards;
-}
-@keyframes windowFace { 0% { opacity: 0; } 20%, 70% { opacity: .95; } 72% { opacity: 0; } 74% { opacity: .9; } 100% { opacity: 0; } }
-.passer {
-  top: 4vh; height: 95vh; aspect-ratio: 120 / 240; left: 0;
-  filter: blur(5px);
-  opacity: 0;
-  animation: passBy 4.2s ease-in-out forwards;
-}
-.passer.rtl { animation-name: passByBack; }
-@keyframes passBy { 0% { transform: translateX(-40vw); opacity: 0; } 35%, 65% { opacity: .45; } 100% { transform: translateX(110vw); opacity: 0; } }
-@keyframes passByBack { 0% { transform: translateX(110vw); opacity: 0; } 35%, 65% { opacity: .45; } 100% { transform: translateX(-40vw); opacity: 0; } }
-
-.peek-hand { width: clamp(60px, 9vw, 100px); left: var(--x); bottom: -4px; transform-origin: 50% 100%; animation: handRise 4.4s ease-in-out forwards; filter: drop-shadow(0 0 14px rgba(0, 0, 0, .95)); }
-@keyframes handRise {
-  0% { transform: translateY(100%) rotate(var(--r)); }
-  35% { transform: translateY(35%) rotate(var(--r)); }
-  45% { transform: translateY(38%) rotate(calc(var(--r) + 6deg)); }
-  55% { transform: translateY(33%) rotate(calc(var(--r) - 6deg)); }
-  75% { transform: translateY(36%) rotate(var(--r)); }
-  100% { transform: translateY(105%) rotate(var(--r)); }
-}
-
-.peek-ghost { width: clamp(70px, 10vw, 120px); top: var(--y); left: 0; opacity: 0; animation: ghostDrift 9s ease-in-out forwards; filter: drop-shadow(0 0 22px rgba(200, 220, 255, .55)); }
-.peek-ghost.rtl { animation-name: ghostDriftBack; }
-@keyframes ghostDrift {
-  0% { transform: translate3d(-15vw, 0, 0); opacity: 0; }
-  15% { opacity: .75; }
-  50% { transform: translate3d(45vw, -6vh, 0) rotate(-6deg); opacity: .55; }
-  85% { opacity: .7; }
-  100% { transform: translate3d(105vw, 2vh, 0) rotate(4deg); opacity: 0; }
-}
-@keyframes ghostDriftBack {
-  0% { transform: translate3d(105vw, 0, 0) scaleX(-1); opacity: 0; }
-  15% { opacity: .75; }
-  50% { transform: translate3d(50vw, 6vh, 0) scaleX(-1); opacity: .5; }
-  100% { transform: translate3d(-20vw, -2vh, 0) scaleX(-1); opacity: 0; }
-}
-
-.peek-eyes { width: var(--s); left: var(--x); top: var(--y); opacity: 0; animation: eyesGlow 5.2s ease-in-out forwards; filter: drop-shadow(0 0 8px rgba(255, 210, 60, .9)); }
-@keyframes eyesGlow {
-  0% { opacity: 0; transform: scaleY(.1); }
-  12% { opacity: 1; transform: scaleY(1); }
-  40% { opacity: 1; transform: scaleY(1); }
-  42% { transform: scaleY(.1); } 45% { transform: scaleY(1); }
-  80% { opacity: 1; }
-  100% { opacity: 0; transform: scaleY(.1); }
-}
-
-.peek-witch { width: clamp(90px, 13vw, 170px); top: calc(var(--safe-t) + clamp(70px, 11vh, 130px)); left: 0; animation: witchFly 9s linear forwards; }
-@keyframes witchFly {
-  0% { transform: translate3d(110vw, 30px, 0) rotate(-6deg); }
-  50% { transform: translate3d(55vw, -10px, 0) rotate(-2deg); }
-  100% { transform: translate3d(-30vw, 10px, 0) rotate(-8deg); }
-}
 
 /* lights flickering / going out */
 .blackout { position: fixed; inset: 0; z-index: 92; background: #000; pointer-events: none; opacity: 0; transition: opacity .06s linear; }
-.dark-eyes { position: fixed; left: 50%; top: 46%; z-index: 93; width: min(22vw, 140px); transform: translate(-50%, -50%); pointer-events: none; animation: darkEyes 1.35s ease-in forwards; filter: drop-shadow(0 0 14px rgba(255, 210, 60, .9)); }
-@keyframes darkEyes { 0% { opacity: 0; } 30% { opacity: 0; } 45% { opacity: 1; transform: translate(-50%, -50%) scale(.9); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1.25); } }
-
-/* jump scare: the hooded one, right in front of you */
-.scare { position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; pointer-events: none; background: #000; animation: scareBg 1.3s ease-out forwards; }
-.scare-face {
-  position: absolute; left: 50%; top: 4vh;
-  height: 110vh; aspect-ratio: 200 / 230;
-  transform-origin: 50% 40%;
-  filter: drop-shadow(0 0 2px rgba(200, 230, 160, .6)) drop-shadow(0 0 40px rgba(120, 200, 80, .35));
-  animation: scareRush 1.3s cubic-bezier(.2, .9, .3, 1) forwards;
-}
-.scare-face svg { height: 100%; width: auto; display: block; }
-@keyframes scareRush {
-  0% { transform: translateX(-50%) scale(.45); opacity: 0; }
-  10% { opacity: 1; }
-  25% { transform: translateX(-50%) scale(1.1); }
-  70% { transform: translateX(-50%) scale(1.16); opacity: 1; }
-  100% { transform: translateX(-50%) scale(1.3); opacity: 0; }
-}
-@keyframes scareBg { 0%, 65% { opacity: 1; } 100% { opacity: 0; } }
-
-/* when a soul loses patience, its shadow looms over everything */
-.dimmer { position: fixed; inset: 0; z-index: 90; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(0, 0, 0, .55), rgba(0, 0, 0, .92)); animation: fadeIn .5s ease-out; transition: opacity .6s; }
-.dimmer.out, .looming.out { opacity: 0; }
-.looming {
-  position: fixed; left: 50%; top: 44%; z-index: 91;
-  font-family: var(--f-emoji); font-size: min(60vmin, 520px); line-height: 1;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  filter: brightness(0) drop-shadow(0 0 2px var(--c)) drop-shadow(0 0 26px var(--c));
-  animation: loom 2.3s cubic-bezier(.3, .1, .3, 1) forwards;
-  transition: opacity .6s;
-}
-@keyframes loom {
-  0% { opacity: 0; transform: translate(-50%, -40%) scale(.7); }
-  30% { opacity: .95; }
-  100% { opacity: .95; transform: translate(-50%, -52%) scale(1.12); }
-}
-.scare-flash { position: fixed; inset: 0; z-index: 94; pointer-events: none; background: radial-gradient(circle, rgba(255, 30, 30, .45), rgba(120, 0, 0, .7)); animation: scareFlash .7s ease-out forwards; }
+.scare-flash { position: fixed; inset: 0; z-index: 97; pointer-events: none; background: radial-gradient(circle, rgba(255, 30, 30, .35), rgba(120, 0, 0, .7)); animation: scareFlash .7s ease-out forwards; }
 @keyframes scareFlash { from { opacity: 1; } to { opacity: 0; } }
-body.quake .altar, body.quake .topbar { animation: quake .5s; }
+body.quake .altar, body.quake .topbar, body.quake .scare-stage { animation: quake .5s; }
 @keyframes quake {
   10%, 90% { transform: translate(-2px, 1px); } 20%, 80% { transform: translate(4px, -2px); }
   30%, 50%, 70% { transform: translate(-6px, 2px); } 40%, 60% { transform: translate(6px, -1px); }
@@ -356,7 +169,7 @@ body.quake .altar, body.quake .topbar { animation: quake .5s; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .creatures, .scare, .scare-flash { display: none; }
+  .creatures, .scare-stage, .scare-flash, .spider-jump { display: none; }
 }
 
 /* =========================================================
@@ -421,39 +234,6 @@ body.witching .sky::after { content: ""; position: absolute; inset: 0; backgroun
 @keyframes stillThere { 0% { opacity: 0; letter-spacing: .4em; } 30%, 70% { opacity: 1; letter-spacing: .08em; } 100% { opacity: 0; } }
 
 /* =========================================================
-   LIGHTNING FIGURES + SKY WRAITHS
-   ========================================================= */
-/* in the front layer, so they stand black against the flash */
-.creatures .flashed { filter: drop-shadow(0 0 2px rgba(200, 200, 255, .5)); }
-.flashed.ghosty { aspect-ratio: 120 / 240; filter: blur(.5px) drop-shadow(0 0 10px rgba(200, 210, 255, .6)); }
-.creature.custom img { display: block; height: 100%; width: auto; }
-
-.flyer {
-  top: var(--y); left: 0;
-  width: var(--w);
-  opacity: 0;
-  animation: flyAcross var(--d, 11s) linear forwards;
-  filter: drop-shadow(0 0 1px rgba(180, 170, 230, .65)) drop-shadow(0 0 14px rgba(110, 100, 180, .5));
-}
-.flyer svg, .flyer img { width: 100%; height: auto; animation: flyBob 1.4s ease-in-out infinite alternate; }
-.flyer.rtl { animation-name: flyAcrossBack; }
-@keyframes flyAcross {
-  0% { transform: translate(-25vw, 0); opacity: 0; }
-  10% { opacity: .92; }
-  50% { transform: translate(45vw, 7vh); }
-  90% { opacity: .92; }
-  100% { transform: translate(112vw, -3vh); opacity: 0; }
-}
-@keyframes flyAcrossBack {
-  0% { transform: translate(112vw, 0) scaleX(-1); opacity: 0; }
-  10% { opacity: .92; }
-  50% { transform: translate(45vw, 7vh) scaleX(-1); }
-  90% { opacity: .92; }
-  100% { transform: translate(-25vw, -3vh) scaleX(-1); opacity: 0; }
-}
-@keyframes flyBob { from { transform: translateY(-7px) rotate(-3deg); } to { transform: translateY(7px) rotate(3deg); } }
-
-/* =========================================================
    HIDDEN PUMPKINS (bonus points)
    ========================================================= */
 .egg {
@@ -472,6 +252,7 @@ body.witching .sky::after { content: ""; position: absolute; inset: 0; backgroun
   transition: opacity 1.2s, filter 1.2s, transform .3s;
   -webkit-tap-highlight-color: transparent;
 }
+body:not(.eggs-on) .egg { display: none; }
 .egg:hover { opacity: .45; filter: grayscale(.4) brightness(.9); transition-duration: .3s; }
 .egg:focus { outline: none; }
 .egg.taken { animation: eggPop .6s ease-out forwards; pointer-events: none; }
@@ -499,15 +280,151 @@ body.judge-door::after {
   animation: fadeIn .8s ease-out;
 }
 
+
 /* =========================================================
-   THE HORDE IN THE LIGHTNING
-   For the length of a flash the page goes see-through and
-   you see who's been standing in the graveyard all along.
+   SHADOW FIGURES
+   Silhouette clipart, always drawn pitch black. On the hill
+   they only exist while the lightning lights the sky (--lit).
    ========================================================= */
+.figure img { display: block; height: 100%; width: auto; filter: brightness(0); user-select: none; -webkit-user-drag: none; }
+.figure.flip img { transform: scaleX(-1); }
+
 .horde { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-.horde .flashed { filter: none; }
-.horde .flashed.ghosty { filter: blur(1.3px) drop-shadow(0 0 14px rgba(220, 225, 255, .7)); opacity: .7; }
-body.lit .altar, body.lit .site-foot, body.lit .topbar { opacity: .08; transition: none; }
-.altar, .site-foot, .topbar { transition: opacity .35s ease-out; }
-body.lit .graveyard { filter: brightness(2.2) contrast(1.1); }
+.flashed {
+  left: var(--x); bottom: var(--b); height: var(--h);
+  opacity: calc(var(--lit, 0) * 1.6);
+}
+.flashed.near img { filter: brightness(0) blur(1.5px); }
+
+/* the reaper gliding over the graveyard */
+.flyer {
+  top: var(--y); left: 0; height: var(--fh);
+  opacity: 0;
+  animation: flyAcross var(--d, 15s) linear forwards;
+  filter: drop-shadow(0 0 1px rgba(180, 170, 230, .5)) drop-shadow(0 0 16px rgba(110, 100, 180, .45));
+}
+.flyer img { animation: flyBob 2.4s ease-in-out infinite alternate; }
+.flyer.rtl { animation-name: flyAcrossBack; }
+@keyframes flyAcross {
+  0% { transform: translate(-15vw, 0) rotate(8deg); opacity: 0; }
+  10% { opacity: .9; }
+  50% { transform: translate(45vw, 5vh) rotate(10deg); }
+  90% { opacity: .9; }
+  100% { transform: translate(108vw, -2vh) rotate(8deg); opacity: 0; }
+}
+@keyframes flyAcrossBack {
+  0% { transform: translate(108vw, 0) scaleX(-1) rotate(8deg); opacity: 0; }
+  10% { opacity: .9; }
+  50% { transform: translate(45vw, 5vh) scaleX(-1) rotate(10deg); }
+  90% { opacity: .9; }
+  100% { transform: translate(-15vw, -2vh) scaleX(-1) rotate(8deg); opacity: 0; }
+}
+@keyframes flyBob { from { transform: translateY(-6px); } to { transform: translateY(6px); } }
+
+/* a zombie walking across the moon */
+.moonwalker { position: fixed; opacity: 0; animation: moonCross 18s linear forwards; }
+.moonwalker img { animation: lurch 1.8s ease-in-out infinite; transform-origin: 50% 100%; }
+@keyframes moonCross {
+  0% { transform: translateX(0); opacity: 0; }
+  10% { opacity: .97; } 88% { opacity: .97; }
+  100% { transform: translateX(var(--w)); opacity: 0; }
+}
+@keyframes lurch { 0%, 100% { transform: translateY(0) rotate(-3deg); } 50% { transform: translateY(-3%) rotate(3deg); } }
+
+/* someone standing in the lit window */
+.in-window { position: fixed; overflow: hidden; opacity: 0; animation: windowFig 9s steps(1) forwards; }
+.in-window .figure { position: absolute; left: 50%; bottom: -8%; height: 105%; transform: translateX(-50%); }
+@keyframes windowFig { 0% { opacity: 0; } 8%, 66% { opacity: 1; } 67% { opacity: 0; } 69%, 80% { opacity: 1; } 81%, 100% { opacity: 0; } }
+
+/* =========================================================
+   THE BIG SCARES
+   A black stage, grain, a cold light from below, and one
+   figure that jumps closer every time the lights cut out.
+   ========================================================= */
+.scare-stage {
+  position: fixed; inset: 0; z-index: 95;
+  overflow: hidden; pointer-events: none;
+  background: #000;
+  opacity: 0; transition: opacity .25s ease-out;
+}
+.scare-stage.on { opacity: 1; }
+.scare-stage.out { opacity: 0; transition-duration: .4s; }
+.scare-light {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 45% at 50% 100%, color-mix(in srgb, var(--c) 30%, transparent), transparent 70%),
+    radial-gradient(90% 70% at 50% 60%, rgba(150, 160, 200, .14), transparent 70%);
+  animation: badBulb 2.2s steps(1) infinite;
+}
+@supports not (color: color-mix(in srgb, red 50%, transparent)) {
+  .scare-light { background: radial-gradient(60% 45% at 50% 100%, rgba(185, 196, 255, .25), transparent 70%); }
+}
+@keyframes badBulb { 0%, 100% { opacity: 1; } 13% { opacity: .55; } 15% { opacity: 1; } 47% { opacity: .7; } 49% { opacity: 1; } 71% { opacity: .4; } 72% { opacity: 1; } }
+.scare-grain {
+  position: absolute; inset: -50%;
+  opacity: .16;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain .6s steps(4) infinite;
+}
+/* the lights cut out */
+.scare-stage.cut .scare-light, .scare-stage.cut .loomer { visibility: hidden; }
+
+.loomer {
+  left: var(--x); bottom: calc(var(--y) * -1); height: var(--h);
+  transform: translateX(-50%);
+  opacity: 0;
+  filter: blur(var(--blur, 0px)) drop-shadow(0 0 2px color-mix(in srgb, var(--c) 70%, transparent)) drop-shadow(0 0 30px color-mix(in srgb, var(--c) 30%, transparent));
+}
+.loomer.seen { opacity: 1; animation: sway 3s ease-in-out infinite alternate; }
+.loomer.lunge { animation: lunge .5s cubic-bezier(.2, .9, .2, 1) forwards; }
+@keyframes sway { from { transform: translateX(-50%) rotate(-1deg); } to { transform: translateX(-50%) rotate(1.2deg); } }
+@keyframes lunge {
+  0% { transform: translateX(-50%) scale(.82); }
+  40% { transform: translateX(-50%) scale(1.06) translateY(-2%); }
+  60% { transform: translateX(-51%) scale(1.03); }
+  80% { transform: translateX(-49%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1.08); }
+}
+/* the hit: the frame smears red/cyan for an instant */
+.scare-stage.hit .loomer img { animation: smear .25s steps(2) 3; }
+@keyframes smear {
+  0% { filter: brightness(0) drop-shadow(-8px 0 0 rgba(255, 0, 40, .75)) drop-shadow(8px 0 0 rgba(0, 220, 255, .5)); }
+  100% { filter: brightness(0); }
+}
+
+/* =========================================================
+   THE SPIDER JUMPS AT YOU
+   ========================================================= */
+.spider.leapt { visibility: hidden; }
+.spider-jump {
+  --sz: min(118vmin, 980px);
+  position: fixed; left: 50%; top: 50%; z-index: 96;
+  width: var(--sz); height: var(--sz);
+  margin: calc(var(--sz) / -2) 0 0 calc(var(--sz) / -2);
+  pointer-events: none;
+  filter: drop-shadow(0 30px 40px rgba(0, 0, 0, .8));
+  will-change: transform;
+}
+.spider-jump svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.spider-jump .sleg { animation: legTwitch .16s ease-in-out infinite alternate; animation-delay: var(--d); }
+.spider-jump.landed .sleg { animation-duration: .09s; }
+@keyframes legTwitch { from { transform: rotate(-3deg); } to { transform: rotate(4deg); } }
+.spider-dim {
+  position: fixed; inset: 0; z-index: 95; pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, .35), rgba(0, 0, 0, .85));
+  animation: fadeIn .25s ease-out; transition: opacity .5s;
+}
+.spider-dim.out { opacity: 0; }
+
+/* =========================================================
+   LIGHTNING
+   ========================================================= */
+.bolt { inset: 0; width: 100%; height: 100%; pointer-events: none; opacity: calc(var(--lit, 0) * 1.5); }
+.bolt path { fill: none; stroke: #f4f6ff; stroke-linejoin: round; stroke-linecap: round; }
+.bolt-core { stroke-width: 2.4; filter: drop-shadow(0 0 4px #c9d2ff) drop-shadow(0 0 18px rgba(150, 165, 255, .9)); }
+.bolt-fork { stroke-width: 1.1; opacity: .7; filter: drop-shadow(0 0 6px rgba(150, 165, 255, .8)); }
+/* during a flash the page dims a little so the hill shows through */
+.altar, .site-foot, .topbar { transition: opacity .3s ease-out; }
+body.lit .altar, body.lit .site-foot, body.lit .topbar { opacity: calc(1 - var(--lit, 0) * .55); transition: none; }
+body.lit .graveyard { filter: brightness(calc(1 + var(--lit, 0) * 1.4)); }
 @media (prefers-reduced-motion: reduce) { body.lit .altar, body.lit .site-foot, body.lit .topbar { opacity: 1; } }

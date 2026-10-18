@@ -247,19 +247,15 @@ button { font: inherit; color: inherit; }
 
 .lightning {
   inset: 0;
-  opacity: 0;
   background:
     radial-gradient(ellipse at 70% 0%, rgba(220, 225, 255, .9), rgba(160, 170, 255, .35) 40%, rgba(120, 120, 220, .1) 80%),
     /* lights up the horizon so whatever stands on the hill shows black against it */
     radial-gradient(120% 40% at 50% 78%, rgba(200, 205, 255, .55), transparent 70%);
   mix-blend-mode: screen;
+  /* set by js/fx.js: a few hard flickers per strike */
+  opacity: var(--lit, 0);
+  transition: opacity 40ms linear;
 }
-.lightning.flash { animation: lightning 1.1s ease-out; }
-@keyframes lightning {
-  0% { opacity: 0; } 4% { opacity: .95; } 8% { opacity: .1; } 14% { opacity: .7; }
-  22% { opacity: 0; } 30% { opacity: .35; } 100% { opacity: 0; }
-}
-body.lit .graveyard { filter: brightness(1.6); }
 
 /* Spider dangling from the top */
 .spider {

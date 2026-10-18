@@ -20,6 +20,9 @@
 (function () {
   "use strict";
 
+  // switched off for now (CURSE_DATA.eggsEnabled in js/data.js)
+  if (!window.CURSE_DATA || !window.CURSE_DATA.eggsEnabled) return;
+
   function S() { return window.Sound || {}; }
   function C() { return window.Creatures || { show: function () {} }; }
 

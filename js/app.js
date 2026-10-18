@@ -224,9 +224,9 @@
     var c = session && charById(session.charId);
     if (stage === "soul" || !c) {
       var k = D.keeper;
-      return { name: k.name, short: k.name, glyph: k.glyph, color: k.color, spin: k.spin, idle: k.idle };
+      return { id: "keeper", name: k.name, short: k.name, glyph: k.glyph, color: k.color, spin: k.spin, idle: k.idle };
     }
-    return { name: c.name, short: c.short, glyph: c.glyph, color: c.color, spin: c.spin, idle: c.idle };
+    return { id: c.id, name: c.name, short: c.short, glyph: c.glyph, color: c.color, spin: c.spin, idle: c.idle };
   }
 
   var WHEEL_NAMES = { soul: "soul", curse: "curse", hex: "hex", twist: "twist" };
@@ -261,7 +261,7 @@
       // patience gone: the soul's shadow looms over everything… then it spins
       looming = true;
       el.spinnerLine.textContent = who.idle;
-      window.Creatures.impatience(who.glyph, who.color, function () { looming = false; spin(true); });
+      window.Creatures.impatience(who, function () { looming = false; spin(true); });
       return;
     }
     el.spinner.classList.add("impatient");
@@ -592,19 +592,20 @@
 
   /* ---------- hidden bonus points ---------- */
 
-  var EGG_IDS = Object.keys(D.eggs || {});
+  var EGG_IDS = D.eggsEnabled ? Object.keys(D.eggs || {}) : [];
+  document.body.classList.toggle("eggs-on", !!D.eggsEnabled);
 
   function renderEggs() {
     var box = $("eggCount");
     if (!box) return;
     var n = session && session.eggs ? session.eggs.length : 0;
-    box.hidden = !session;
+    box.hidden = !session || !EGG_IDS.length;
     box.textContent = "🎃 Hidden pumpkins: " + n + " / " + EGG_IDS.length;
   }
 
   /** Called by js/eggs.js when a hidden pumpkin or secret is found. */
   function claimEgg(id) {
-    if (!D.eggs || !D.eggs[id]) return "unknown";
+    if (!D.eggsEnabled || !D.eggs || !D.eggs[id]) return "unknown";
     if (!session) { window.Eggs && window.Eggs.toast("🎃 Sign the ledger first… then come back for me."); return "no-team"; }
     session.eggs = session.eggs || [];
     if (session.eggs.indexOf(id) >= 0) { window.Eggs && window.Eggs.toast("🎃 Already in your grimoire."); return "dupe"; }
@@ -627,6 +628,26 @@
     if (e.key === "Escape") Array.prototype.forEach.call(document.querySelectorAll(".modal"), closeModal);
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "H" || e.key === "h")) { e.preventDefault(); openHost(); }
   });
+
+  /* ---------- organisers: back to the sign-in page ---------- */
+  // TEMPORARY testing aid. Type  mtchome  anywhere (not in a text box) to forget
+  // this phone's team and return to the team-name form. Only this browser
+  // forgets: every team stays registered in the ledger, so typing a team name
+  // again shows straight away whether it was saved.
+  var HOME_WORD = "mtchome", homeTyped = "";
+  document.addEventListener("keydown", function (e) {
+    var tg = e.target;
+    if (tg && (tg.tagName === "INPUT" || tg.tagName === "TEXTAREA" || tg.isContentEditable)) return;
+    if (!e.key || e.key.length !== 1) return;
+    homeTyped = (homeTyped + e.key.toLowerCase()).slice(-HOME_WORD.length);
+    if (homeTyped !== HOME_WORD) return;
+    window.Store.clearSession();
+    window.Store.unlockDevice();
+    try { sessionStorage.setItem("woc.home", "1"); } catch (err) {}
+    location.reload();
+  });
+  var wentHome = false;
+  try { wentHome = sessionStorage.getItem("woc.home") === "1"; } catch (err) {}
 
   /* ---------- sound toggle ---------- */
 
@@ -896,7 +917,7 @@
   // Lost the session on this phone (cleared storage, crash)? If the ledger
   // knows the team this phone registered, pick up exactly where it was —
   // including a finished team, which simply sees its sealed fate again.
-  if (!session) {
+  if (!session && !wentHome) {
     window.Ledger.ready().then(function () {
       if (session) return;
       var lock = window.Store.deviceTeam();
