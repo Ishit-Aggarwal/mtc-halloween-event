@@ -29,14 +29,39 @@
     cardName: $("cardName"), cardLore: $("cardLore"), cardDesc: $("cardDesc"), cardBtn: $("cardBtn"),
     host: $("hostModal"), announcer: $("announcer"), soundBtn: $("soundBtn"),
     spinner: $("spinner"), spinnerFace: $("spinnerFace"), spinnerName: $("spinnerName"), spinnerLine: $("spinnerLine"),
-    gate: $("gate"), scareBtn: $("scareBtn"), cardScope: $("cardScope")
+    gate: $("gate"), scareBtn: $("scareBtn"), cardScope: $("cardScope"),
+    submissionCard: $("submissionCard"), subForm: $("submissionForm"),
+    subUrl: $("subUrl"), subRepo: $("subRepo"), subError: $("subError"),
+    subSubmitBtn: $("subSubmitBtn"), subSubmitLabel: $("subSubmitLabel"),
+    subResult: $("subResult"), subResultTime: $("subResultTime"),
+    subLiveLink: $("subLiveLink"), subRepoLink: $("subRepoLink"), subEditBtn: $("subEditBtn"),
+    viewTabs: $("viewTabs"), tabMission: $("tabMission"), tabWheel: $("tabWheel")
   };
 
   var wheel = new window.Wheel(el.canvas, el.rotor, el.pointer);
   var session = window.Store.session();
   var timerId = null, lastBpm = 0;
   var busy = false;
+  var activeView = "mission";
   var baseTitle = document.title;
+
+  function setView(view, smoothScroll) {
+    if (view !== "mission" && view !== "wheel") view = "mission";
+    activeView = view;
+    if (!el.wheelPanel) return;
+    el.wheelPanel.classList.toggle("view-mission", view === "mission");
+    el.wheelPanel.classList.toggle("view-wheel", view === "wheel");
+    if (el.tabMission) el.tabMission.classList.toggle("is-active", view === "mission");
+    if (el.tabWheel) el.tabWheel.classList.toggle("is-active", view === "wheel");
+    if (view === "wheel" && wheel) {
+      setTimeout(function () {
+        if (session && typeof session.twist === "number") wheel.show(session.twist);
+      }, 60);
+    }
+    if (smoothScroll && el.viewTabs) {
+      el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
 
   /* ---------- helpers ---------- */
 
@@ -161,7 +186,31 @@
     else setFate(4, {});
 
     el.grimoireFoot.hidden = stage !== "done";
+    if (stage === "done") renderSubmissionState();
     renderEggs();
+  }
+
+  function renderSubmissionState() {
+    if (!session || !el.submissionCard) return;
+    var hasSub = !!session.submissionUrl;
+    el.subResult.hidden = !hasSub;
+    el.subForm.hidden = hasSub;
+    el.subError.hidden = true;
+    el.subError.textContent = "";
+
+    if (hasSub) {
+      el.subLiveLink.href = session.submissionUrl;
+      var timeStr = session.submittedAt
+        ? new Date(session.submittedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+        : "";
+      el.subResultTime.textContent = timeStr ? "Submitted at " + timeStr : "Submitted";
+      if (session.repoUrl) {
+        el.subRepoLink.hidden = false;
+        el.subRepoLink.href = session.repoUrl;
+      } else {
+        el.subRepoLink.hidden = true;
+      }
+    }
   }
 
   function configureWheel(stage, animate) {
@@ -208,12 +257,12 @@
   function setSpinState(stage) {
     var canSpin = !busy && (stage === "soul" || stage === "curse" || stage === "hex" || stage === "twist");
     var who = spinnerFor(stage);
-    el.spinBtn.disabled = !canSpin;
+    el.spinBtn.disabled = !canSpin && stage !== "done";
     el.hub.disabled = !canSpin;
     el.spinHint.style.visibility = canSpin ? "visible" : "hidden";
     if (busy) el.spinLabel.textContent = "The wheel turns…";
     else if (stage === "wait") el.spinLabel.textContent = "Chained · " + fmt(session.unlockAt - Date.now());
-    else if (stage === "done") el.spinLabel.textContent = "Fate Sealed";
+    else if (stage === "done") el.spinLabel.textContent = (session && session.submissionUrl) ? "View Submission ↗" : "Submit Project 🚀";
     else if (stage === "soul") el.spinLabel.textContent = "Spin the Wheel";
     else el.spinLabel.textContent = "Let " + who.short + " spin";
   }
@@ -279,6 +328,8 @@
     if (!session) {
       el.ledgerPanel.hidden = false;
       el.wheelPanel.hidden = true;
+      if (el.viewTabs) el.viewTabs.hidden = true;
+      el.wheelPanel.classList.remove("view-mission", "view-wheel");
       setSeals(0);
       stopTimer();
       document.title = baseTitle;
@@ -292,6 +343,14 @@
     configureWheel(stage, animate);
     renderGrimoire(false);
     setSpinState(stage);
+
+    if (stage === "done") {
+      if (el.viewTabs) el.viewTabs.hidden = false;
+      setView(activeView || "mission");
+    } else {
+      if (el.viewTabs) el.viewTabs.hidden = true;
+      el.wheelPanel.classList.remove("view-mission", "view-wheel");
+    }
 
     el.chains.hidden = stage !== "wait";
     el.chains.classList.remove("breaking");
@@ -425,6 +484,11 @@
     if (typeof session.hex === "number") { p.hex = session.hex; p.hexAt = session.hexAt; p.unlockAt = session.unlockAt; }
     if (typeof session.twist === "number") { p.twist = session.twist; p.twistText = fillTwist(D.twists[session.twist].d); p.twistExtra = session.twistExtra; }
     if (session.eggs && session.eggs.length) p.eggs = session.eggs.slice();
+    if (session.submissionUrl) {
+      p.submissionUrl = session.submissionUrl;
+      p.submittedAt = session.submittedAt;
+      if (session.repoUrl) p.repoUrl = session.repoUrl;
+    }
     window.Ledger.saveProgress(session.teamKey, p);
   }
 
@@ -514,14 +578,23 @@
     if (stage === "soul") session.stage = "curse";
     else if (stage === "curse") session.stage = "hex";
     else if (stage === "hex") session.stage = Date.now() >= session.unlockAt ? "twist" : "wait";
-    else if (stage === "twist") session.stage = "done";
+    else if (stage === "twist") {
+      session.stage = "done";
+      activeView = "mission";
+    }
     save();
     saveProgress();
     busy = false;
     resetIdle();
     render(stage !== "twist");
     renderGrimoire(true);
-    if (window.innerWidth < 980 && stage === "twist") {
+    if (stage === "twist") {
+      setView("mission");
+      setTimeout(function () {
+        if (el.viewTabs) el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
+        else el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
+    } else if (window.innerWidth < 980) {
       document.querySelector(".grimoire").scrollIntoView({ behavior: "smooth", block: "start" });
     } else {
       el.stage.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -596,9 +669,115 @@
 
   /* ---------- controls ---------- */
 
-  el.spinBtn.addEventListener("click", function () { spin(false); });
+  if (el.tabMission) {
+    el.tabMission.addEventListener("click", function () {
+      setView("mission", true);
+      if (window.Sound && window.Sound.tick) window.Sound.tick(0.5);
+    });
+  }
+  if (el.tabWheel) {
+    el.tabWheel.addEventListener("click", function () {
+      setView("wheel", true);
+      if (window.Sound && window.Sound.tick) window.Sound.tick(0.5);
+    });
+  }
+
+  el.spinBtn.addEventListener("click", function () {
+    if (session && session.stage === "done") {
+      setView("mission");
+      el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!session.submissionUrl) {
+        setTimeout(function () { el.subUrl.focus(); }, 350);
+      }
+      return;
+    }
+    spin(false);
+  });
   el.hub.addEventListener("click", function () { spin(false); });
   el.cardBtn.addEventListener("click", acceptCard);
+
+  /* ---------- project submission ---------- */
+
+  el.subForm.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (!session) return;
+    var url = (el.subUrl.value || "").trim();
+    var repo = (el.subRepo.value || "").trim();
+
+    if (!url) {
+      el.subError.hidden = false;
+      el.subError.textContent = "Please provide your live hosted website URL.";
+      el.subUrl.focus();
+      return;
+    }
+
+    if (!/^https?:\/\//i.test(url)) {
+      url = "https://" + url;
+      el.subUrl.value = url;
+    }
+
+    try {
+      new URL(url);
+    } catch (err) {
+      el.subError.hidden = false;
+      el.subError.textContent = "Please enter a valid URL (e.g. https://your-team.vercel.app).";
+      el.subUrl.focus();
+      return;
+    }
+
+    if (repo && !/^https?:\/\//i.test(repo)) {
+      repo = "https://" + repo;
+      el.subRepo.value = repo;
+    }
+    if (repo) {
+      try {
+        new URL(repo);
+      } catch (err) {
+        el.subError.hidden = false;
+        el.subError.textContent = "Please enter a valid GitHub repository URL or leave it blank.";
+        el.subRepo.focus();
+        return;
+      }
+    }
+
+    el.subError.hidden = true;
+    el.subSubmitBtn.disabled = true;
+    var origText = el.subSubmitLabel.textContent;
+    el.subSubmitLabel.textContent = "Saving…";
+
+    var now = Date.now();
+    session.submissionUrl = url;
+    session.repoUrl = repo;
+    session.submittedAt = now;
+    save();
+
+    var patch = { submissionUrl: url, repoUrl: repo, submittedAt: now };
+    try {
+      await window.Ledger.saveProgress(session.teamKey, patch);
+      if (session.entryId) {
+        await window.Ledger.update(session.entryId, patch);
+      }
+      renderSubmissionState();
+      setSpinState(session.stage);
+      if (window.Sound && window.Sound.claim) window.Sound.claim();
+      announce("Your project has been submitted!");
+    } catch (err) {
+      console.warn("Cloud sync failed, stored locally", err);
+      renderSubmissionState();
+    } finally {
+      el.subSubmitBtn.disabled = false;
+      el.subSubmitLabel.textContent = origText;
+    }
+  });
+
+  el.subEditBtn.addEventListener("click", function () {
+    el.subResult.hidden = true;
+    el.subForm.hidden = false;
+    el.subUrl.value = session.submissionUrl || "";
+    el.subRepo.value = session.repoUrl || "";
+    el.subSubmitLabel.textContent = "Update Project Link";
+    el.subUrl.focus();
+  });
 
   /* ---------- hidden bonus points ---------- */
 
@@ -795,13 +974,14 @@
   });
   $("hostCsv").addEventListener("click", function () {
     var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
-    var lines = [["Team", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Claimed at"].map(q).join(",")];
+    var lines = [["Team", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Submitted at", "Claimed at"].map(q).join(",")];
     window.Ledger.entries().forEach(function (e) {
       var c = charById(e.charId), p = c && c.problems[e.problem];
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null, t = typeof e.twist === "number" ? D.twists[e.twist] : null;
-      lines.push([e.team, c && c.name, p && p.t, p && p.d, h && h.t, t && t.t, e.twistText, new Date(e.at).toLocaleString()].map(q).join(","));
+      var subTime = e.submittedAt ? new Date(e.submittedAt).toLocaleString() : "";
+      lines.push([e.team, c && c.name, p && p.t, p && p.d, h && h.t, t && t.t, e.twistText, e.submissionUrl || "", e.repoUrl || "", subTime, new Date(e.at).toLocaleString()].map(q).join(","));
     });
-    download("wheel-of-curses-" + stamp() + ".csv", "﻿" + lines.join("\r\n"), "text/csv");
+    download("wheel-of-curses-" + stamp() + ".csv", "\ufeff" + lines.join("\r\n"), "text/csv");
   });
   $("hostImport").addEventListener("change", function () {
     var f = this.files && this.files[0], input = this;
@@ -919,7 +1099,7 @@
       }
       window.Store.lockDevice(t.name, t.key);
       var restored = { team: t.name, teamKey: t.key, startedAt: t.at || Date.now(), stage: t.stage || "soul", eggs: (t.eggs || []).slice() };
-      ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
+      ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "submittedAt"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
       if (restored.charId && typeof restored.problem === "number") restored.entryId = restored.charId + "__" + restored.problem;
       // "<stage>-spun" = the wheel had stopped but the card wasn't accepted yet
       var m = /^(soul|curse|hex|twist)-spun$/.exec(restored.stage);

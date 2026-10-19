@@ -59,6 +59,38 @@ body.judges { font-size: 16px; }
 .badge.spinning { color: #ffc23a; }
 .badge.waiting { color: #ff8b6a; }
 .badge.done { color: var(--bone); border-color: var(--ember); }
+.badge.submitted { color: #52e379; border-color: #52e379; background: rgba(82, 227, 121, .12); box-shadow: 0 0 10px rgba(82, 227, 121, .25); }
+
+.judge-live-btn {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #116834;
+  color: #fff;
+  border-radius: 4px;
+  font-family: var(--f-type);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-decoration: none;
+  box-shadow: 0 0 8px rgba(82, 227, 121, .3);
+  margin-right: 6px;
+  border: 1px solid #4ade80;
+}
+.judge-live-btn:hover { background: #188a46; filter: brightness(1.15); }
+.judge-repo-btn {
+  display: inline-block;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, .08);
+  color: var(--bone);
+  border-radius: 4px;
+  font-family: var(--f-type);
+  font-size: 12px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, .2);
+  margin-right: 6px;
+}
+.judge-repo-btn:hover { background: rgba(255, 255, 255, .18); }
+.judge-sub-time { display: block; margin-top: 4px; font-size: 11px; color: var(--bone-dim); }
 
 .trow { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; padding: 10px 14px; border-bottom: 1px solid rgba(244, 227, 215, .05); }
 .trow:last-child { border-bottom: 0; }

@@ -25,6 +25,7 @@
   <!-- ============ ATMOSPHERE (purely decorative) ============ -->
   <div class="atmo" aria-hidden="true">
     <div class="sky"></div>
+    <div class="circuit-grid" id="circuitGrid"></div>
     <div class="stars" id="stars"></div>
     <div class="moon-wrap">
       <div class="moon"></div>
@@ -189,6 +190,18 @@
       <li data-step="4"><span class="seal-num">IV</span><span class="seal-name">The Twist</span></li>
     </ol>
 
+    <!-- View Switcher (Active when Round 2 Build is unlocked) -->
+    <nav class="view-tabs" id="viewTabs" aria-label="Ritual views" hidden>
+      <button class="view-tab is-active" id="tabMission" type="button" data-view="mission">
+        <span class="tab-icon">🚀</span>
+        <span class="tab-label">Round 2 · The Build</span>
+      </button>
+      <button class="view-tab" id="tabWheel" type="button" data-view="wheel">
+        <span class="tab-icon">🎡</span>
+        <span class="tab-label">Wheel of Fate</span>
+      </button>
+    </nav>
+
     <!-- ===== Stage: sign the ledger ===== -->
     <section class="panel ledger-panel" id="ledgerPanel" hidden>
       <div class="parchment">
@@ -343,8 +356,73 @@
           </ol>
           <p class="egg-count" id="eggCount" hidden></p>
           <div class="grimoire-foot" id="grimoireFoot" hidden>
-            <p class="sealed-msg">Your fate is sealed. Now go build.</p>
+            <p class="sealed-msg">Your fate is sealed. The ritual is complete.</p>
             <p class="sealed-sub">This phone is bound to your team. There is no going back.</p>
+
+            <!-- ============ SUBMISSION PANEL ============ -->
+            <div class="sub-panel" id="submissionCard">
+              <div class="sub-header">
+                <span class="sub-tag">Round 2 · The Build</span>
+                <h3 class="sub-title">Submit Your Project</h3>
+              </div>
+
+              <div class="sub-body">
+                <div class="sub-left">
+                  <div class="sub-instructions">
+                    <p class="sub-notice">⚡ <b>The Twist is Announced!</b> You have received all four seals of fate.</p>
+                    <ol class="sub-steps">
+                      <li><strong>Build:</strong> Craft your web experience incorporating your Soul, Curse, Hex, and Twist.</li>
+                      <li><strong>Host:</strong> Deploy your website online and ensure it is publicly accessible.</li>
+                      <li><strong>Submit:</strong> Paste your live hosted link below so judges can view and evaluate your project.</li>
+                    </ol>
+                    <div class="sub-platforms">
+                      <span class="sub-platforms-title">Recommended Free Hosting Platforms:</span>
+                      <div class="host-badges">
+                        <span class="host-pill">▲ Vercel</span>
+                        <span class="host-pill">💎 Netlify</span>
+                        <span class="host-pill">🐙 GitHub Pages</span>
+                        <span class="host-pill">⚡ Render</span>
+                        <span class="host-pill">☁️ Cloudflare</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="sub-right">
+                  <!-- Form for entering links -->
+                  <form class="sub-form" id="submissionForm" novalidate autocomplete="off">
+                    <label class="sub-label">
+                      <span class="sub-label-text">🌐 Live Hosted Website URL <span class="sub-req">*</span></span>
+                      <input type="url" id="subUrl" class="sub-input" placeholder="https://your-team.vercel.app" required spellcheck="false" autocomplete="off">
+                    </label>
+                    <label class="sub-label">
+                      <span class="sub-label-text">📁 GitHub Repository URL <span class="sub-opt">(optional)</span></span>
+                      <input type="url" id="subRepo" class="sub-input" placeholder="https://github.com/username/project" spellcheck="false" autocomplete="off">
+                    </label>
+                    <p class="sub-error" id="subError" role="alert" hidden></p>
+                    <button type="submit" class="btn btn-blood sub-btn" id="subSubmitBtn">
+                      <span id="subSubmitLabel">Submit Project Link</span>
+                    </button>
+                  </form>
+
+                  <!-- State when project has been submitted -->
+                  <div class="sub-result" id="subResult" hidden>
+                    <div class="sub-result-card">
+                      <div class="sub-result-icon" aria-hidden="true">⚡</div>
+                      <div class="sub-result-details">
+                        <p class="sub-result-status">Project Submitted</p>
+                        <p class="sub-result-time" id="subResultTime"></p>
+                        <div class="sub-result-links">
+                          <a class="sub-live-link" id="subLiveLink" href="#" target="_blank" rel="noopener">🌐 Open Live Site ↗</a>
+                          <a class="sub-repo-link" id="subRepoLink" href="#" target="_blank" rel="noopener" hidden>📁 View Code ↗</a>
+                        </div>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-ghost btn-sm sub-edit-btn" id="subEditBtn">Update Links</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </aside>

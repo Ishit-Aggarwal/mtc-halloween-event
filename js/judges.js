@@ -29,12 +29,18 @@
       if (typeof t.problem !== "number") t.problem = e.problem;
       if (typeof t.hex !== "number" && typeof e.hex === "number") { t.hex = e.hex; t.hexAt = e.hexAt; }
       if (typeof t.twist !== "number" && typeof e.twist === "number") { t.twist = e.twist; t.twistText = e.twistText; }
+      if (!t.submissionUrl && e.submissionUrl) {
+        t.submissionUrl = e.submissionUrl;
+        t.repoUrl = e.repoUrl;
+        t.submittedAt = e.submittedAt;
+      }
     });
     return Object.keys(byKey).map(function (k) { return byKey[k]; })
       .sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
   }
 
   function statusOf(t) {
+    if (t.submissionUrl) return "submitted";
     if (typeof t.twist === "number") return "done";
     if (typeof t.hex === "number") return "waiting";
     return "spinning";
@@ -46,7 +52,8 @@
     var h = typeof t.hex === "number" ? D.uiCurses[t.hex] : null;
     var tw = typeof t.twist === "number" ? D.twists[t.twist] : null;
     var st = statusOf(t);
-    var badge = st === "done" ? "Twist revealed"
+    var badge = st === "submitted" ? "Submitted"
+      : st === "done" ? "Twist revealed"
       : st === "waiting" ? (t.unlockAt && t.unlockAt > Date.now() ? "Twist in " + fmt(t.unlockAt - Date.now()) : "Twist awake")
       : c ? "Spinning…" : "Signed in";
 
@@ -62,6 +69,11 @@
       row("curse", "Curse", p && p.t, p && p.d) +
       row("hex", "Hex", h && h.t, h && h.d, h && h.glyph) +
       row("twist", "Twist", tw && tw.t, tw && (t.twistText || tw.d), tw && tw.glyph) +
+      (t.submissionUrl ? '<div class="trow submission"><span class="trow-label">Project</span><div>' +
+        '<a class="judge-live-btn" href="' + esc(t.submissionUrl) + '" target="_blank" rel="noopener">🌐 Open Live Website ↗</a>' +
+        (t.repoUrl ? ' <a class="judge-repo-btn" href="' + esc(t.repoUrl) + '" target="_blank" rel="noopener">📁 GitHub ↗</a>' : "") +
+        (t.submittedAt ? '<span class="judge-sub-time">Submitted ' + time(t.submittedAt) + '</span>' : "") +
+        '</div></div>' : (st === "done" ? '<div class="trow submission pending"><span class="trow-label">Project</span><p class="trow-title pending">Awaiting submission…</p></div>' : "")) +
       (!D.eggsEnabled ? "" : (function () {
         var eggs = (t.eggs || []).filter(function (id) { return D.eggs && D.eggs[id]; });
         var total = Object.keys(D.eggs || {}).length;
@@ -74,13 +86,14 @@
 
   function render() {
     var teams = collect();
-    var counts = { all: teams.length, spinning: 0, waiting: 0, done: 0 };
+    var counts = { all: teams.length, spinning: 0, waiting: 0, done: 0, submitted: 0 };
     teams.forEach(function (t) { counts[statusOf(t)]++; });
     $("stats").innerHTML =
       '<div class="bstat"><b>' + counts.all + "</b><span>Teams</span></div>" +
       '<div class="bstat"><b>' + counts.spinning + "</b><span>Still spinning</span></div>" +
       '<div class="bstat"><b>' + counts.waiting + "</b><span>Twist chained</span></div>" +
-      '<div class="bstat"><b>' + counts.done + "</b><span>Twist revealed</span></div>";
+      '<div class="bstat"><b>' + counts.done + "</b><span>Twist revealed</span></div>" +
+      '<div class="bstat"><b>' + counts.submitted + "</b><span>Submitted</span></div>";
 
     var q = query.toLowerCase();
     var html = teams.map(function (t, i) { return { t: t, n: i + 1 }; }).filter(function (x) {
