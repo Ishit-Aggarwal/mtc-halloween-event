@@ -59,8 +59,8 @@ Phones need a public link. Any static host works:
 If you host somewhere other than Firebase, add that domain under **Authentication → Settings → Authorized domains**.
 
 ## 7. Check it before the event
-1. Open the link. A **"Crypt linked"** pill with a green dot should appear at the top right.
-2. Tap the club logo 5 times to open the host ledger, then sign in with the host account.
+1. Open the link, type the host word into the team-name box, and check the host ledger says **"Shared ledger · Crypt linked"**.
+2. Type the host word into the team-name box to open the host ledger, then sign in with the host account.
 3. Do a dry run: set the twist delay to `0.5` minutes, spin through on two phones, then **Wipe entire ledger** and set the delay back to `15`.
 
 ## On the night

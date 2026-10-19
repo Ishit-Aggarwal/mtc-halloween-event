@@ -32,6 +32,11 @@ window.CURSE_DATA = {
   // then paste the result here.
   judgeKey: "h0cgcvlf4s",
 
+  // Fingerprint of the HOST WORD. Typed into the team-name box (phone or
+  // laptop) it opens the host panel instead of registering a team. This is
+  // the only way in. Change it the same way as judgeKey.
+  hostKey: "1k65q6pmu75",
+
   // Easter eggs and hidden pumpkins are switched off for now. Set this to true
   // to bring them all back (js/eggs.js, the pumpkins, the judges' bonus row).
   eggsEnabled: false,

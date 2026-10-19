@@ -89,7 +89,7 @@ To change the secret name: open the browser console on the site, run `Store.secr
 The board shows every team on one page: soul, curse, hex and twist with full descriptions, a live twist countdown, and bonus pumpkins. It has search and filters (still spinning / twist chained / twist revealed), and a print layout. With the shared ledger on, it updates live from every phone.
 
 ## Host controls
-Open the host ledger in any of these ways: tap the club logo (top-left) 5 times, press **Ctrl/Cmd + Shift + H**, or add `?host` to the URL.
+Open the host ledger by typing the **host word** into the team-name box and pressing Begin (works on phones and laptops). It is the only way in. The word is not written in the code, only its fingerprint (`hostKey` in `js/data.js`); to change it, run `Store.secret("new word")` in the browser console and paste the result there.
 
 From the ledger you can:
 - See how many curses each character has left, and every team's results

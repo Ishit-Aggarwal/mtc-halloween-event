@@ -27,7 +27,7 @@
     fateList: $("fateList"), grimoireTeam: $("grimoireTeam"), grimoireFoot: $("grimoireFoot"),
     reveal: $("reveal"), card: $("card"), cardKicker: $("cardKicker"), cardGlyph: $("cardGlyph"),
     cardName: $("cardName"), cardLore: $("cardLore"), cardDesc: $("cardDesc"), cardBtn: $("cardBtn"),
-    host: $("hostModal"), announcer: $("announcer"), soundBtn: $("soundBtn"), brand: $("brand"),
+    host: $("hostModal"), announcer: $("announcer"), soundBtn: $("soundBtn"),
     spinner: $("spinner"), spinnerFace: $("spinnerFace"), spinnerName: $("spinnerName"), spinnerLine: $("spinnerLine"),
     gate: $("gate"), scareBtn: $("scareBtn"), cardScope: $("cardScope")
   };
@@ -541,6 +541,15 @@
     if (signing || session) return;
     var name = el.teamInput.value.replace(/\s+/g, " ").trim();
 
+    // the host word opens the host panel (the only way in, on phones too)
+    if (D.hostKey && window.Store.secret(name) === D.hostKey) {
+      el.teamInput.value = "";
+      el.teamError.textContent = "";
+      el.teamInput.blur();
+      openHost();
+      return;
+    }
+
     // the judges' secret name opens their board instead of registering a team
     if (window.Store.secret(name) === D.judgeKey) {
       window.Store.setJudgePass(D.judgeKey);
@@ -627,7 +636,6 @@
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") Array.prototype.forEach.call(document.querySelectorAll(".modal"), closeModal);
-    if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === "H" || e.key === "h")) { e.preventDefault(); openHost(); }
   });
 
   /* ---------- organisers: back to the sign-in page ---------- */
@@ -684,14 +692,6 @@
 
   /* ---------- host ledger ---------- */
 
-  var brandTaps = [];
-  el.brand.addEventListener("click", function () {
-    var now = Date.now();
-    brandTaps = brandTaps.filter(function (t) { return now - t < 2500; });
-    brandTaps.push(now);
-    if (brandTaps.length >= 5) { brandTaps = []; openHost(); }
-  });
-
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
   function renderHost() {
@@ -736,7 +736,6 @@
   }
 
   function openHost() { renderHost(); $("hostNote").textContent = ""; openModal(el.host); }
-  if (/[?#&]host\b/.test(location.search + location.hash)) setTimeout(openHost, 300);
 
   function hostNote(msg, bad) {
     var n = $("hostNote");
@@ -857,22 +856,12 @@
     return { connecting: "Summoning the crypt…", online: "Crypt linked", offline: "Offline — reconnecting", error: "Crypt unreachable", local: "Local mode" }[s] || s;
   }
 
-  var crypt = $("crypt"), cryptText = $("cryptText");
-  function renderStatus() {
-    var L = window.Ledger;
-    crypt.hidden = L.mode !== "cloud";
-    crypt.setAttribute("data-state", L.status);
-    cryptText.textContent = statusText(L.status);
-    crypt.title = L.error || "";
-  }
-
   var liveQueued = false;
   window.Ledger.onChange(function () {
     if (liveQueued) return;
     liveQueued = true;
     requestAnimationFrame(function () {
       liveQueued = false;
-      renderStatus();
       $("rulesDelay").textContent = delayMinutes();
       // other phones' claims strike out segments on this wheel as they happen
       if (session && !busy && el.reveal.hidden && (session.stage === "soul" || session.stage === "curse")) render(false);
@@ -894,7 +883,6 @@
   $("rulesDelay").textContent = delayMinutes();
   window.Creatures.init({ isBusy: function () { return busy || !el.reveal.hidden || !el.gate.classList.contains("gone"); } });
   setScares(window.Store.prefs().scares !== false);
-  renderStatus();
   render(true);
 
   function resumePending() {
