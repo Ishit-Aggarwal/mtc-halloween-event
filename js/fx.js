@@ -10,6 +10,8 @@
   var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
   var lowPower = coarse || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+  var finePointer = window.matchMedia && window.matchMedia("(hover: hover)").matches;
+  if (lowPower) document.documentElement.classList.add("low-power");
   var SVGNS = "http://www.w3.org/2000/svg";
 
   // seeded RNG so the graveyard looks the same on every load
@@ -273,15 +275,14 @@
 
   /* ---------- flashlight + watching eye ---------- */
   function makeTracking() {
-    var root = document.documentElement;
+    var torch = document.querySelector(".flashlight");
     var iris = document.getElementById("iris");
     var hub = document.getElementById("hub");
     var px = window.innerWidth / 2, py = window.innerHeight * 0.4, queued = false;
 
     function apply() {
       queued = false;
-      root.style.setProperty("--mx", px + "px");
-      root.style.setProperty("--my", py + "px");
+      if (torch && finePointer) torch.style.transform = "translate3d(" + px + "px," + py + "px,0)";
       if (iris && hub && hub.offsetParent) {
         var r = hub.getBoundingClientRect();
         var dx = px - (r.left + r.width / 2), dy = py - (r.top + r.height / 2);

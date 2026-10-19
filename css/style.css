@@ -31,8 +31,6 @@
   --chamfer: polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
   --f-emoji: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", "Segoe UI Symbol", sans-serif;
 
-  --mx: 50vw;
-  --my: 40vh;
   --vh: 1vh;
   --wheel: min(540px, 86vw, calc(var(--vh) * 60));
   --gutter: clamp(16px, 4vw, 40px);
@@ -208,6 +206,7 @@ button { font: inherit; color: inherit; }
   animation: current 34s linear infinite;
   will-change: transform;
 }
+.low-power .circuit i { display: none; }
 .circuit i + i { width: 44vmax; height: 44vmax; animation-duration: 27s; animation-direction: reverse; animation-delay: -11s; }
 @keyframes current {
   0%   { transform: translate3d(8vw, 18vh, 0); }
@@ -244,21 +243,31 @@ button { font: inherit; color: inherit; }
   100% { transform: translate3d(-15vw, 3vh, 0) scaleX(-1); }
 }
 
-/* a warm candle-light circle follows the cursor; everything else sinks into the dark */
+/* a warm candle-light circle follows the cursor; everything else sinks into the dark.
+   With a mouse it is one huge layer that js/fx.js slides around with transform
+   (no repaint per move); on touch screens it is a still pool of light. */
 .flashlight {
   inset: 0;
   z-index: 1;
-  background: radial-gradient(circle at var(--mx) var(--my),
-    rgba(255, 170, 110, .13) 0,
-    rgba(255, 120, 70, .07) 90px,
-    rgba(255, 90, 40, 0) 190px,
-    rgba(2, 0, 3, .52) 470px,
-    rgba(1, 0, 2, .66) 900px);
+  background: radial-gradient(ellipse at 50% 40%, rgba(255, 150, 100, .06) 0, transparent 35%, rgba(1, 0, 2, .5) 90%);
   animation: candle 3.2s ease-in-out infinite alternate;
 }
 @keyframes candle { 0% { opacity: .92; } 35% { opacity: 1; } 60% { opacity: .88; } 100% { opacity: 1; } }
-@media (hover: none) {
-  .flashlight { background: radial-gradient(ellipse at 50% 40%, rgba(255, 150, 100, .06) 0, transparent 35%, rgba(1, 0, 2, .5) 90%); }
+@media (hover: hover) {
+  .flashlight {
+    inset: auto;
+    left: 0; top: 0;
+    width: 300vmax; height: 300vmax;
+    margin: -150vmax 0 0 -150vmax;
+    background: radial-gradient(circle at 50% 50%,
+      rgba(255, 170, 110, .13) 0,
+      rgba(255, 120, 70, .07) 90px,
+      rgba(255, 90, 40, 0) 190px,
+      rgba(2, 0, 3, .52) 470px,
+      rgba(1, 0, 2, .66) 900px);
+    transform: translate3d(50vw, 40vh, 0);
+    will-change: transform;
+  }
 }
 
 .vignette {
@@ -370,7 +379,9 @@ button { font: inherit; color: inherit; }
   cursor: pointer;
   transition: border-color .2s, background .2s, transform .2s;
 }
-.icon-btn:hover { border-color: rgba(255, 90, 42, .6); background: rgba(48, 10, 10, .7); }
+@media (hover: hover) {
+  .icon-btn:hover { border-color: rgba(255, 90, 42, .6); background: rgba(48, 10, 10, .7); }
+}
 .icon-btn:active { transform: scale(.94); }
 .icon-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .icon-btn .spk { fill: currentColor; stroke: none; }
@@ -391,6 +402,8 @@ button { font: inherit; color: inherit; }
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 var(--gutter) 40px;
+  /* the wheel glow may overhang narrow phones; clip it without breaking the sticky grimoire */
+  overflow-x: clip;
 }
 
 .hero { text-align: center; padding-top: clamp(4px, 2vh, 24px); }
@@ -530,12 +543,13 @@ button { font: inherit; color: inherit; }
 .parchment, .grimoire-inner {
   position: relative;
   isolation: isolate;
-  filter: drop-shadow(0 26px 40px rgba(0, 0, 0, .65)) drop-shadow(0 0 18px rgba(255, 40, 20, .14));
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, .8);
 }
 .parchment::before, .grimoire-inner::before,
 .parchment::after, .grimoire-inner::after {
   content: "";
   position: absolute;
+  -webkit-clip-path: var(--chamfer);
   clip-path: var(--chamfer);
   pointer-events: none;
 }
@@ -659,7 +673,11 @@ button { font: inherit; color: inherit; }
     0 10px 28px rgba(200, 22, 20, .45);
   text-shadow: 0 1px 0 rgba(0, 0, 0, .5);
 }
-.btn-blood:not([disabled]):hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -6px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(0,0,0,.6), 0 12px 40px rgba(255, 50, 30, .65); filter: brightness(1.08); }
+@media (hover: hover) {
+  .btn-blood:not([disabled]):hover { box-shadow: inset 0 1px 0 rgba(255,255,255,.3), inset 0 -6px 12px rgba(0,0,0,.3), 0 0 0 1px rgba(0,0,0,.6), 0 12px 40px rgba(255, 50, 30, .65); filter: brightness(1.08); }
+  .btn-blood:not([disabled]):hover::after { transform: scaleY(1); }
+}
+.btn-blood:not([disabled]):active::after { transform: scaleY(1); }
 /* blood drips under the button */
 .btn-blood::after {
   content: "";
@@ -677,14 +695,15 @@ button { font: inherit; color: inherit; }
   pointer-events: none;
   z-index: -1;
 }
-.btn-blood:not([disabled]):hover::after { transform: scaleY(1); }
 
 .btn-ghost {
   color: var(--bone);
   background: rgba(22, 6, 6, .55);
   border-color: rgba(244, 227, 215, .3);
 }
-.btn-ghost:hover { border-color: var(--ember); color: #fff; box-shadow: 0 0 22px rgba(255, 90, 42, .25); }
+@media (hover: hover) {
+  .btn-ghost:hover { border-color: var(--ember); color: #fff; box-shadow: 0 0 22px rgba(255, 90, 42, .25); }
+}
 .btn-sm { --h: 42px; font-size: 14px; letter-spacing: .1em; padding: 0 18px; }
 
 /* =========================================================
@@ -787,7 +806,10 @@ button { font: inherit; color: inherit; }
   transition: transform .25s;
 }
 .hub svg { width: 100%; height: 100%; display: block; }
-.hub:not([disabled]):hover { transform: translate(-50%, -50%) scale(1.06); }
+@media (hover: hover) {
+  .hub:not([disabled]):hover { transform: translate(-50%, -50%) scale(1.06); }
+}
+.hub:not([disabled]):active { transform: translate(-50%, -50%) scale(.96); }
 .hub[disabled] { cursor: default; }
 .iris { transition: transform .12s linear; }
 .pupil { transition: transform .4s; transform-box: fill-box; transform-origin: center; }
@@ -1138,6 +1160,61 @@ button { font: inherit; color: inherit; }
 .site-foot p { margin: 0; }
 
 /* =========================================================
+   POLISH — small motions (transform/opacity only, cheap on phones)
+   ========================================================= */
+
+/* the page rises out of the dark once the gate opens */
+.gate.gone ~ .altar .hero > * { animation: rise .9s cubic-bezier(.2, .8, .2, 1) both; }
+.gate.gone ~ .altar .hero > .title { animation: rise .9s .08s cubic-bezier(.2, .8, .2, 1) both, titleFlicker 7s 1s infinite; }
+.gate.gone ~ .altar .hero > :nth-child(3) { animation-delay: .18s; }
+.gate.gone ~ .altar .hero > :nth-child(4) { animation-delay: .26s; }
+.gate.gone ~ .altar .seals { animation: riseAgain .9s .3s cubic-bezier(.2, .8, .2, 1) both; }
+/* panels keep their own timing (they also rise each time they swap) */
+.gate.gone ~ .altar .panel { animation-name: riseAgain; }
+@keyframes riseAgain { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+
+/* a hot trace fills the line between the seals as the ritual advances */
+.seals::after {
+  content: "";
+  position: absolute;
+  left: 12.5%; top: 22px;
+  width: 75%; height: 2px; margin-top: -.5px;
+  background: linear-gradient(90deg, #8e1410, var(--ember));
+  box-shadow: 0 0 8px rgba(255, 70, 40, .7);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--p, 0));
+  transition: transform 1s cubic-bezier(.4, 0, .2, 1);
+  pointer-events: none;
+}
+.seals li { z-index: 1; }
+.seals li.is-done .seal-num { animation: sealStamp .55s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes sealStamp { 0% { transform: scale(1.45) rotate(-8deg); opacity: .4; } 100% { transform: none; opacity: 1; } }
+
+/* a faint sheen sweeps across the red buttons now and then */
+.btn-blood::before {
+  content: "";
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(105deg, transparent 38%, rgba(255, 235, 225, .2) 50%, transparent 62%) no-repeat;
+  background-size: 250% 100%;
+  animation: sheen 6s ease-in-out infinite;
+  pointer-events: none;
+}
+.btn-blood[disabled]::before { display: none; }
+@keyframes sheen { 0%, 62% { background-position: 130% 0; } 100% { background-position: -40% 0; } }
+
+/* the hot red cut-out letters stutter like a bad bulb */
+.ransom .b3 { animation: ransomFlicker 5s steps(1) infinite; }
+.ransom .b3:nth-of-type(2n) { animation-delay: -2.2s; }
+@keyframes ransomFlicker { 0%, 100% { opacity: 1; } 41% { opacity: .35; } 43% { opacity: 1; } 77% { opacity: .6; } 78% { opacity: 1; } }
+
+/* fates lean in a touch under a mouse */
+@media (hover: hover) {
+  .fate { transition: border-color .4s, background .4s, box-shadow .4s, transform .3s; }
+  .fate.is-filled:hover { transform: translateX(3px); border-color: rgba(240, 90, 70, .35); }
+}
+
+/* =========================================================
    RESPONSIVE TWEAKS
    ========================================================= */
 
@@ -1149,7 +1226,7 @@ button { font: inherit; color: inherit; }
   .brand-text { font-size: 13px; }
   .seals { gap: 4px; }
   .seal-num { width: 38px; height: 38px; font-size: 13px; }
-  .seals::before { top: 19px; }
+  .seals::before, .seals::after { top: 19px; }
   .btn-spin { min-width: 0; width: min(100%, 320px); }
   .grimoire-inner { padding: 22px 16px 18px; }
   .fate-desc { font-size: 15px; }

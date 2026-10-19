@@ -40,8 +40,17 @@
     // flapper state (degrees; negative = knocked back against the spin)
     this.flap = 0;
     this.flapVel = 0;
-    var self = this;
-    window.addEventListener("resize", function () { self.draw(); });
+    var self = this, queued = false;
+    // Redraw only when the wheel's size really changes. Phones fire "resize" all
+    // through a scroll (the address bar), and a full redraw each time is jank.
+    function redraw() {
+      queued = false;
+      var w = self.rotor.clientWidth;
+      if (w && w !== self._drawnAt) self.draw();
+    }
+    function queue() { if (!queued) { queued = true; requestAnimationFrame(redraw); } }
+    if (window.ResizeObserver) new ResizeObserver(queue).observe(rotor);
+    else window.addEventListener("resize", queue);
     // labels are drawn in a web font: redraw once it has arrived
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { self.draw(); });
   }
@@ -55,6 +64,7 @@
   Wheel.prototype.draw = function () {
     var n = this.segments.length;
     var cssSize = this.rotor.clientWidth || 400;
+    this._drawnAt = this.rotor.clientWidth;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var size = Math.round(cssSize * dpr);
     if (this.canvas.width !== size) { this.canvas.width = size; this.canvas.height = size; }
@@ -73,6 +83,22 @@
     rim.addColorStop(0.6, "#180707");
     rim.addColorStop(1, "#030204");
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fillStyle = rim; ctx.fill();
+
+    // chip pins etched into the rim, like the traces on the poster
+    ctx.strokeStyle = "rgba(255,80,60,.28)";
+    ctx.lineWidth = Math.max(1, R * 0.007);
+    ctx.lineCap = "round";
+    for (var q = 0; q < n * 4; q++) {
+      if (q % 4 === 0) continue; // the pegs sit there
+      var qa = -Math.PI / 2 + q * seg / 4;
+      ctx.beginPath();
+      ctx.moveTo(cx + Math.cos(qa) * R * 0.918, cy + Math.sin(qa) * R * 0.918);
+      ctx.lineTo(cx + Math.cos(qa) * R * 0.94, cy + Math.sin(qa) * R * 0.94);
+      ctx.stroke();
+    }
+    // a hot hairline round the outside
+    ctx.beginPath(); ctx.arc(cx, cy, R * 0.985, 0, TAU);
+    ctx.strokeStyle = "rgba(255,70,45,.35)"; ctx.lineWidth = Math.max(1, R * 0.006); ctx.stroke();
 
     // ---- segments ----
     for (var i = 0; i < n; i++) {
@@ -105,25 +131,49 @@
       }
     }
 
-    // ---- separators ----
-    ctx.strokeStyle = "rgba(244,200,185,.18)";
-    ctx.lineWidth = Math.max(1, R * 0.006);
+    // ---- cobweb: threads strung between the spokes, sagging toward the hub ----
+    ctx.strokeStyle = "rgba(244,215,205,.12)";
+    ctx.lineWidth = Math.max(1, R * 0.004);
+    var rings = [0.36, 0.5, 0.64, 0.79];
     for (i = 0; i < n; i++) {
-      var a = -Math.PI / 2 + i * seg;
-      ctx.beginPath();
-      ctx.moveTo(cx + Math.cos(a) * hubR, cy + Math.sin(a) * hubR);
-      ctx.lineTo(cx + Math.cos(a) * rimIn, cy + Math.sin(a) * rimIn);
-      ctx.stroke();
+      var w0 = -Math.PI / 2 + i * seg, w1 = w0 + seg, wm = w0 + seg / 2;
+      for (var k = 0; k < rings.length; k++) {
+        var wr = rimIn * rings[k] * (1 + (((i * 7 + k * 3) % 5) - 2) * 0.012);
+        ctx.beginPath();
+        ctx.moveTo(cx + Math.cos(w0) * wr, cy + Math.sin(w0) * wr);
+        ctx.quadraticCurveTo(cx + Math.cos(wm) * wr * 0.9, cy + Math.sin(wm) * wr * 0.9,
+                             cx + Math.cos(w1) * wr, cy + Math.sin(w1) * wr);
+        ctx.stroke();
+      }
     }
 
-    // ---- pegs on the rim (the flapper clicks against these) ----
+    // ---- spokes: circuit traces with a solder dot ----
+    for (i = 0; i < n; i++) {
+      var a = -Math.PI / 2 + i * seg;
+      var ax = Math.cos(a), ay = Math.sin(a);
+      ctx.beginPath();
+      ctx.moveTo(cx + ax * hubR, cy + ay * hubR);
+      ctx.lineTo(cx + ax * rimIn, cy + ay * rimIn);
+      ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.lineWidth = Math.max(2, R * 0.014); ctx.stroke();
+      ctx.strokeStyle = "rgba(255,90,65,.32)"; ctx.lineWidth = Math.max(1, R * 0.005); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(cx + ax * R * 0.33, cy + ay * R * 0.33, Math.max(1.5, R * 0.011), 0, TAU);
+      ctx.fillStyle = "#140405"; ctx.fill();
+      ctx.strokeStyle = "rgba(255,90,65,.5)"; ctx.lineWidth = Math.max(1, R * 0.004); ctx.stroke();
+    }
+
+    // ---- pegs on the rim (the flapper clicks against these): hot embers ----
+    ctx.save();
+    ctx.shadowColor = "rgba(255,60,25,.85)";
+    ctx.shadowBlur = R * 0.03;
     for (i = 0; i < n; i++) {
       var ra = -Math.PI / 2 + i * seg;
       var rx = cx + Math.cos(ra) * (R * 0.95), ry = cy + Math.sin(ra) * (R * 0.95);
-      var rg = ctx.createRadialGradient(rx - R * 0.008, ry - R * 0.008, 0, rx, ry, R * 0.026);
-      rg.addColorStop(0, "#ffd2bf"); rg.addColorStop(0.45, "#a8442c"); rg.addColorStop(1, "#1a121a");
+      var rg = ctx.createRadialGradient(rx - R * 0.006, ry - R * 0.006, 0, rx, ry, R * 0.026);
+      rg.addColorStop(0, "#ffe6cf"); rg.addColorStop(0.35, "#ff5a2a"); rg.addColorStop(0.75, "#7a0f08"); rg.addColorStop(1, "#1a0505");
       ctx.beginPath(); ctx.arc(rx, ry, R * 0.024, 0, TAU); ctx.fillStyle = rg; ctx.fill();
     }
+    ctx.restore();
 
     // ---- labels ----
     var labelOuter = rimIn - R * 0.07;
@@ -181,6 +231,10 @@
     // ---- inner rings ----
     ctx.beginPath(); ctx.arc(cx, cy, hubR * 1.25, 0, TAU);
     ctx.strokeStyle = "rgba(240,115,90,.35)"; ctx.lineWidth = Math.max(1, R * 0.006); ctx.stroke();
+    ctx.beginPath(); ctx.arc(cx, cy, hubR * 1.25 + R * 0.025, 0, TAU);
+    ctx.setLineDash([R * 0.012, R * 0.02]);
+    ctx.strokeStyle = "rgba(255,80,60,.22)"; ctx.lineWidth = Math.max(1, R * 0.006); ctx.stroke();
+    ctx.setLineDash([]);
     ctx.beginPath(); ctx.arc(cx, cy, rimIn, 0, TAU);
     ctx.strokeStyle = "rgba(0,0,0,.85)"; ctx.lineWidth = R * 0.012; ctx.stroke();
 

@@ -32,9 +32,11 @@
 .gate {
   position: fixed; inset: 0;
   z-index: 80;
-  display: grid; place-items: center;
-  padding: 24px 16px;
+  display: grid;
+  padding: 24px 16px calc(24px + var(--safe-b));
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   background:
     radial-gradient(circle at 50% 22%, rgba(255, 90, 30, .14), transparent 34%),
     radial-gradient(ellipse at 50% 50%, #120304 0%, #030101 75%);
@@ -42,13 +44,20 @@
   transition: opacity 1.1s ease, visibility 1.1s;
 }
 .gate.gone { opacity: 0; visibility: hidden; pointer-events: none; }
-.gate-inner { max-width: 560px; animation: rise 1.2s cubic-bezier(.2, .8, .2, 1) both; }
+.gate-inner { max-width: 560px; margin: auto; }
+.gate-inner > * { animation: rise .9s cubic-bezier(.2, .8, .2, 1) both; }
+.gate-inner > :nth-child(2) { animation-delay: .12s; }
+.gate-inner > :nth-child(3) { animation-delay: .2s; }
+.gate-inner > :nth-child(4) { animation-delay: .32s; }
+.gate-inner > :nth-child(5) { animation-delay: .42s; }
+.gate-inner > :nth-child(6) { animation-delay: .52s; }
+.gate-inner > :nth-child(n+7) { animation-delay: .62s; }
 .gate-kicker { margin: 0 0 4px; font-family: var(--f-sc); font-size: 14px; letter-spacing: .26em; text-transform: uppercase; color: var(--bone-dim); }
 .gate-title {
   margin: 0;
   font-size: clamp(3.4rem, 15vw, 6.4rem);
   line-height: 1;
-  animation: titleFlicker 5s infinite;
+  animation: rise .9s .2s cubic-bezier(.2, .8, .2, 1) both, titleFlicker 5s 1.1s infinite;
 }
 .gate-kicker, .gate-text, .ransom { text-wrap: balance; }
 .gate-text { margin: 18px auto 26px; color: var(--bone-dim); font-style: italic; font-size: clamp(16px, 2.3vw, 19px); }
@@ -74,7 +83,7 @@
   overflow: visible;
   shape-rendering: crispEdges;
   filter: drop-shadow(0 0 14px rgba(255, 90, 20, .55)) drop-shadow(0 0 46px rgba(255, 40, 10, .35));
-  animation: pumpkinFloat 3.4s ease-in-out infinite alternate;
+  animation: rise .9s cubic-bezier(.2, .8, .2, 1) both, pumpkinFloat 3.4s ease-in-out .9s infinite alternate;
 }
 .pixel-pumpkin .pk-face { animation: pumpkinFlicker 2.6s steps(1) infinite; }
 @keyframes pumpkinFloat { from { transform: translateY(-3px); } to { transform: translateY(4px); } }
@@ -112,7 +121,7 @@
   color: rgba(244, 227, 215, .45);
   cursor: pointer; text-decoration: underline; text-underline-offset: 4px;
 }
-.gate-quiet:hover { color: var(--bone); }
+@media (hover: hover) { .gate-quiet:hover { color: var(--bone); } }
 
 /* ---------- topbar ghost toggle ---------- */
 .icon-btn .ghost { fill: currentColor; stroke: none; opacity: .9; }
@@ -200,6 +209,18 @@ body.quake .altar, body.quake .topbar, body.quake .scare-stage { animation: quak
   .web { width: 110px; }
 }
 
+/* landscape phones: the whole gate fits without scrolling */
+@media (max-height: 520px) and (orientation: landscape) {
+  .gate { padding-top: 10px; padding-bottom: 10px; }
+  .pixel-pumpkin, .ransom { display: none; }
+  .gate-title { font-size: clamp(2.4rem, 14vh, 3.4rem); }
+  .motto { margin-top: 0; font-size: 17px; }
+  .gate-text { margin: 8px auto 12px; font-size: 15px; }
+  .gate-btn { --h: 48px; font-size: 17px; }
+  .gate-quiet { margin-top: 6px; padding: 4px; }
+  .gate-when { margin-top: 8px; font-size: 15px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .creatures, .scare-stage, .scare-flash, .spider-jump { display: none; }
 }
@@ -285,7 +306,7 @@ body.witching .sky::after { content: ""; position: absolute; inset: 0; backgroun
   -webkit-tap-highlight-color: transparent;
 }
 body:not(.eggs-on) .egg { display: none; }
-.egg:hover { opacity: .45; filter: grayscale(.4) brightness(.9); transition-duration: .3s; }
+.egg:focus-visible, .egg:hover { opacity: .45; filter: grayscale(.4) brightness(.9); transition-duration: .3s; }
 .egg:focus { outline: none; }
 .egg.taken { animation: eggPop .6s ease-out forwards; pointer-events: none; }
 @keyframes eggPop { 40% { transform: scale(2.2) rotate(-12deg); opacity: 1; filter: none; } 100% { transform: scale(0); opacity: 0; } }

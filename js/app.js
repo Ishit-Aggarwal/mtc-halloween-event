@@ -111,6 +111,7 @@
 
   function setSeals(step) {
     var items = el.seals.querySelectorAll("li");
+    el.seals.style.setProperty("--p", Math.max(0, Math.min(1, (step - 1) / (items.length - 1))));
     for (var i = 0; i < items.length; i++) {
       var n = i + 1;
       items[i].classList.toggle("is-done", n < step);
