@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#07040b">
+  <meta name="theme-color" content="#0a0203">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="Wheel of Curses — a Halloween build challenge by the Microsoft Tech Club, Amity Noida.">
-  <title>Wheel of Curses</title>
+  <meta name="description" content="BOO!LD — Creep. Code. Create. Round 2 of the Microsoft Tech Community Halloween build: spin the Wheel of Curses.">
+  <title>BOO!LD · Wheel of Curses</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Special+Elite&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Oswald:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/creepy.css">
 </head>
@@ -25,6 +25,8 @@
   <!-- ============ ATMOSPHERE (purely decorative) ============ -->
   <div class="atmo" aria-hidden="true">
     <div class="sky"></div>
+    <!-- the blood-red circuit board from the poster, with current crawling through it -->
+    <div class="circuit"><i></i><i></i></div>
     <div class="stars" id="stars"></div>
     <div class="moon-wrap">
       <div class="moon"></div>
@@ -36,12 +38,12 @@
     <svg class="graveyard" viewBox="0 0 1440 360" preserveAspectRatio="xMidYMax slice">
       <defs>
         <linearGradient id="hillFar" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#1c1030"/>
-          <stop offset="1" stop-color="#0d0718"/>
+          <stop offset="0" stop-color="#2a0a0a"/>
+          <stop offset="1" stop-color="#120405"/>
         </linearGradient>
         <linearGradient id="hillNear" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#0a0510"/>
-          <stop offset="1" stop-color="#030105"/>
+          <stop offset="0" stop-color="#0d0304"/>
+          <stop offset="1" stop-color="#030102"/>
         </linearGradient>
         <radialGradient id="winGlow">
           <stop offset="0" stop-color="#ffcf6b" stop-opacity=".9"/>
@@ -53,7 +55,7 @@
       <path fill="url(#hillFar)" d="M0 250 C120 205 230 215 340 232 C470 252 560 190 700 196 C840 202 900 240 1010 222 C1110 205 1180 150 1290 160 C1360 166 1410 190 1440 200 L1440 360 L0 360Z"/>
 
       <!-- haunted house on the far hill -->
-      <g class="house" fill="#0b0613">
+      <g class="house" fill="#0f0405">
         <path d="M1200 170 L1200 120 L1192 120 L1226 70 L1260 120 L1252 120 L1252 170Z"/>
         <path d="M1150 175 L1150 128 L1140 128 L1175 96 L1210 128 L1200 128 L1200 175Z"/>
         <path d="M1252 172 L1252 140 L1244 140 L1270 112 L1296 140 L1288 140 L1288 172Z"/>
@@ -69,15 +71,15 @@
       </g>
 
       <!-- trees are generated in js/fx.js -->
-      <g id="treesFar" stroke="#0f0819" fill="none" stroke-linecap="round"></g>
+      <g id="treesFar" stroke="#170607" fill="none" stroke-linecap="round"></g>
 
       <!-- near hill -->
       <path fill="url(#hillNear)" d="M0 300 C160 262 300 282 440 290 C600 299 700 258 860 266 C1010 274 1120 300 1260 286 C1350 277 1400 270 1440 272 L1440 360 L0 360Z"/>
 
-      <g id="treesNear" stroke="#040207" fill="none" stroke-linecap="round"></g>
+      <g id="treesNear" stroke="#060203" fill="none" stroke-linecap="round"></g>
 
       <!-- gravestones -->
-      <g fill="#050208">
+      <g fill="#070203">
         <path d="M120 300 v-34 a18 18 0 0 1 36 0 v34z"/>
         <path d="M190 296 v-22 a12 12 0 0 1 24 0 v22z"/>
         <path d="M232 292 h6 v-30 h-10 v-7 h10 v-9 h6 v9 h10 v7 h-10 v30 h6z"/>
@@ -89,11 +91,11 @@
       </g>
 
       <!-- iron fence -->
-      <g class="fence" stroke="#030104" stroke-width="3" fill="#030104">
+      <g class="fence" stroke="#040102" stroke-width="3" fill="#040102">
         <path d="M0 330 H1440" stroke-width="4"/>
         <path d="M0 346 H1440" stroke-width="3"/>
       </g>
-      <g id="fencePosts" fill="#030104"></g>
+      <g id="fencePosts" fill="#040102"></g>
     </svg>
 
     <!-- figures that stand in the graveyard and watch (js/creatures.js) -->
@@ -125,13 +127,13 @@
 
     <!-- cobwebs in the corners -->
     <svg class="web web-tr" viewBox="0 0 200 200" aria-hidden="true">
-      <g stroke="rgba(230,225,240,.28)" stroke-width="1" fill="none">
+      <g stroke="rgba(240,215,205,.24)" stroke-width="1" fill="none">
         <path d="M200 0 L60 200 M200 0 L0 120 M200 0 L110 200 M200 0 L0 40 M200 0 L170 200"/>
         <path d="M168 0 Q172 26 200 32"/><path d="M128 0 Q140 52 200 64 "/><path d="M86 0 Q104 82 200 102"/><path d="M44 0 Q66 118 200 146"/><path d="M8 4 Q30 150 200 190"/>
       </g>
     </svg>
     <svg class="web web-bl" viewBox="0 0 200 200" aria-hidden="true">
-      <g stroke="rgba(230,225,240,.2)" stroke-width="1" fill="none">
+      <g stroke="rgba(240,215,205,.17)" stroke-width="1" fill="none">
         <path d="M0 200 L140 0 M0 200 L200 80 M0 200 L90 0 M0 200 L200 160"/>
         <path d="M0 160 Q30 170 36 200"/><path d="M0 116 Q56 128 70 200"/><path d="M0 70 Q86 92 110 200"/>
       </g>
@@ -144,22 +146,25 @@
   <!-- ============ ENTRY GATE (also unlocks audio) ============ -->
   <div class="gate" id="gate">
     <div class="gate-inner">
-      <div class="candles" aria-hidden="true"><i></i><i></i><i></i></div>
-      <p class="gate-kicker">Microsoft Tech Club · Amity Noida</p>
-      <h1 class="gate-title">Wheel of Curses</h1>
-      <p class="gate-text">The spirits are restless tonight.<br>Turn your sound up…<button class="egg" type="button" tabindex="-1" data-egg="gate" aria-label="pumpkin">🎃</button> and enter, if you dare.</p>
+      <svg class="pixel-pumpkin" data-pixel-pumpkin viewBox="0 0 15 13" aria-hidden="true"></svg>
+      <p class="gate-kicker">Microsoft Tech Community presents</p>
+      <h1 class="gate-title logo">BOO!LD</h1>
+      <p class="motto">Creep. Code. Create.</p>
+      <p class="ransom" data-ransom>Spooky Stories. Killer Interfaces.</p>
+      <p class="gate-text">Round 2 — the BOO!LD Build. The spirits are restless tonight.<br>Turn your sound up…<button class="egg" type="button" tabindex="-1" data-egg="gate" aria-label="pumpkin">🎃</button> and enter, if you dare.</p>
       <button class="btn btn-blood gate-btn" id="gateEnter" type="button">Enter the Crypt</button>
       <button class="gate-quiet" id="gateQuiet" type="button">enter quietly (no sound)</button>
+      <p class="gate-when"><span>29 Oct '26</span><i aria-hidden="true"></i><span>2:30 PM onwards</span></p>
     </div>
   </div>
 
   <!-- ============ TOP BAR ============ -->
   <header class="topbar">
-    <button class="brand" id="brand" type="button" aria-label="Microsoft Tech Club, Amity Noida">
+    <button class="brand" id="brand" type="button" aria-label="Microsoft Tech Community, Amity Noida">
       <span class="brand-mark" aria-hidden="true">
         <i></i><i></i><i></i><i></i>
       </span>
-      <span class="brand-text">Microsoft Tech Club<small>Amity Noida</small></span>
+      <span class="brand-text">Microsoft Tech Community<small>Amity Noida</small></span>
     </button>
     <div class="topbar-actions">
       <span class="crypt" id="crypt" data-state="connecting" role="status" hidden><i aria-hidden="true"></i><span id="cryptText">Summoning the crypt…</span></span>
@@ -175,13 +180,10 @@
   <main class="altar" id="app">
 
     <section class="hero">
-      <p class="eyebrow">Microsoft Tech Club presents · Halloween Build Night</p>
-      <h1 class="title" data-text="Wheel of Curses">
-        <span class="title-line">Wheel</span>
-        <span class="title-of">of</span>
-        <span class="title-line">Curses</span>
-      </h1>
-      <p class="tagline">Spin for a soul. Inherit its curse. Build the site that saves it.</p>
+      <p class="eyebrow">Microsoft Tech Community presents</p>
+      <h1 class="title logo" data-text="BOO!LD"><span class="title-line">BOO!LD</span></h1>
+      <p class="motto">Creep. Code. Create.</p>
+      <p class="tagline"><b>Round 2 · The BOO!LD Build.</b> Spin for a soul, inherit its dilemma, and build the web experience that sets it free.</p>
     </section>
 
     <ol class="seals" id="seals" aria-label="Ritual progress">
@@ -194,8 +196,9 @@
     <!-- ===== Stage: sign the ledger ===== -->
     <section class="panel ledger-panel" id="ledgerPanel" hidden>
       <div class="parchment">
+        <p class="panel-kicker">Round 2 — BOO!LD Build</p>
         <h2 class="panel-title">Sign the Ledger</h2>
-        <p class="panel-lede">Every soul that enters must leave a name. Write your team's name in the book of the damned.</p>
+        <p class="panel-lede">Transform your character's dilemma into a creative, interactive web experience. But first, write your team's name in the book of the damned.</p>
         <form id="ledgerForm" autocomplete="off" novalidate>
           <label class="field">
             <span class="field-label">Team name</span>
@@ -257,8 +260,8 @@
                 </radialGradient>
                 <clipPath id="eyeClip"><path d="M8 50 Q50 14 92 50 Q50 86 8 50Z"/></clipPath>
               </defs>
-              <circle cx="50" cy="50" r="48" fill="#120a14" stroke="#3b2a40" stroke-width="3"/>
-              <circle cx="50" cy="50" r="44" fill="none" stroke="#a50f25" stroke-opacity=".5" stroke-width="1"/>
+              <circle cx="50" cy="50" r="48" fill="#140506" stroke="#4a1512" stroke-width="3"/>
+              <circle cx="50" cy="50" r="44" fill="none" stroke="#ff3326" stroke-opacity=".45" stroke-width="1"/>
               <g clip-path="url(#eyeClip)">
                 <rect x="0" y="0" width="100" height="100" fill="url(#sclera)"/>
                 <g stroke="#b3122e" stroke-width=".8" fill="none" opacity=".55">
@@ -270,8 +273,8 @@
                   <circle cx="44" cy="44" r="3" fill="#fff" opacity=".85"/>
                 </g>
                 <g class="lids" id="lids">
-                  <path class="lid-top" d="M0 0 H100 V50 Q50 14 0 50Z" fill="#1c0f1c"/>
-                  <path class="lid-bot" d="M0 100 H100 V50 Q50 86 0 50Z" fill="#1c0f1c"/>
+                  <path class="lid-top" d="M0 0 H100 V50 Q50 14 0 50Z" fill="#1f0a0a"/>
+                  <path class="lid-bot" d="M0 100 H100 V50 Q50 86 0 50Z" fill="#1f0a0a"/>
                 </g>
               </g>
               <path d="M8 50 Q50 14 92 50 Q50 86 8 50Z" fill="none" stroke="#050205" stroke-width="2.5"/>
@@ -315,7 +318,7 @@
           <button class="btn btn-blood btn-spin" id="spinBtn" type="button">
             <span id="spinLabel">Spin the Wheel</span>
           </button>
-          <p class="spin-hint" id="spinHint">or tap the<button class="egg" type="button" tabindex="-1" data-egg="whisper" aria-label="pumpkin">🎃</button>eye</p>
+          <p class="spin-hint" id="spinHint">or tap the <button class="egg" type="button" tabindex="-1" data-egg="whisper" aria-label="pumpkin">🎃</button>eye</p>
         </div>
       </div>
 
@@ -323,7 +326,7 @@
       <aside class="grimoire" aria-labelledby="grimoireTitle">
         <div class="grimoire-inner">
           <p class="grimoire-team" id="grimoireTeam"></p>
-          <h2 class="grimoire-title" id="grimoireTitle">Your<button class="egg" type="button" tabindex="-1" data-egg="grimoire" aria-label="pumpkin">🎃</button>Grimoire</h2>
+          <h2 class="grimoire-title" id="grimoireTitle">Your <button class="egg" type="button" tabindex="-1" data-egg="grimoire" aria-label="pumpkin">🎃</button>Grimoire</h2>
           <ol class="fate-list" id="fateList">
             <li class="fate" data-slot="1">
               <span class="fate-num">I</span>
@@ -353,7 +356,7 @@
   </main>
 
   <footer class="site-foot">
-    <p>Microsoft Tech Club · Amity Noida ·<button class="egg" type="button" tabindex="-1" data-egg="footer" aria-label="pumpkin">🎃</button>Halloween <span id="year">2026</span></p>
+    <p>Microsoft Tech Community · BOO!LD · <button class="egg" type="button" tabindex="-1" data-egg="footer" aria-label="pumpkin">🎃</button>Build for the other side · <span id="year">2026</span></p>
   </footer>
 
   <!-- ============ FATE CARD (result reveal) ============ -->

@@ -210,7 +210,7 @@
   function stage(color) {
     var st = document.createElement("div");
     st.className = "scare-stage";
-    st.style.setProperty("--c", color || "#b9c4ff");
+    st.style.setProperty("--c", color || "#ff9a85");
     st.innerHTML = '<div class="scare-light"></div><div class="scare-grain"></div>';
     document.body.appendChild(st);
     return st;
@@ -296,7 +296,7 @@
     jumpscare: function () {
       if (!scaresOn || reduceMotion) { peek(); return; }
       var f = fig(pick(CLOSE_UP)), sc = f.scale || 1;
-      var st = stage("#c8d2ff");
+      var st = stage("#ffb3a3");
       var node = figEl("loomer" + (Math.random() < 0.5 ? " flip" : ""), f);
       var x = rnd(25, 75);
       pose(node, 22 * sc, x, -6, 0);

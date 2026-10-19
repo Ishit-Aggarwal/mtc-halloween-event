@@ -30,7 +30,7 @@
       var x = (r() * 100).toFixed(2), y = (Math.pow(r(), 1.6) * 62).toFixed(2);
       var size = r() < 0.12 ? 1 : 0;
       var alpha = (0.35 + r() * 0.6).toFixed(2);
-      var tone = r() < 0.15 ? "255,200,170" : "235,230,255";
+      var tone = r() < 0.2 ? "255,170,140" : "255,232,222";
       (i % 2 ? a : b).push(x + "vw " + y + "vh 0 " + size + "px rgba(" + tone + "," + alpha + ")");
     }
     host.style.boxShadow = a.join(",");
@@ -111,7 +111,7 @@
     var ctx = c.getContext("2d");
     var dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     var W, H, parts = [];
-    var palette = ["255,140,60", "255,90,60", "160,255,110", "200,170,255"];
+    var palette = ["255,140,60", "255,90,60", "255,55,35", "255,190,130"];
 
     function size() {
       W = window.innerWidth; H = window.innerHeight;
@@ -433,6 +433,69 @@
     });
   }
 
+  /* ---------- the poster's pixel jack-o'-lantern ---------- */
+  // O = skin, E = the burning face, S = stem
+  var PUMPKIN = [
+    ".......SS......",
+    "......SS.......",
+    "...OOOOOOOOO...",
+    ".OOOOOOOOOOOOO.",
+    "OOEOOOOOOOOOEOO",
+    "OOEEEEOOOEEEEOO",
+    "OOOOOOOEOOOOOOO",
+    "OOEOOOOOOOOOEOO",
+    "OOEEEOEEEOEEEOO",
+    ".OOEEEEEEEEEOO.",
+    "..OOOOOOOOOOO..",
+    "....OOOOOOO...."
+  ];
+  function makePixelPumpkins() {
+    var svgs = document.querySelectorAll("[data-pixel-pumpkin]");
+    if (!svgs.length) return;
+    var skin = "", dark = "", face = "", stem = "";
+    PUMPKIN.forEach(function (row, y) {
+      for (var x = 0; x < row.length; x++) {
+        var ch = row[x], px = "M" + x + " " + (y + 1) + "h1v1h-1z";
+        if (ch === "S") stem += px;
+        else if (ch === "E") face += px;
+        else if (ch === "O") {
+          // the ribs and the rim sit in shadow
+          var edge = row[x - 1] !== "O" && row[x - 1] !== "E" || row[x + 1] !== "O" && row[x + 1] !== "E";
+          if (edge || x === 4 || x === 10 || y === PUMPKIN.length - 1) dark += px; else skin += px;
+        }
+      }
+    });
+    var markup =
+      "<path d=\"" + stem + "\" fill=\"#5a2a12\"/>" +
+      "<path d=\"" + dark + "\" fill=\"#b8360c\"/>" +
+      "<path d=\"" + skin + "\" fill=\"#ff6a1a\"/>" +
+      "<path class=\"pk-face\" d=\"" + face + "\" fill=\"#ffd84a\"/>";
+    Array.prototype.forEach.call(svgs, function (s) { s.innerHTML = markup; });
+  }
+
+  /* ---------- ransom-note lettering ---------- */
+  function makeRansom() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-ransom]"), function (host) {
+      var text = host.textContent.trim(), n = 0;
+      host.setAttribute("aria-label", text);
+      host.textContent = "";
+      text.split(/\s+/).forEach(function (word) {
+        var w = document.createElement("span");
+        w.className = "w";
+        w.setAttribute("aria-hidden", "true");
+        for (var i = 0; i < word.length; i++, n++) {
+          var l = document.createElement("span"), k = (n * 7 + word.charCodeAt(i)) % 13;
+          // mostly bare cut-out letters; now and then one on a scrap of paper
+          l.className = "l f" + (k % 5) + (k === 1 ? " b1" : k === 5 || k === 9 ? " b2" : k === 3 || k === 11 ? " b3" : "") +
+            " t" + (n % 4) + (k % 4 === 0 ? " s1" : k === 7 ? " s0" : "");
+          l.textContent = word[i];
+          w.appendChild(l);
+        }
+        host.appendChild(w);
+      });
+    });
+  }
+
   /* ---------- --vh fallback for older mobile browsers ---------- */
   function vhFix() {
     if (window.CSS && CSS.supports && CSS.supports("height", "1dvh")) return;
@@ -445,6 +508,8 @@
 
   function start() {
     vhFix();
+    makePixelPumpkins();
+    makeRansom();
     makeStars();
     makeTrees();
     makeMotes();

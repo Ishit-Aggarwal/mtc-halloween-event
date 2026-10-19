@@ -56,7 +56,7 @@
         (text ? '<p class="trow-text">' + esc(text) + "</p>" : "") + "</div></div>";
     }
 
-    return '<article class="tcard" style="--c:' + (c ? c.color : "#b5aa95") + '">' +
+    return '<article class="tcard" style="--c:' + (c ? c.color : "#bf9f93") + '">' +
       '<header class="tcard-head"><span class="tcard-num">#' + n + '</span><h2 class="tcard-name">' + esc(t.name) + '</h2><span class="badge ' + st + '">' + esc(badge) + "</span></header>" +
       row("soul", "Soul", c && c.name, c && c.lore, c && c.glyph) +
       row("curse", "Curse", p && p.t, p && p.d) +

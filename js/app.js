@@ -11,10 +11,10 @@
   var STAGES = { soul: 1, curse: 2, hex: 3, wait: 4, twist: 4, done: 5 };
 
   var THEMES = {
-    soul:  { a: "#1a0b14", b: "#100710", accent: "#b3122e" },
-    curse: { a: "#1e080d", b: "#120509", accent: "#b3122e" },
-    hex:   { a: "#0c160d", b: "#070d08", accent: "#9cff6b" },
-    twist: { a: "#190c22", b: "#0e0614", accent: "#a874ff" }
+    soul:  { a: "#1c0708", b: "#110405", accent: "#c4161c" },
+    curse: { a: "#200807", b: "#130404", accent: "#c4161c" },
+    hex:   { a: "#200d05", b: "#130703", accent: "#ff7a1a" },
+    twist: { a: "#25060a", b: "#150306", accent: "#ff3326" }
   };
 
   var el = {
@@ -98,12 +98,12 @@
   }
   function hexSegments() {
     return D.uiCurses.map(function (h, i) {
-      return { label: h.t, glyph: h.glyph, glyphIsText: !isEmoji(h.glyph), color: i % 2 ? "#4f9e2c" : "#7fd94a" };
+      return { label: h.t, glyph: h.glyph, glyphIsText: !isEmoji(h.glyph), color: i % 2 ? "#d9480f" : "#ff8a3d" };
     });
   }
   function twistSegments() {
     return D.twists.map(function (t, i) {
-      return { label: t.t, glyph: t.glyph, glyphIsText: !isEmoji(t.glyph), color: i % 2 ? "#a874ff" : "#ff2a3d" };
+      return { label: t.t, glyph: t.glyph, glyphIsText: !isEmoji(t.glyph), color: i % 2 ? "#f0735a" : "#ff3326" };
     });
   }
 
@@ -126,7 +126,7 @@
     if (data && data.name) {
       var wasEmpty = name.textContent === "???";
       li.classList.add("is-filled");
-      li.style.setProperty("--c", data.color || "#efe6d2");
+      li.style.setProperty("--c", data.color || "#f4e3d7");
       num.textContent = data.glyph || roman;
       name.textContent = data.name;
       desc.textContent = data.desc || "";
@@ -151,10 +151,10 @@
     setFate(2, p ? { name: p.t, desc: p.d, glyph: "📜", color: c.color, fresh: fresh } : { current: stage === "curse" });
 
     var h = typeof s.hex === "number" ? D.uiCurses[s.hex] : null;
-    setFate(3, h ? { name: h.t, desc: h.d, glyph: h.glyph, color: "#9cff6b", fresh: fresh } : { current: stage === "hex" });
+    setFate(3, h ? { name: h.t, desc: h.d, glyph: h.glyph, color: "#ff8a3d", fresh: fresh } : { current: stage === "hex" });
 
     var t = typeof s.twist === "number" ? D.twists[s.twist] : null;
-    if (t) setFate(4, { name: t.t, desc: fillTwist(t.d), glyph: t.glyph, color: "#ff5a6a", fresh: fresh });
+    if (t) setFate(4, { name: t.t, desc: fillTwist(t.d), glyph: t.glyph, color: "#ff5a4a", fresh: fresh });
     else if (stage === "wait") setFate(4, { current: true, pendingName: "Sleeping…", pendingDesc: "Wakes in " + fmt(s.unlockAt - Date.now()) });
     else if (stage === "twist") setFate(4, { current: true, pendingName: "Awake", pendingDesc: "Spin the final wheel." });
     else setFate(4, {});
@@ -475,7 +475,7 @@
 
   function showCard(stage) {
     var c = charById(session.charId);
-    var kicker, glyph, name, lore = "", desc = "", btn, accent = "#b3122e";
+    var kicker, glyph, name, lore = "", desc = "", btn, accent = "#c4161c";
     if (stage === "soul") {
       kicker = "Your soul is"; glyph = c.glyph; name = c.name; lore = c.lore; btn = "Accept your soul"; accent = c.color;
     } else if (stage === "curse") {
@@ -483,10 +483,10 @@
       kicker = c.short + "'s curse"; glyph = c.glyph; name = p.t; desc = p.d; btn = "Accept the curse"; accent = c.color;
     } else if (stage === "hex") {
       var h = D.uiCurses[session.hex];
-      kicker = "A hex upon your UI"; glyph = h.glyph; name = h.t; desc = h.d; btn = "Accept the hex"; accent = "#5fbf3a";
+      kicker = "A hex upon your UI"; glyph = h.glyph; name = h.t; desc = h.d; btn = "Accept the hex"; accent = "#ff7a1a";
     } else {
       var t = D.twists[session.twist];
-      kicker = "The twist"; glyph = t.glyph; name = t.t; desc = fillTwist(t.d); btn = "Seal my fate"; accent = "#8b3fd6";
+      kicker = "The twist"; glyph = t.glyph; name = t.t; desc = fillTwist(t.d); btn = "Seal my fate"; accent = "#ff3326";
     }
     el.cardKicker.textContent = kicker;
     el.cardGlyph.textContent = glyph;

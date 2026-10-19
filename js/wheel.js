@@ -26,7 +26,7 @@
   function rgba(hex, a) { var c = hexToRgb(hex); return "rgba(" + c[0] + "," + c[1] + "," + c[2] + "," + a + ")"; }
 
   var EMOJI_FONT = '"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji","Segoe UI Symbol",sans-serif';
-  var LABEL_FONT = '"Special Elite","Courier New",monospace';
+  var LABEL_FONT = '"Oswald","Arial Narrow",sans-serif';
 
   function Wheel(canvas, rotor, pointer) {
     this.canvas = canvas;
@@ -42,6 +42,8 @@
     this.flapVel = 0;
     var self = this;
     window.addEventListener("resize", function () { self.draw(); });
+    // labels are drawn in a web font: redraw once it has arrived
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { self.draw(); });
   }
 
   Wheel.prototype.setSegments = function (segments, theme) {
@@ -67,8 +69,8 @@
     // ---- outer iron rim ----
     var rim = ctx.createRadialGradient(cx, cy, rimIn, cx, cy, R);
     rim.addColorStop(0, "#030204");
-    rim.addColorStop(0.35, "#2e2530");
-    rim.addColorStop(0.6, "#141016");
+    rim.addColorStop(0.35, "#3d1412");
+    rim.addColorStop(0.6, "#180707");
     rim.addColorStop(1, "#030204");
     ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fillStyle = rim; ctx.fill();
 
@@ -80,10 +82,10 @@
       ctx.moveTo(cx, cy);
       ctx.arc(cx, cy, rimIn, a0, a1);
       ctx.closePath();
-      ctx.fillStyle = i % 2 ? (th.a || "#14080f") : (th.b || "#0b050a");
+      ctx.fillStyle = i % 2 ? (th.a || "#1c0708") : (th.b || "#110405");
       ctx.fill();
 
-      var tint = s.color || th.accent || "#b3122e";
+      var tint = s.color || th.accent || "#c4161c";
       var g = ctx.createRadialGradient(cx, cy, hubR, cx, cy, rimIn);
       if (s.disabled) {
         g.addColorStop(0, "rgba(0,0,0,.65)"); g.addColorStop(1, "rgba(0,0,0,.8)");
@@ -104,7 +106,7 @@
     }
 
     // ---- separators ----
-    ctx.strokeStyle = "rgba(239,230,210,.18)";
+    ctx.strokeStyle = "rgba(244,200,185,.18)";
     ctx.lineWidth = Math.max(1, R * 0.006);
     for (i = 0; i < n; i++) {
       var a = -Math.PI / 2 + i * seg;
@@ -119,7 +121,7 @@
       var ra = -Math.PI / 2 + i * seg;
       var rx = cx + Math.cos(ra) * (R * 0.95), ry = cy + Math.sin(ra) * (R * 0.95);
       var rg = ctx.createRadialGradient(rx - R * 0.008, ry - R * 0.008, 0, rx, ry, R * 0.026);
-      rg.addColorStop(0, "#f1e6c8"); rg.addColorStop(0.45, "#a08a5a"); rg.addColorStop(1, "#1a121a");
+      rg.addColorStop(0, "#ffd2bf"); rg.addColorStop(0.45, "#a8442c"); rg.addColorStop(1, "#1a121a");
       ctx.beginPath(); ctx.arc(rx, ry, R * 0.024, 0, TAU); ctx.fillStyle = rg; ctx.fill();
     }
 
@@ -140,9 +142,9 @@
       var glyphSize = Math.min(R * 0.1, arcH * 0.62);
       var x = labelOuter;
       if (s.glyph) {
-        ctx.font = glyphSize + "px " + (s.glyphIsText ? LABEL_FONT : EMOJI_FONT);
+        ctx.font = (s.glyphIsText ? "500 " : "") + glyphSize + "px " + (s.glyphIsText ? LABEL_FONT : EMOJI_FONT);
         ctx.globalAlpha = s.disabled ? 0.25 : 1;
-        ctx.fillStyle = s.glyphIsText ? rgba(s.color || th.accent || "#efe6d2", 1) : "#fff";
+        ctx.fillStyle = s.glyphIsText ? rgba(s.color || th.accent || "#f4e3d7", 1) : "#fff";
         ctx.fillText(s.glyph, x, 0);
         x -= glyphSize * 1.25;
       }
@@ -150,15 +152,15 @@
       var fs = Math.min(R * 0.068, arcH * 0.42);
       var text = s.label || "";
       var avail = x - labelInner;
-      ctx.font = fs + "px " + LABEL_FONT;
+      ctx.font = "500 " + fs + "px " + LABEL_FONT;
       var w = ctx.measureText(text).width;
       if (w > avail) {
         fs = Math.max(fs * (avail / w), R * 0.036);
-        ctx.font = fs + "px " + LABEL_FONT;
+        ctx.font = "500 " + fs + "px " + LABEL_FONT;
         while (ctx.measureText(text).width > avail && text.length > 3) text = text.slice(0, -2) + "…";
       }
       ctx.globalAlpha = s.disabled ? 0.3 : 1;
-      ctx.fillStyle = s.disabled ? "#8f8578" : "#efe3cc";
+      ctx.fillStyle = s.disabled ? "#8f7068" : "#f4e3d7";
       ctx.shadowColor = "rgba(0,0,0,.95)";
       ctx.shadowBlur = R * 0.02;
       ctx.fillText(text, x, 0);
@@ -166,7 +168,7 @@
 
       if (s.disabled) {
         ctx.globalAlpha = 0.75;
-        ctx.strokeStyle = "#b3122e";
+        ctx.strokeStyle = "#ff3326";
         ctx.lineWidth = Math.max(1.5, R * 0.008);
         ctx.beginPath();
         ctx.moveTo(labelInner - R * 0.02, 0);
@@ -178,13 +180,13 @@
 
     // ---- inner rings ----
     ctx.beginPath(); ctx.arc(cx, cy, hubR * 1.25, 0, TAU);
-    ctx.strokeStyle = "rgba(201,162,39,.3)"; ctx.lineWidth = Math.max(1, R * 0.006); ctx.stroke();
+    ctx.strokeStyle = "rgba(240,115,90,.35)"; ctx.lineWidth = Math.max(1, R * 0.006); ctx.stroke();
     ctx.beginPath(); ctx.arc(cx, cy, rimIn, 0, TAU);
     ctx.strokeStyle = "rgba(0,0,0,.85)"; ctx.lineWidth = R * 0.012; ctx.stroke();
 
     // ---- grime + sheen ----
     var sheen = ctx.createLinearGradient(0, 0, size, size);
-    sheen.addColorStop(0, "rgba(255,240,200,.05)");
+    sheen.addColorStop(0, "rgba(255,200,180,.05)");
     sheen.addColorStop(0.5, "rgba(255,255,255,0)");
     sheen.addColorStop(1, "rgba(0,0,0,.35)");
     ctx.beginPath(); ctx.arc(cx, cy, rimIn, 0, TAU); ctx.fillStyle = sheen; ctx.fill();

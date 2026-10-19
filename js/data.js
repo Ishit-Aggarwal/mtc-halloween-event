@@ -71,7 +71,7 @@ window.CURSE_DATA = {
   characters: [
     {
       id: "dracula", name: "Count Dracula", short: "Dracula", glyph: "🧛",
-      color: "#b3122e",
+      color: "#e01b24",
       lore: "Six hundred years old, still dramatic, still allergic to mornings.",
       spin: "I vant to choose your fate. Bleh!", idle: "I have waited centuries. Not one second more…",
       problems: [
@@ -89,7 +89,7 @@ window.CURSE_DATA = {
     },
     {
       id: "monster", name: "Frankenstein's Monster", short: "The Monster", glyph: "⚡",
-      color: "#5fbf3a",
+      color: "#ff5a2a",
       lore: "Stitched from eight strangers and raised by lightning.",
       spin: "MONSTER… SPIN. *grunt*", idle: "Monster… getting… angry…",
       problems: [
@@ -107,7 +107,7 @@ window.CURSE_DATA = {
     },
     {
       id: "victor", name: "Dr. Frankenstein", short: "Dr. Frankenstein", glyph: "🧪",
-      color: "#3ad1c4",
+      color: "#ff8a5c",
       lore: "Brilliant, sleepless, and a little too fond of graveyards.",
       spin: "IT'S ALIVE! …and it's spinning!", idle: "The experiment demands a result. NOW.",
       problems: [
@@ -125,7 +125,7 @@ window.CURSE_DATA = {
     },
     {
       id: "zombie", name: "The Zombie", short: "Zombie", glyph: "🧟",
-      color: "#7e9c3a",
+      color: "#c8552a",
       lore: "Was an accountant once. Mostly remembers the hunger.",
       spin: "Braaaains… I mean… spiiiin…", idle: "Uuurgh… spin… or I eat… your brains…",
       problems: [
@@ -143,7 +143,7 @@ window.CURSE_DATA = {
     },
     {
       id: "mummy", name: "The Mummy", short: "Mummy", glyph: "🏺",
-      color: "#d6b46a",
+      color: "#e8b07a",
       lore: "A pharaoh who overslept by three thousand years.",
       spin: "By the sands of time… SPIN!", idle: "I slept three thousand years. I will not wait for you.",
       problems: [
@@ -161,7 +161,7 @@ window.CURSE_DATA = {
     },
     {
       id: "werewolf", name: "The Werewolf", short: "Werewolf", glyph: "🐺",
-      color: "#9a6b3f",
+      color: "#b8703f",
       lore: "Office worker by day. Very, very hairy by full moon.",
       spin: "AWOOOO! The moon says… spin!", idle: "Grrr… my patience is thinner than my fur…",
       problems: [
@@ -179,7 +179,7 @@ window.CURSE_DATA = {
     },
     {
       id: "witch", name: "The Witch", short: "Witch", glyph: "🧙‍♀️",
-      color: "#8b3fd6",
+      color: "#e0386a",
       lore: "Three cauldrons, one cat, zero patience.",
       spin: "Double, double, toil and… SPIN!", idle: "Spin it, or I turn you into a toad.",
       problems: [
@@ -197,7 +197,7 @@ window.CURSE_DATA = {
     },
     {
       id: "ghost", name: "The Ghost", short: "Ghost", glyph: "👻",
-      color: "#cfe3ff",
+      color: "#f6dcd2",
       lore: "Died in 1847. Still hasn't been told.",
       spin: "Boooo… let me spin it… boooo…", idle: "I can't touch the wheel… but I'll find a way…",
       problems: [
@@ -215,7 +215,7 @@ window.CURSE_DATA = {
     },
     {
       id: "reaper", name: "The Grim Reaper", short: "Grim Reaper", glyph: "⚰️",
-      color: "#6b7c8f",
+      color: "#a08a84",
       lore: "Ten thousand years on the job. Never once a day off.",
       spin: "Your time has come… to spin.", idle: "Everyone's time runs out. Yours is running now.",
       problems: [
@@ -269,7 +269,7 @@ window.CURSE_DATA = {
     },
     {
       id: "skeleton", name: "The Skeleton", short: "Skeleton", glyph: "💀",
-      color: "#e8e1cf",
+      color: "#ece2d0",
       lore: "Two hundred and six bones. Allegedly.",
       spin: "*rattle rattle* Watch my bones spin it!", idle: "I've got a bone to pick with you. SPIN.",
       problems: [
@@ -287,7 +287,7 @@ window.CURSE_DATA = {
     },
     {
       id: "invisible", name: "The Invisible Man", short: "Invisible Man", glyph: "🕶️",
-      color: "#9fb6c9",
+      color: "#c9a9a0",
       lore: "Drank the formula. Regrets it daily. Nobody can tell.",
       spin: "You can't see me… but you can see this spin.", idle: "I'm right behind you. Spin the wheel.",
       problems: [
@@ -305,7 +305,7 @@ window.CURSE_DATA = {
     },
     {
       id: "blackcat", name: "The Black Cat", short: "Black Cat", glyph: "🐈",
-      color: "#f4d03f",
+      color: "#ffc23a",
       lore: "Nine lives, one bad reputation.",
       spin: "Mrrrow. *swats the wheel*", idle: "Hssss! I'll knock this wheel over myself.",
       problems: [
@@ -323,7 +323,7 @@ window.CURSE_DATA = {
     },
     {
       id: "scarecrow", name: "The Scarecrow", short: "Scarecrow", glyph: "🌾",
-      color: "#c9a227",
+      color: "#d99a3c",
       lore: "Stuffed with straw. Stared at by crows. Wants more.",
       spin: "The crows told me to spin it. So I will.", idle: "I've stood still for fifty years. You won't.",
       problems: [
