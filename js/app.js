@@ -220,7 +220,7 @@
       case "soul":
         segs = soulSegments(); theme = THEMES.soul;
         kicker = "Wheel I · The Soul"; title = "Choose Your Soul";
-        sub = "Fifteen damned souls wait in the dark. One of them is yours.";
+        sub = D.characters.length + " souls wait in the dark. One of them is yours.";
         break;
       case "curse":
         segs = curseSegments(c); theme = { a: THEMES.curse.a, b: THEMES.curse.b, accent: c.color };
