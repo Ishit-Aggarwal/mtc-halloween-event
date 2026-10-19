@@ -1,11 +1,11 @@
-# BOO!LD — Wheel of Curses
+# Wheel of Curses — Round 2 challenge picker
 
-*Creep. Code. Create.* The Round 2 (BOO!LD Build) challenge picker for the Microsoft Tech Community Halloween event, 29 Oct 2026, 2:30 PM onwards. Round 1 (Tech Trials) runs separately.
+*Creep. Code. Create.* The Round 2 (Build) challenge picker for the Microsoft Tech Community Halloween event, 29 Oct 2026, 2:30 PM onwards. Round 1 (Tech Trials) runs separately. The event has no name yet, so the site shows none anywhere; it just greets teams with "Welcome to the Crypt" (a greeting, not a title).
 
 A spooky four-wheel challenge picker. There's no build step and no framework.
 
 ## Look
-The styling follows the BOO!LD poster: blood red on black, red circuit-board traces (`.circuit` in `css/style.css`), the Rye wordmark, Oswald labels, a Pixelify Sans pixel face for the date and countdown, a pixel jack-o'-lantern and a ransom-note tagline (both built in `js/fx.js`). Colours are tokens at the top of `css/style.css`.
+The styling follows the event poster: blood red on black, the Rye headline, Oswald labels, a Pixelify Sans pixel face for the date and countdown, a pixel jack-o'-lantern and a ransom-note tagline (both built in `js/fx.js`). Colours are tokens at the top of `css/style.css`.
 
 ## Run it
 - **Quickest:** double-click `index.html`.

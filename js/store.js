@@ -16,9 +16,17 @@
   var phone = (location.search.match(/[?&]phone=([\w-]+)/) || [])[1];
   var ns = phone ? "." + phone : "";
 
-  var LEDGER_KEY = "woc.ledger.v1" + ns;
-  var SESSION_KEY = "woc.session.v1" + ns;
-  var PREFS_KEY = "woc.prefs.v1" + ns;
+  // v2 = fresh ledger for the real event: every team registered during
+  // testing (ledger, phone locks, sessions, progress) is dropped below.
+  var LEDGER_KEY = "woc.ledger.v2" + ns;
+  var SESSION_KEY = "woc.session.v2" + ns;
+  var PREFS_KEY = "woc.prefs.v2" + ns;
+  try {
+    for (var k = window.localStorage.length - 1; k >= 0; k--) {
+      var old = window.localStorage.key(k);
+      if (/^woc\.(ledger|session|prefs|device)\.v1(\.|$)/.test(old)) window.localStorage.removeItem(old);
+    }
+  } catch (e) { /* storage blocked: nothing to clear */ }
 
   // In-memory fallback for private mode / blocked storage.
   var memory = {};
@@ -62,7 +70,7 @@
     return 4294967296 * (2097151 & h2) + (h1 >>> 0);
   }
 
-  var DEVICE_KEY = "woc.device.v1" + ns;
+  var DEVICE_KEY = "woc.device.v2" + ns;
   var JUDGE_KEY = "woc.judge.v1";
 
   var Store = {

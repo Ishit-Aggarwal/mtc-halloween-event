@@ -1,5 +1,5 @@
 /* =========================================================
-   BOO!LD · WHEEL OF CURSES — creepier additions
+   WHEEL OF CURSES — creepier additions
    (entry gate, creatures, jump scares, the haunted spinner)
    ========================================================= */
 
@@ -55,8 +55,9 @@
 .gate-kicker { margin: 0 0 4px; font-family: var(--f-sc); font-size: 14px; letter-spacing: .26em; text-transform: uppercase; color: var(--bone-dim); }
 .gate-title {
   margin: 0;
-  font-size: clamp(3.4rem, 15vw, 6.4rem);
-  line-height: 1;
+  font-size: clamp(2.4rem, 10vw, 4.6rem);
+  line-height: 1.05;
+  text-wrap: balance;
   animation: rise .9s .2s cubic-bezier(.2, .8, .2, 1) both, titleFlicker 5s 1.1s infinite;
 }
 .gate-kicker, .gate-text, .ransom { text-wrap: balance; }
@@ -213,7 +214,7 @@ body.quake .altar, body.quake .topbar, body.quake .scare-stage { animation: quak
 @media (max-height: 520px) and (orientation: landscape) {
   .gate { padding-top: 10px; padding-bottom: 10px; }
   .pixel-pumpkin, .ransom { display: none; }
-  .gate-title { font-size: clamp(2.4rem, 14vh, 3.4rem); }
+  .gate-title { font-size: clamp(1.9rem, 10vh, 2.6rem); }
   .motto { margin-top: 0; font-size: 17px; }
   .gate-text { margin: 8px auto 12px; font-size: 15px; }
   .gate-btn { --h: 48px; font-size: 17px; }

@@ -1,7 +1,7 @@
 /* =========================================================
-   BOO!LD · WHEEL OF CURSES — styles
-   Palette and type follow the BOO!LD poster: blood red on
-   black, red circuit traces, Rye + Oswald + a pixel face.
+   WHEEL OF CURSES — styles
+   Palette and type follow the event poster: blood red on
+   black, Rye + Oswald + a pixel face.
    ========================================================= */
 
 :root {
@@ -184,37 +184,6 @@ button { font: inherit; color: inherit; }
 
 .motes { inset: 0; width: 100%; height: 100%; }
 
-/* red circuit traces (as on the poster), strongest at the edges so the centre stays dark.
-   Two embers of "current" drift underneath and light up only the traces (color-dodge on black). */
-.circuit {
-  inset: 0;
-  isolation: isolate;
-  overflow: hidden;
-  background: #000 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Cg fill='none' stroke='%23631210' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 20H70L90 40H160L180 20H240M0 70H40L60 90V150L80 170H126M240 70H210L190 90H124M0 138H20M200 138H240M0 210H90L110 190H140L160 210H240M120 0V8M120 240V230M210 43V70M160 120V112M175 120V112M190 120V112M160 156V164M175 156V164M190 156V164'/%3E%3C/g%3E%3Crect x='150' y='120' width='50' height='36' rx='3' fill='%23180405' stroke='%23631210' stroke-width='2'/%3E%3Cg fill='%23000' stroke='%23631210' stroke-width='2'%3E%3Ccircle cx='130' cy='170' r='4'/%3E%3Ccircle cx='120' cy='90' r='4'/%3E%3Ccircle cx='24' cy='138' r='4'/%3E%3Ccircle cx='120' cy='12' r='4'/%3E%3Ccircle cx='120' cy='226' r='4'/%3E%3Ccircle cx='210' cy='40' r='3'/%3E%3Ccircle cx='40' cy='180' r='3'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 240px 240px;
-  mix-blend-mode: screen;
-  opacity: .5;
-  -webkit-mask-image: radial-gradient(ellipse 58% 70% at 50% 45%, transparent 0%, rgba(0, 0, 0, .2) 45%, #000 100%);
-  mask-image: radial-gradient(ellipse 58% 70% at 50% 45%, transparent 0%, rgba(0, 0, 0, .2) 45%, #000 100%);
-}
-.circuit i {
-  position: absolute;
-  left: -30vmax; top: -30vmax;
-  width: 60vmax; height: 60vmax;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 150, 110, .8), rgba(255, 70, 40, .35) 45%, transparent);
-  mix-blend-mode: color-dodge;
-  animation: current 34s linear infinite;
-  will-change: transform;
-}
-.low-power .circuit i { display: none; }
-.circuit i + i { width: 44vmax; height: 44vmax; animation-duration: 27s; animation-direction: reverse; animation-delay: -11s; }
-@keyframes current {
-  0%   { transform: translate3d(8vw, 18vh, 0); }
-  25%  { transform: translate3d(92vw, 8vh, 0); }
-  50%  { transform: translate3d(86vw, 78vh, 0); }
-  75%  { transform: translate3d(12vw, 70vh, 0); }
-  100% { transform: translate3d(8vw, 18vh, 0); }
-}
 
 .bats { inset: 0; }
 .bat {
@@ -406,7 +375,7 @@ button { font: inherit; color: inherit; }
   overflow-x: clip;
 }
 
-.hero { text-align: center; padding-top: clamp(4px, 2vh, 24px); }
+.hero { text-align: center; padding-top: clamp(12px, 3.5vh, 36px); }
 
 .eyebrow {
   margin: 0 0 6px;
@@ -417,7 +386,7 @@ button { font: inherit; color: inherit; }
   color: var(--bone-dim);
 }
 
-/* the BOO!LD wordmark: red Victorian letters with a hot rim and a glow, like the poster */
+/* the headline: red Victorian letters with a hot rim and a glow, like the poster */
 .logo {
   font-family: var(--f-title);
   font-weight: 400;
@@ -433,11 +402,12 @@ button { font: inherit; color: inherit; }
 }
 .title {
   margin: 0;
-  line-height: 1;
-  font-size: clamp(3.2rem, 11vw, 6.6rem);
+  line-height: 1.05;
+  font-size: clamp(2.2rem, 5.6vw, 4.2rem);
+  text-wrap: balance;
   animation: titleFlicker 7s infinite;
 }
-.title-line { display: inline-block; }
+.title-line { display: inline-block; max-width: 100%; }
 @keyframes titleFlicker {
   0%, 18%, 22%, 62%, 64%, 100% { opacity: 1; filter: none; }
   19% { opacity: .55; }
@@ -1165,9 +1135,9 @@ button { font: inherit; color: inherit; }
 
 /* the page rises out of the dark once the gate opens */
 .gate.gone ~ .altar .hero > * { animation: rise .9s cubic-bezier(.2, .8, .2, 1) both; }
-.gate.gone ~ .altar .hero > .title { animation: rise .9s .08s cubic-bezier(.2, .8, .2, 1) both, titleFlicker 7s 1s infinite; }
-.gate.gone ~ .altar .hero > :nth-child(3) { animation-delay: .18s; }
-.gate.gone ~ .altar .hero > :nth-child(4) { animation-delay: .26s; }
+.gate.gone ~ .altar .hero > .title { animation: rise .9s 0s cubic-bezier(.2, .8, .2, 1) both, titleFlicker 7s 1s infinite; }
+.gate.gone ~ .altar .hero > :nth-child(2) { animation-delay: .12s; }
+.gate.gone ~ .altar .hero > :nth-child(3) { animation-delay: .22s; }
 .gate.gone ~ .altar .seals { animation: riseAgain .9s .3s cubic-bezier(.2, .8, .2, 1) both; }
 /* panels keep their own timing (they also rise each time they swap) */
 .gate.gone ~ .altar .panel { animation-name: riseAgain; }
@@ -1221,7 +1191,7 @@ button { font: inherit; color: inherit; }
 @media (max-width: 560px) {
   .moon-wrap { width: 92px; height: 92px; right: -22px; top: calc(var(--safe-t) + 70px); opacity: .85; }
   body.in-ritual .tagline { display: none; }
-  body.in-ritual .title { font-size: clamp(2.4rem, 13vw, 3.4rem); }
+  body.in-ritual .title { font-size: clamp(1.9rem, 9vw, 2.6rem); }
   body.in-ritual .motto { font-size: 16px; margin-top: 2px; }
   .brand-text { font-size: 13px; }
   .seals { gap: 4px; }
@@ -1236,13 +1206,13 @@ button { font: inherit; color: inherit; }
 @media (max-height: 520px) and (orientation: landscape) {
   :root { --wheel: min(78vh, 46vw); }
   .hero .tagline { display: none; }
-  .title { font-size: clamp(2.2rem, 7vw, 3.6rem); }
+  .title { font-size: clamp(1.8rem, 5vw, 2.8rem); }
   .wheel-panel { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .cloud, .fog, .grain, .bats, .lightning, .circuit i { display: none; }
+  .cloud, .fog, .grain, .bats, .lightning { display: none; }
   .card { animation: none; }
 }
 
