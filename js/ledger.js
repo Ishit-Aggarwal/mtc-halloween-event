@@ -16,7 +16,8 @@
 
   var SDK = "https://www.gstatic.com/firebasejs/10.12.2/";
   var mock = /[?&]mockcloud\b/.test(location.search);
-  var cfg = window.FIREBASE_CONFIG || (mock ? { projectId: "mock-crypt" } : null);
+  // ?mockcloud always uses the fake crypt, never the real project
+  var cfg = mock ? { projectId: "mock-crypt" } : window.FIREBASE_CONFIG;
   var Store = window.Store;
 
   var listeners = [];

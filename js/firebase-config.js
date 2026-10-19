@@ -11,7 +11,14 @@
    protect the data.
    ========================================================= */
 
-window.FIREBASE_CONFIG = null;
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCu67CDDYhWPg_P3xCX-oCEqgnceVIa_eE",
+  authDomain: "mtc-halloween.firebaseapp.com",
+  projectId: "mtc-halloween",
+  storageBucket: "mtc-halloween.firebasestorage.app",
+  messagingSenderId: "191524538035",
+  appId: "1:191524538035:web:79b5cd06f0dbdba4a452c6"
+};
 
 /* Example:
 window.FIREBASE_CONFIG = {

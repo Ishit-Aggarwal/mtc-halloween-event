@@ -2,8 +2,8 @@ rules_version = '2';
 
 // Wheel of Curses — Firestore security rules.
 //
-// ✏️  Replace host@example.com below with the email of the host account you
-//     create in Firebase Authentication (you can list several emails).
+// Host account: the email below (created in Firebase Authentication). You
+//     can list several emails to add co-hosts.
 //
 // What these rules enforce:
 //   • Anyone can READ the ledger (the wheels need it to strike out taken curses).
@@ -19,7 +19,7 @@ service cloud.firestore {
 
     function isHost() {
       return request.auth != null
-        && request.auth.token.email in ['host@example.com'];
+        && request.auth.token.email in ['ishit2807@gmail.com'];
     }
 
     function signedIn() {
