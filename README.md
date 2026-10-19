@@ -1,6 +1,6 @@
 # Wheel of Curses — Round 2 challenge picker
 
-*Creep. Code. Create.* The Round 2 (Build) challenge picker for the Microsoft Tech Community Halloween event, 29 Oct 2026, 2:30 PM onwards. Round 1 (Tech Trials) runs separately. The event has no name yet, so the site shows none anywhere; it just greets teams with "Welcome to the Crypt" (a greeting, not a title).
+*Creep. Code. Create.* The Round 2 (Build) challenge picker for the Microsoft Tech Community Halloween event, 29 Oct 2026, 2:30 PM onwards. Round 1 (Tech Trials) runs separately. The event has no name yet, so the site shows none anywhere; the gate greets teams with "Welcome to the Crypt" and the page above the wheels reads "Your Fate Awaits" (neither is a title).
 
 A spooky four-wheel challenge picker. There's no build step and no framework.
 
