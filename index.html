@@ -210,11 +210,49 @@
         <p class="panel-lede">Transform your character's dilemma into a creative, interactive web experience. But first, write your team's name in the book of the damned.</p>
         <form id="ledgerForm" autocomplete="off" novalidate>
           <label class="field">
-            <span class="field-label">Team name</span>
+            <span class="field-label">Team Name</span>
             <input id="teamInput" name="team" type="text" maxlength="40" required placeholder="e.g. The Midnight Coders" spellcheck="false" autocapitalize="words">
           </label>
+
+          <!-- Team Leader Section -->
+          <div class="ledger-section">
+            <div class="ledger-section-head">
+              <span class="ledger-section-title"><span class="badge-icon">👑</span> Team Leader</span>
+              <span class="ledger-section-sub">Student 1</span>
+            </div>
+            <label class="field">
+              <span class="field-label">Leader Name</span>
+              <input id="leaderNameInput" name="leaderName" type="text" maxlength="50" required placeholder="Full name" spellcheck="false" autocapitalize="words">
+            </label>
+            <div class="field-row">
+              <label class="field">
+                <span class="field-label">Year of College</span>
+                <input id="leaderYearInput" name="leaderYear" type="text" maxlength="20" required placeholder="e.g. 1st, 2nd, 3rd, 4th" spellcheck="false">
+              </label>
+              <label class="field">
+                <span class="field-label">Branch</span>
+                <input id="leaderBranchInput" name="leaderBranch" type="text" maxlength="40" required placeholder="e.g. CSE, IT, ECE" spellcheck="false" autocapitalize="characters">
+              </label>
+            </div>
+          </div>
+
+          <!-- Team Members Section -->
+          <div class="ledger-section">
+            <div class="ledger-section-head">
+              <span class="ledger-section-title"><span class="badge-icon">👥</span> Team Member</span>
+              <span class="ledger-section-sub">Max 2 in team (Leader + 1 Member)</span>
+            </div>
+            <div id="membersContainer" class="members-container"></div>
+            <div class="add-member-wrap">
+              <button type="button" class="btn btn-add-member" id="addMemberBtn">
+                <span>+ Add Team Member (Optional)</span>
+              </button>
+              <p class="members-limit-note" id="membersLimitNote" hidden>Maximum team size reached (Leader + 1 Member).</p>
+            </div>
+          </div>
+
           <p class="field-error" id="teamError" role="alert"></p>
-          <button class="btn btn-blood" type="submit">
+          <button class="btn btn-blood btn-submit-ledger" type="submit">
             <span>Begin the Ritual</span>
           </button>
         </form>
@@ -335,6 +373,7 @@
       <aside class="grimoire" aria-labelledby="grimoireTitle">
         <div class="grimoire-inner">
           <p class="grimoire-team" id="grimoireTeam"></p>
+          <p class="grimoire-roster" id="grimoireRoster" hidden></p>
           <h2 class="grimoire-title" id="grimoireTitle">Your <button class="egg" type="button" tabindex="-1" data-egg="grimoire" aria-label="pumpkin">🎃</button>Grimoire</h2>
           <ol class="fate-list" id="fateList">
             <li class="fate" data-slot="1">
@@ -373,7 +412,7 @@
                     <ol class="sub-steps">
                       <li><strong>Build:</strong> Craft your web experience incorporating your Soul, Curse, Hex, and Twist.</li>
                       <li><strong>Host:</strong> Deploy your website online and ensure it is publicly accessible.</li>
-                      <li><strong>Submit:</strong> Paste your live hosted link below so judges can view and evaluate your project.</li>
+                      <li><strong>Submit:</strong> Paste your live hosted link and provide your source code (GitHub repo, .zip upload, or Drive link) below so judges can evaluate your project.</li>
                     </ol>
                     <div class="sub-platforms">
                       <span class="sub-platforms-title">Recommended Free Hosting Platforms:</span>
@@ -389,7 +428,7 @@
                 </div>
 
                 <div class="sub-right">
-                  <!-- Form for entering links -->
+                  <!-- Form for entering links & code -->
                   <form class="sub-form" id="submissionForm" novalidate autocomplete="off">
                     <label class="sub-label">
                       <span class="sub-label-text">🌐 Live Hosted Website URL <span class="sub-req">*</span></span>
@@ -399,9 +438,41 @@
                       <span class="sub-label-text">📁 GitHub Repository URL <span class="sub-opt">(optional)</span></span>
                       <input type="url" id="subRepo" class="sub-input" placeholder="https://github.com/username/project" spellcheck="false" autocomplete="off">
                     </label>
+
+                    <!-- Source code zip archive & cloud link -->
+                    <div class="sub-zip-section">
+                      <div class="sub-zip-header">
+                        <span class="sub-label-text">📦 Source Code Archive (.zip) <span class="sub-opt">(optional)</span></span>
+                      </div>
+
+                      <div class="sub-dropzone" id="subDropzone" tabindex="0" role="button" aria-label="Upload source code zip file">
+                        <input type="file" id="subZipFile" accept=".zip,application/zip,application/x-zip-compressed" class="sr-only">
+                        <div class="sub-dropzone-content" id="subDropzoneContent">
+                          <span class="sub-dropzone-icon" aria-hidden="true">🗜️</span>
+                          <div class="sub-dropzone-text">
+                            <p class="sub-dropzone-title"><b>Choose a .zip file</b> or drag &amp; drop</p>
+                            <p class="sub-dropzone-desc">Max 50MB · Attach project source code</p>
+                          </div>
+                        </div>
+                        <div class="sub-file-chosen" id="subFileChosen" hidden>
+                          <span class="sub-file-icon" aria-hidden="true">📦</span>
+                          <div class="sub-file-info">
+                            <span class="sub-file-name" id="subFileName">project.zip</span>
+                            <span class="sub-file-size" id="subFileSize">0 KB</span>
+                          </div>
+                          <button type="button" class="sub-file-remove" id="subFileRemove" title="Remove attached zip" aria-label="Remove attached zip file">✕</button>
+                        </div>
+                      </div>
+
+                      <label class="sub-label sub-label-inline">
+                        <span class="sub-label-text">☁️ Or Drive / Cloud ZIP Link <span class="sub-opt">(Google Drive, OneDrive, etc.)</span></span>
+                        <input type="url" id="subZipLink" class="sub-input" placeholder="https://drive.google.com/file/d/... or direct zip link" spellcheck="false" autocomplete="off">
+                      </label>
+                    </div>
+
                     <p class="sub-error" id="subError" role="alert" hidden></p>
                     <button type="submit" class="btn btn-blood sub-btn" id="subSubmitBtn">
-                      <span id="subSubmitLabel">Submit Project Link</span>
+                      <span id="subSubmitLabel">Submit Project</span>
                     </button>
                   </form>
 
@@ -415,10 +486,12 @@
                         <div class="sub-result-links">
                           <a class="sub-live-link" id="subLiveLink" href="#" target="_blank" rel="noopener">🌐 Open Live Site ↗</a>
                           <a class="sub-repo-link" id="subRepoLink" href="#" target="_blank" rel="noopener" hidden>📁 View Code ↗</a>
+                          <a class="sub-zip-download" id="subZipDownload" href="#" download="project-source.zip" hidden>📦 Download ZIP ⤓</a>
+                          <a class="sub-zip-link" id="subZipCloudLink" href="#" target="_blank" rel="noopener" hidden>☁️ Cloud ZIP ↗</a>
                         </div>
                       </div>
                     </div>
-                    <button type="button" class="btn btn-ghost btn-sm sub-edit-btn" id="subEditBtn">Update Links</button>
+                    <button type="button" class="btn btn-ghost btn-sm sub-edit-btn" id="subEditBtn">Update Submission</button>
                   </div>
                 </div>
               </div>

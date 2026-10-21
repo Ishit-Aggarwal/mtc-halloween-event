@@ -20,11 +20,13 @@
   var el = {
     ledgerPanel: $("ledgerPanel"), wheelPanel: $("wheelPanel"),
     form: $("ledgerForm"), teamInput: $("teamInput"), teamError: $("teamError"),
+    leaderNameInput: $("leaderNameInput"), leaderYearInput: $("leaderYearInput"), leaderBranchInput: $("leaderBranchInput"),
+    membersContainer: $("membersContainer"), addMemberBtn: $("addMemberBtn"), membersLimitNote: $("membersLimitNote"),
     seals: $("seals"), kicker: $("wheelKicker"), title: $("wheelTitle"), sub: $("wheelSub"),
     stage: $("wheelStage"), rotor: $("wheelRotor"), canvas: $("wheelCanvas"), pointer: $("pointer"),
     hub: $("hub"), chains: $("chains"), countdown: $("countdown"),
     spinBtn: $("spinBtn"), spinLabel: $("spinLabel"), spinHint: $("spinHint"),
-    fateList: $("fateList"), grimoireTeam: $("grimoireTeam"), grimoireFoot: $("grimoireFoot"),
+    fateList: $("fateList"), grimoireTeam: $("grimoireTeam"), grimoireRoster: $("grimoireRoster"), grimoireFoot: $("grimoireFoot"),
     reveal: $("reveal"), card: $("card"), cardKicker: $("cardKicker"), cardGlyph: $("cardGlyph"),
     cardName: $("cardName"), cardLore: $("cardLore"), cardDesc: $("cardDesc"), cardBtn: $("cardBtn"),
     host: $("hostModal"), announcer: $("announcer"), soundBtn: $("soundBtn"),
@@ -32,9 +34,15 @@
     gate: $("gate"), scareBtn: $("scareBtn"), cardScope: $("cardScope"),
     submissionCard: $("submissionCard"), subForm: $("submissionForm"),
     subUrl: $("subUrl"), subRepo: $("subRepo"), subError: $("subError"),
+    subZipFile: $("subZipFile"), subDropzone: $("subDropzone"),
+    subDropzoneContent: $("subDropzoneContent"), subFileChosen: $("subFileChosen"),
+    subFileName: $("subFileName"), subFileSize: $("subFileSize"), subFileRemove: $("subFileRemove"),
+    subZipLink: $("subZipLink"),
     subSubmitBtn: $("subSubmitBtn"), subSubmitLabel: $("subSubmitLabel"),
     subResult: $("subResult"), subResultTime: $("subResultTime"),
-    subLiveLink: $("subLiveLink"), subRepoLink: $("subRepoLink"), subEditBtn: $("subEditBtn"),
+    subLiveLink: $("subLiveLink"), subRepoLink: $("subRepoLink"),
+    subZipDownload: $("subZipDownload"), subZipCloudLink: $("subZipCloudLink"),
+    subEditBtn: $("subEditBtn"),
     viewTabs: $("viewTabs"), tabMission: $("tabMission"), tabWheel: $("tabWheel")
   };
 
@@ -170,6 +178,22 @@
     var c = charById(s.charId);
     var stage = s.stage;
     el.grimoireTeam.textContent = s.team ? "Team · " + s.team : "";
+    if (el.grimoireRoster) {
+      if (s.leader && s.leader.name) {
+        var rText = "👑 " + s.leader.name;
+        if (s.leader.branch || s.leader.year) {
+          rText += " (" + [s.leader.year, s.leader.branch].filter(Boolean).join(" · ") + ")";
+        }
+        if (s.members && s.members.length) {
+          rText += " · +" + s.members.length + " member" + (s.members.length > 1 ? "s" : "");
+        }
+        el.grimoireRoster.textContent = rText;
+        el.grimoireRoster.hidden = false;
+      } else {
+        el.grimoireRoster.textContent = "";
+        el.grimoireRoster.hidden = true;
+      }
+    }
 
     setFate(1, c ? { name: c.name, desc: c.lore, glyph: c.glyph, color: c.color, fresh: fresh } : { current: stage === "soul" });
 
@@ -209,6 +233,33 @@
         el.subRepoLink.href = session.repoUrl;
       } else {
         el.subRepoLink.hidden = true;
+      }
+
+      if (session.zipCloudUrl) {
+        el.subZipCloudLink.hidden = false;
+        el.subZipCloudLink.href = session.zipCloudUrl;
+      } else {
+        el.subZipCloudLink.hidden = true;
+      }
+
+      if (session.zipUrl) {
+        el.subZipDownload.hidden = false;
+        el.subZipDownload.href = session.zipUrl;
+        el.subZipDownload.download = session.zipName || "project-source.zip";
+      } else if (session.zipData) {
+        el.subZipDownload.hidden = false;
+        el.subZipDownload.href = session.zipData;
+        el.subZipDownload.download = session.zipName || "project-source.zip";
+      } else if (session.zipName) {
+        el.subZipDownload.hidden = false;
+        el.subZipDownload.download = session.zipName;
+        window.Store.getZipFile(session.teamKey).then(function (rec) {
+          if (rec && rec.blob) {
+            el.subZipDownload.href = URL.createObjectURL(rec.blob);
+          }
+        });
+      } else {
+        el.subZipDownload.hidden = true;
       }
     }
   }
@@ -479,6 +530,8 @@
   function saveProgress() {
     if (!session || !session.teamKey) return;
     var p = { stage: session.pending ? session.pending + "-spun" : session.stage };
+    if (session.leader) p.leader = session.leader;
+    if (session.members && session.members.length) p.members = session.members.slice();
     if (session.charId) p.charId = session.charId;
     if (typeof session.problem === "number") p.problem = session.problem;
     if (typeof session.hex === "number") { p.hex = session.hex; p.hexAt = session.hexAt; p.unlockAt = session.unlockAt; }
@@ -488,6 +541,10 @@
       p.submissionUrl = session.submissionUrl;
       p.submittedAt = session.submittedAt;
       if (session.repoUrl) p.repoUrl = session.repoUrl;
+      if (session.zipUrl) p.zipUrl = session.zipUrl;
+      if (session.zipName) p.zipName = session.zipName;
+      if (session.zipSize) p.zipSize = session.zipSize;
+      if (session.zipCloudUrl) p.zipCloudUrl = session.zipCloudUrl;
     }
     window.Ledger.saveProgress(session.teamKey, p);
   }
@@ -608,6 +665,84 @@
     return d ? "This phone has already signed the ledger as “" + d.team + "”. Each team gets one registration." : "";
   }
 
+  /* ---------- ledger (team sign-in & roster) ---------- */
+
+  var MAX_TOTAL_MEMBERS = 2; // 1 leader + up to 1 additional member
+
+  function updateAddMemberState() {
+    if (!el.membersContainer || !el.addMemberBtn) return;
+    var currentCount = el.membersContainer.querySelectorAll(".member-card").length;
+    var atLimit = (1 + currentCount) >= MAX_TOTAL_MEMBERS;
+    el.addMemberBtn.hidden = atLimit;
+    if (el.membersLimitNote) el.membersLimitNote.hidden = !atLimit;
+  }
+
+  function addMemberRow() {
+    if (!el.membersContainer) return;
+    var currentCount = el.membersContainer.querySelectorAll(".member-card").length;
+    if (1 + currentCount >= MAX_TOTAL_MEMBERS) return;
+
+    var num = currentCount + 2;
+    var card = document.createElement("div");
+    card.className = "member-card";
+    card.setAttribute("data-member-num", num);
+    card.innerHTML =
+      '<div class="member-card-head">' +
+        '<span class="member-card-title">Member ' + num + '</span>' +
+        '<button type="button" class="member-remove-btn" title="Remove member" aria-label="Remove member ' + num + '">✕ Remove</button>' +
+      '</div>' +
+      '<div class="member-card-body">' +
+        '<label class="field">' +
+          '<span class="field-label">Member Name</span>' +
+          '<input class="member-name-input" type="text" maxlength="50" placeholder="Full name" spellcheck="false" autocapitalize="words" required>' +
+        '</label>' +
+        '<div class="field-row">' +
+          '<label class="field">' +
+            '<span class="field-label">Year of College</span>' +
+            '<input class="member-year-input" type="text" maxlength="20" placeholder="e.g. 1st, 2nd, 3rd, 4th" spellcheck="false" required>' +
+          '</label>' +
+          '<label class="field">' +
+            '<span class="field-label">Branch</span>' +
+            '<input class="member-branch-input" type="text" maxlength="40" placeholder="e.g. CSE, IT, ECE" spellcheck="false" autocapitalize="characters" required>' +
+          '</label>' +
+        '</div>' +
+      '</div>';
+
+    var removeBtn = card.querySelector(".member-remove-btn");
+    removeBtn.addEventListener("click", function () {
+      card.remove();
+      renumberMembers();
+      updateAddMemberState();
+      if (window.Sound && window.Sound.tick) window.Sound.tick(0.4);
+    });
+
+    el.membersContainer.appendChild(card);
+    updateAddMemberState();
+
+    var nameInp = card.querySelector(".member-name-input");
+    if (nameInp) nameInp.focus();
+    if (window.Sound && window.Sound.tick) window.Sound.tick(0.6);
+  }
+
+  function renumberMembers() {
+    if (!el.membersContainer) return;
+    var cards = el.membersContainer.querySelectorAll(".member-card");
+    for (var i = 0; i < cards.length; i++) {
+      var n = i + 2;
+      cards[i].setAttribute("data-member-num", n);
+      var title = cards[i].querySelector(".member-card-title");
+      if (title) title.textContent = "Member " + n;
+      var removeBtn = cards[i].querySelector(".member-remove-btn");
+      if (removeBtn) removeBtn.setAttribute("aria-label", "Remove member " + n);
+    }
+  }
+
+  if (el.addMemberBtn) {
+    el.addMemberBtn.addEventListener("click", function () {
+      addMemberRow();
+    });
+  }
+
   var signing = false;
   el.form.addEventListener("submit", async function (e) {
     e.preventDefault();
@@ -635,8 +770,65 @@
     }
 
     if (alreadyRegistered()) { el.teamError.textContent = alreadyRegistered(); return; }
-    if (name.length < 2) { el.teamError.textContent = "The ledger needs a real name — at least two letters."; el.teamInput.focus(); return; }
+    if (name.length < 2) { el.teamError.textContent = "The ledger needs a real team name — at least two letters."; el.teamInput.focus(); return; }
     if (window.Ledger.teamExists(name)) { el.teamError.textContent = "That name is already written in the ledger. Choose another."; el.teamInput.focus(); return; }
+
+    var leaderName = (el.leaderNameInput ? el.leaderNameInput.value : "").replace(/\s+/g, " ").trim();
+    var leaderYear = (el.leaderYearInput ? el.leaderYearInput.value : "").replace(/\s+/g, " ").trim();
+    var leaderBranch = (el.leaderBranchInput ? el.leaderBranchInput.value : "").replace(/\s+/g, " ").trim();
+
+    if (leaderName.length < 2) {
+      el.teamError.textContent = "Please enter the team leader's name.";
+      if (el.leaderNameInput) el.leaderNameInput.focus();
+      return;
+    }
+    if (!leaderYear) {
+      el.teamError.textContent = "Please enter the team leader's year of college.";
+      if (el.leaderYearInput) el.leaderYearInput.focus();
+      return;
+    }
+    if (!leaderBranch) {
+      el.teamError.textContent = "Please enter the team leader's branch.";
+      if (el.leaderBranchInput) el.leaderBranchInput.focus();
+      return;
+    }
+
+    var memberCards = el.membersContainer ? el.membersContainer.querySelectorAll(".member-card") : [];
+    var members = [];
+    for (var i = 0; i < memberCards.length; i++) {
+      var card = memberCards[i];
+      var mNameInput = card.querySelector(".member-name-input");
+      var mYearInput = card.querySelector(".member-year-input");
+      var mBranchInput = card.querySelector(".member-branch-input");
+      var mName = (mNameInput ? mNameInput.value : "").replace(/\s+/g, " ").trim();
+      var mYear = (mYearInput ? mYearInput.value : "").replace(/\s+/g, " ").trim();
+      var mBranch = (mBranchInput ? mBranchInput.value : "").replace(/\s+/g, " ").trim();
+      var studentNum = i + 2;
+
+      if (mName.length < 2) {
+        el.teamError.textContent = "Please enter Member " + studentNum + "'s name (or remove this member).";
+        if (mNameInput) mNameInput.focus();
+        return;
+      }
+      if (!mYear) {
+        el.teamError.textContent = "Please enter Member " + studentNum + "'s year of college.";
+        if (mYearInput) mYearInput.focus();
+        return;
+      }
+      if (!mBranch) {
+        el.teamError.textContent = "Please enter Member " + studentNum + "'s branch.";
+        if (mBranchInput) mBranchInput.focus();
+        return;
+      }
+      members.push({ name: mName, year: mYear, branch: mBranch });
+    }
+
+    if (members.length > 1) {
+      el.teamError.textContent = "Maximum team size is 2 (Leader + 1 Member).";
+      return;
+    }
+
+    var leaderObj = { name: leaderName, year: leaderYear, branch: leaderBranch };
     el.teamError.textContent = "";
 
     var btn = el.form.querySelector("button[type=submit] span");
@@ -648,7 +840,7 @@
       await window.Ledger.ready();
       // a restore may have happened while we waited
       if (session || alreadyRegistered()) res = { ok: false, error: alreadyRegistered() || "" };
-      else res = await window.Ledger.registerTeam(name);
+      else res = await window.Ledger.registerTeam(name, { leader: leaderObj, members: members });
     } catch (err) {
       res = { ok: false, error: window.Ledger.friendly(err) };
     }
@@ -657,15 +849,29 @@
     if (session) return;
     if (!res.ok) { el.teamError.textContent = res.error; el.teamInput.focus(); return; }
 
-    session = { team: name, teamKey: res.key, stage: "soul", startedAt: Date.now(), eggs: [] };
-    window.Store.lockDevice(name, res.key);
+    session = {
+      team: name,
+      teamKey: res.key,
+      leader: leaderObj,
+      members: members,
+      stage: "soul",
+      startedAt: Date.now(),
+      eggs: []
+    };
+    window.Store.lockDevice(name, res.key, { leader: leaderObj, members: members });
     save();
+    saveProgress();
     resetIdle();
     window.Sound.whoosh();
     render(true);
     el.stage.scrollIntoView({ behavior: "smooth", block: "center" });
   });
+
   el.teamInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderNameInput) el.leaderNameInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderYearInput) el.leaderYearInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderBranchInput) el.leaderBranchInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.membersContainer) el.membersContainer.addEventListener("input", function () { el.teamError.textContent = ""; });
 
   /* ---------- controls ---------- */
 
@@ -696,13 +902,97 @@
   el.hub.addEventListener("click", function () { spin(false); });
   el.cardBtn.addEventListener("click", acceptCard);
 
-  /* ---------- project submission ---------- */
+  /* ---------- project submission & zip handling ---------- */
+
+  var attachedZipFile = null;
+
+  function fmtBytes(b) {
+    if (!b || b <= 0) return "0 B";
+    var k = 1024, s = ["B", "KB", "MB", "GB"], i = Math.floor(Math.log(b) / Math.log(k));
+    return parseFloat((b / Math.pow(k, i)).toFixed(1)) + " " + s[i];
+  }
+
+  function handleZipSelection(file) {
+    if (!file) return;
+    if (!/\.zip$/i.test(file.name) && file.type && !/zip/i.test(file.type)) {
+      el.subError.hidden = false;
+      el.subError.textContent = "Please select a valid .zip archive file.";
+      return;
+    }
+    if (file.size > 50 * 1024 * 1024) {
+      el.subError.hidden = false;
+      el.subError.textContent = "File is too large (" + fmtBytes(file.size) + "). Maximum allowed is 50MB. Please use the Drive/Cloud ZIP link instead.";
+      return;
+    }
+    el.subError.hidden = true;
+    attachedZipFile = file;
+    el.subFileName.textContent = file.name;
+    el.subFileSize.textContent = fmtBytes(file.size);
+    el.subDropzoneContent.hidden = true;
+    el.subFileChosen.hidden = false;
+  }
+
+  if (el.subDropzone) {
+    el.subDropzone.addEventListener("click", function (e) {
+      if (e.target && e.target.closest("#subFileRemove")) return;
+      el.subZipFile.click();
+    });
+    el.subDropzone.addEventListener("keydown", function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        el.subZipFile.click();
+      }
+    });
+    el.subDropzone.addEventListener("dragover", function (e) {
+      e.preventDefault();
+      el.subDropzone.classList.add("dragover");
+    });
+    el.subDropzone.addEventListener("dragleave", function (e) {
+      e.preventDefault();
+      el.subDropzone.classList.remove("dragover");
+    });
+    el.subDropzone.addEventListener("drop", function (e) {
+      e.preventDefault();
+      el.subDropzone.classList.remove("dragover");
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleZipSelection(e.dataTransfer.files[0]);
+      }
+    });
+  }
+
+  if (el.subZipFile) {
+    el.subZipFile.addEventListener("change", function () {
+      if (this.files && this.files[0]) {
+        handleZipSelection(this.files[0]);
+      }
+    });
+  }
+
+  if (el.subFileRemove) {
+    el.subFileRemove.addEventListener("click", function (e) {
+      e.stopPropagation();
+      attachedZipFile = null;
+      if (el.subZipFile) el.subZipFile.value = "";
+      if (session) {
+        delete session.zipUrl;
+        delete session.zipName;
+        delete session.zipSize;
+        delete session.zipData;
+        if (session.teamKey) window.Store.removeZipFile(session.teamKey);
+        save();
+        saveProgress();
+      }
+      el.subDropzoneContent.hidden = false;
+      el.subFileChosen.hidden = true;
+    });
+  }
 
   el.subForm.addEventListener("submit", async function (e) {
     e.preventDefault();
     if (!session) return;
     var url = (el.subUrl.value || "").trim();
     var repo = (el.subRepo.value || "").trim();
+    var zipLink = el.subZipLink ? (el.subZipLink.value || "").trim() : "";
 
     if (!url) {
       el.subError.hidden = false;
@@ -740,18 +1030,78 @@
       }
     }
 
+    if (zipLink && !/^https?:\/\//i.test(zipLink)) {
+      zipLink = "https://" + zipLink;
+      if (el.subZipLink) el.subZipLink.value = zipLink;
+    }
+    if (zipLink) {
+      try {
+        new URL(zipLink);
+      } catch (err) {
+        el.subError.hidden = false;
+        el.subError.textContent = "Please enter a valid Drive/Cloud link or leave it blank.";
+        if (el.subZipLink) el.subZipLink.focus();
+        return;
+      }
+    }
+
     el.subError.hidden = true;
     el.subSubmitBtn.disabled = true;
     var origText = el.subSubmitLabel.textContent;
-    el.subSubmitLabel.textContent = "Saving…";
+    el.subSubmitLabel.textContent = attachedZipFile ? "Processing ZIP…" : "Saving…";
 
     var now = Date.now();
     session.submissionUrl = url;
     session.repoUrl = repo;
+    session.zipCloudUrl = zipLink || null;
     session.submittedAt = now;
+
+    if (attachedZipFile) {
+      session.zipName = attachedZipFile.name;
+      session.zipSize = attachedZipFile.size;
+      try {
+        await window.Store.saveZipFile(session.teamKey, attachedZipFile);
+      } catch (idbErr) {
+        console.warn("IndexedDB save error", idbErr);
+      }
+
+      if (attachedZipFile.size <= 700000) {
+        try {
+          session.zipData = await new Promise(function (res, rej) {
+            var reader = new FileReader();
+            reader.onload = function () { res(reader.result); };
+            reader.onerror = rej;
+            reader.readAsDataURL(attachedZipFile);
+          });
+        } catch (b64Err) {
+          console.warn("Base64 encode error", b64Err);
+        }
+      }
+
+      try {
+        var upRes = await window.Ledger.uploadZip(session.teamKey, attachedZipFile, function (pct) {
+          el.subSubmitLabel.textContent = "Uploading ZIP (" + pct + "%)…";
+        });
+        if (upRes && upRes.url) {
+          session.zipUrl = upRes.url;
+        }
+      } catch (upErr) {
+        console.warn("Cloud Storage upload failed/skipped", upErr);
+      }
+    }
+
     save();
 
-    var patch = { submissionUrl: url, repoUrl: repo, submittedAt: now };
+    var patch = {
+      submissionUrl: url,
+      repoUrl: repo,
+      submittedAt: now
+    };
+    if (session.zipUrl) patch.zipUrl = session.zipUrl;
+    if (session.zipName) patch.zipName = session.zipName;
+    if (session.zipSize) patch.zipSize = session.zipSize;
+    if (session.zipCloudUrl) patch.zipCloudUrl = session.zipCloudUrl;
+
     try {
       await window.Ledger.saveProgress(session.teamKey, patch);
       if (session.entryId) {
@@ -775,7 +1125,19 @@
     el.subForm.hidden = false;
     el.subUrl.value = session.submissionUrl || "";
     el.subRepo.value = session.repoUrl || "";
-    el.subSubmitLabel.textContent = "Update Project Link";
+    if (el.subZipLink) el.subZipLink.value = session.zipCloudUrl || "";
+    if (session.zipName) {
+      el.subFileName.textContent = session.zipName;
+      el.subFileSize.textContent = session.zipSize ? fmtBytes(session.zipSize) : "Attached";
+      el.subDropzoneContent.hidden = true;
+      el.subFileChosen.hidden = false;
+    } else {
+      attachedZipFile = null;
+      if (el.subZipFile) el.subZipFile.value = "";
+      el.subDropzoneContent.hidden = false;
+      el.subFileChosen.hidden = true;
+    }
+    el.subSubmitLabel.textContent = "Update Submission";
     el.subUrl.focus();
   });
 
@@ -974,12 +1336,37 @@
   });
   $("hostCsv").addEventListener("click", function () {
     var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
-    var lines = [["Team", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Submitted at", "Claimed at"].map(q).join(",")];
+    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Members", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Claimed at"].map(q).join(",")];
+    var teamsByKey = {};
+    window.Ledger.teams().forEach(function (t) { teamsByKey[t.key] = t; });
     window.Ledger.entries().forEach(function (e) {
+      var tDoc = teamsByKey[e.teamKey || window.Ledger.teamKey(e.team || "")] || {};
+      var ldr = tDoc.leader || {};
+      var memList = (tDoc.members || []).map(function (m) {
+        return m.name + (m.year || m.branch ? " (" + [m.year, m.branch].filter(Boolean).join(" - ") + ")" : "");
+      }).join("; ");
       var c = charById(e.charId), p = c && c.problems[e.problem];
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null, t = typeof e.twist === "number" ? D.twists[e.twist] : null;
       var subTime = e.submittedAt ? new Date(e.submittedAt).toLocaleString() : "";
-      lines.push([e.team, c && c.name, p && p.t, p && p.d, h && h.t, t && t.t, e.twistText, e.submissionUrl || "", e.repoUrl || "", subTime, new Date(e.at).toLocaleString()].map(q).join(","));
+      lines.push([
+        e.team,
+        ldr.name || "",
+        ldr.year || "",
+        ldr.branch || "",
+        memList,
+        c && c.name,
+        p && p.t,
+        p && p.d,
+        h && h.t,
+        t && t.t,
+        e.twistText,
+        e.submissionUrl || "",
+        e.repoUrl || "",
+        e.zipUrl || (e.zipName ? "Attached: " + e.zipName : ""),
+        e.zipCloudUrl || "",
+        subTime,
+        new Date(e.at).toLocaleString()
+      ].map(q).join(","));
     });
     download("wheel-of-curses-" + stamp() + ".csv", "\ufeff" + lines.join("\r\n"), "text/csv");
   });
@@ -1081,7 +1468,7 @@
   setTimeout(resumePending, 600);
 
   // One registration per phone: a phone that already has a team is locked to it.
-  if (session && !window.Store.deviceTeam()) window.Store.lockDevice(session.team, session.teamKey || window.Ledger.teamKey(session.team));
+  if (session && !window.Store.deviceTeam()) window.Store.lockDevice(session.team, session.teamKey || window.Ledger.teamKey(session.team), { leader: session.leader, members: session.members });
 
   // Lost the session on this phone (cleared storage, crash)? If the ledger
   // knows the team this phone registered, pick up exactly where it was —
@@ -1097,9 +1484,17 @@
         if (lock && (window.Ledger.mode === "local" || window.Ledger.status === "online")) window.Store.unlockDevice();
         return;
       }
-      window.Store.lockDevice(t.name, t.key);
-      var restored = { team: t.name, teamKey: t.key, startedAt: t.at || Date.now(), stage: t.stage || "soul", eggs: (t.eggs || []).slice() };
-      ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "submittedAt"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
+      window.Store.lockDevice(t.name, t.key, { leader: t.leader, members: t.members });
+      var restored = {
+        team: t.name,
+        teamKey: t.key,
+        leader: t.leader || (lock && lock.leader) || null,
+        members: t.members || (lock && lock.members) || [],
+        startedAt: t.at || Date.now(),
+        stage: t.stage || "soul",
+        eggs: (t.eggs || []).slice()
+      };
+      ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "zipUrl", "zipName", "zipSize", "zipCloudUrl", "submittedAt", "leader", "members"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
       if (restored.charId && typeof restored.problem === "number") restored.entryId = restored.charId + "__" + restored.problem;
       // "<stage>-spun" = the wheel had stopped but the card wasn't accepted yet
       var m = /^(soul|curse|hex|twist)-spun$/.exec(restored.stage);

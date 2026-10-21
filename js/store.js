@@ -83,7 +83,7 @@
 
     /* ---------- one registration per phone ---------- */
     deviceTeam: function () { return read(DEVICE_KEY, null); },
-    lockDevice: function (team, key) { write(DEVICE_KEY, { team: team, key: key, at: Date.now() }); },
+    lockDevice: function (team, key, meta) { write(DEVICE_KEY, Object.assign({ team: team, key: key, at: Date.now() }, meta || {})); },
     unlockDevice: function () { remove(DEVICE_KEY); },
 
     /* ---------- judges' pass (kept for this browser) ---------- */
@@ -178,8 +178,77 @@
 
     /* ---------- device prefs ---------- */
     prefs: function () { return read(PREFS_KEY, {}) || {}; },
-    setPref: function (k, v) { var p = this.prefs(); p[k] = v; write(PREFS_KEY, p); }
+    setPref: function (k, v) { var p = this.prefs(); p[k] = v; write(PREFS_KEY, p); },
+
+    /* ---------- indexeddb for source code zip files ---------- */
+    saveZipFile: function (key, file) {
+      return getDb().then(function (db) {
+        return new Promise(function (resolve, reject) {
+          try {
+            var tx = db.transaction(IDB_STORE, "readwrite");
+            var store = tx.objectStore(IDB_STORE);
+            var record = {
+              key: key,
+              name: file.name,
+              size: file.size,
+              type: file.type || "application/zip",
+              blob: file,
+              savedAt: Date.now()
+            };
+            var req = store.put(record);
+            req.onsuccess = function () { resolve(record); };
+            req.onerror = function (e) { reject(e.target.error); };
+          } catch (err) { reject(err); }
+        });
+      });
+    },
+
+    getZipFile: function (key) {
+      return getDb().then(function (db) {
+        return new Promise(function (resolve, reject) {
+          try {
+            var tx = db.transaction(IDB_STORE, "readonly");
+            var store = tx.objectStore(IDB_STORE);
+            var req = store.get(key);
+            req.onsuccess = function (e) { resolve(e.target.result || null); };
+            req.onerror = function (e) { reject(e.target.error); };
+          } catch (err) { reject(err); }
+        });
+      }).catch(function () { return null; });
+    },
+
+    removeZipFile: function (key) {
+      return getDb().then(function (db) {
+        return new Promise(function (resolve, reject) {
+          try {
+            var tx = db.transaction(IDB_STORE, "readwrite");
+            var store = tx.objectStore(IDB_STORE);
+            var req = store.delete(key);
+            req.onsuccess = function () { resolve(); };
+            req.onerror = function (e) { reject(e.target.error); };
+          } catch (err) { reject(err); }
+        });
+      }).catch(function () {});
+    }
   };
+
+  /* IndexedDB helper for storing local binaries */
+  var IDB_NAME = "woc_storage_v1";
+  var IDB_STORE = "zips";
+  function getDb() {
+    return new Promise(function (resolve, reject) {
+      if (typeof window === "undefined" || !window.indexedDB) return reject(new Error("IndexedDB not available"));
+      var req = window.indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = function (e) {
+        var db = e.target.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) {
+          db.createObjectStore(IDB_STORE, { keyPath: "key" });
+        }
+      };
+      req.onsuccess = function (e) { resolve(e.target.result); };
+      req.onerror = function (e) { reject(e.target.error); };
+    });
+  }
 
   window.Store = Store;
 })();

@@ -34,6 +34,9 @@
         t.repoUrl = e.repoUrl;
         t.submittedAt = e.submittedAt;
       }
+      if (!t.zipUrl && e.zipUrl) t.zipUrl = e.zipUrl;
+      if (!t.zipName && e.zipName) t.zipName = e.zipName;
+      if (!t.zipCloudUrl && e.zipCloudUrl) t.zipCloudUrl = e.zipCloudUrl;
     });
     return Object.keys(byKey).map(function (k) { return byKey[k]; })
       .sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
@@ -63,8 +66,23 @@
         (text ? '<p class="trow-text">' + esc(text) + "</p>" : "") + "</div></div>";
     }
 
+    var rosterHtml = "";
+    if (t.leader && t.leader.name) {
+      var ldrMeta = [t.leader.year, t.leader.branch].filter(Boolean).map(esc).join(" · ");
+      var ldrStr = esc(t.leader.name) + (ldrMeta ? ' <span class="roster-meta">[' + ldrMeta + "]</span>" : "");
+      var memStrs = (t.members || []).map(function (m) {
+        var mMeta = [m.year, m.branch].filter(Boolean).map(esc).join(" · ");
+        return esc(m.name) + (mMeta ? ' <span class="roster-meta">[' + mMeta + "]</span>" : "");
+      });
+      rosterHtml = '<div class="trow roster"><span class="trow-label">Roster</span><div>' +
+        '<p class="trow-title"><span class="g">👑</span>' + ldrStr + '</p>' +
+        (memStrs.length ? '<p class="trow-text roster-members"><span class="g">👥</span>' + memStrs.join(" · ") + '</p>' : "") +
+        '</div></div>';
+    }
+
     return '<article class="tcard" style="--c:' + (c ? c.color : "#bf9f93") + '">' +
       '<header class="tcard-head"><span class="tcard-num">#' + n + '</span><h2 class="tcard-name">' + esc(t.name) + '</h2><span class="badge ' + st + '">' + esc(badge) + "</span></header>" +
+      rosterHtml +
       row("soul", "Soul", c && c.name, c && c.lore, c && c.glyph) +
       row("curse", "Curse", p && p.t, p && p.d) +
       row("hex", "Hex", h && h.t, h && h.d, h && h.glyph) +
@@ -72,7 +90,9 @@
       (t.submissionUrl ? '<div class="trow submission"><span class="trow-label">Project</span><div>' +
         '<a class="judge-live-btn" href="' + esc(t.submissionUrl) + '" target="_blank" rel="noopener">🌐 Open Live Website ↗</a>' +
         (t.repoUrl ? ' <a class="judge-repo-btn" href="' + esc(t.repoUrl) + '" target="_blank" rel="noopener">📁 GitHub ↗</a>' : "") +
-        (t.submittedAt ? '<span class="judge-sub-time">Submitted ' + time(t.submittedAt) + '</span>' : "") +
+        (t.zipUrl ? ' <a class="judge-zip-btn" href="' + esc(t.zipUrl) + '" target="_blank" rel="noopener" download="' + esc(t.zipName || "project-source.zip") + '">📦 Source ZIP ⤓</a>' : "") +
+        (t.zipCloudUrl ? ' <a class="judge-zip-cloud-btn" href="' + esc(t.zipCloudUrl) + '" target="_blank" rel="noopener">☁️ Cloud ZIP ↗</a>' : "") +
+        (t.submittedAt ? '<span class="judge-sub-time">Submitted ' + time(t.submittedAt) + (t.zipName ? ' · ' + esc(t.zipName) : '') + '</span>' : "") +
         '</div></div>' : (st === "done" ? '<div class="trow submission pending"><span class="trow-label">Project</span><p class="trow-title pending">Awaiting submission…</p></div>' : "")) +
       (!D.eggsEnabled ? "" : (function () {
         var eggs = (t.eggs || []).filter(function (id) { return D.eggs && D.eggs[id]; });
@@ -101,7 +121,9 @@
       if (!q) return true;
       var c = charById(x.t.charId) || {};
       var p = c.problems && typeof x.t.problem === "number" ? c.problems[x.t.problem] : {};
-      var hay = [x.t.name, c.name, p && p.t, typeof x.t.hex === "number" ? D.uiCurses[x.t.hex].t : "", typeof x.t.twist === "number" ? D.twists[x.t.twist].t : ""].join(" ").toLowerCase();
+      var ldr = x.t.leader ? [x.t.leader.name, x.t.leader.year, x.t.leader.branch].join(" ") : "";
+      var mems = (x.t.members || []).map(function (m) { return [m.name, m.year, m.branch].join(" "); }).join(" ");
+      var hay = [x.t.name, ldr, mems, c.name, p && p.t, typeof x.t.hex === "number" ? D.uiCurses[x.t.hex].t : "", typeof x.t.twist === "number" ? D.twists[x.t.twist].t : ""].join(" ").toLowerCase();
       return hay.indexOf(q) >= 0;
     }).map(function (x) { return card(x.t, x.n); }).join("");
 

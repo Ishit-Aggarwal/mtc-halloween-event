@@ -100,7 +100,8 @@
     return Promise.all([
       loadScript(SDK + "firebase-app-compat.js"),
       loadScript(SDK + "firebase-auth-compat.js"),
-      loadScript(SDK + "firebase-firestore-compat.js")
+      loadScript(SDK + "firebase-firestore-compat.js"),
+      loadScript(SDK + "firebase-storage-compat.js").catch(function () { return null; })
     ]);
   }
 
@@ -191,17 +192,36 @@
   }
 
   var cloud = {
-    registerTeam: async function (name) {
+    registerTeam: async function (name, meta) {
       needUser();
       var key = teamKey(name);
       var ref = db.collection("teams").doc(key);
       var uid = state.user.uid;
-      var ok = await withTimeout(db.runTransaction(async function (t) {
-        var snap = await t.get(ref);
-        if (snap.exists) return false;
-        t.set(ref, { name: name, uid: uid, at: window.firebase.firestore.FieldValue.serverTimestamp() });
-        return true;
-      }), 12000);
+      var data = { name: name, uid: uid, at: window.firebase.firestore.FieldValue.serverTimestamp() };
+      if (meta && meta.leader) data.leader = meta.leader;
+      if (meta && meta.members) data.members = meta.members;
+
+      var ok = false;
+      try {
+        ok = await withTimeout(db.runTransaction(async function (t) {
+          var snap = await t.get(ref);
+          if (snap.exists) return false;
+          t.set(ref, data);
+          return true;
+        }), 12000);
+      } catch (err) {
+        if (err && err.code === "permission-denied" && (data.leader || data.members)) {
+          console.warn("Retrying team registration with core fields due to Firestore rules restrictions", err);
+          ok = await withTimeout(db.runTransaction(async function (t) {
+            var snap = await t.get(ref);
+            if (snap.exists) return false;
+            t.set(ref, { name: name, uid: uid, at: window.firebase.firestore.FieldValue.serverTimestamp() });
+            return true;
+          }), 12000);
+        } else {
+          throw err;
+        }
+      }
       return ok ? { ok: true, key: key } : { ok: false, error: "That name is already written in the ledger. Choose another." };
     },
 
@@ -221,16 +241,64 @@
       return entry;
     },
 
+    uploadZip: async function (key, file, onProgress) {
+      if (!window.firebase || !window.firebase.storage || !cfg || !cfg.storageBucket) {
+        return null;
+      }
+      try {
+        var storage = window.firebase.storage();
+        var safeName = (file.name || "source.zip").replace(/[^a-zA-Z0-9._-]/g, "_");
+        var path = "submissions/" + key + "/" + Date.now() + "_" + safeName;
+        var ref = storage.ref().child(path);
+        var uploadTask = ref.put(file);
+        if (typeof onProgress === "function") {
+          uploadTask.on("state_changed", function (snap) {
+            var pct = snap.totalBytes ? Math.round((snap.bytesTransferred / snap.totalBytes) * 100) : 0;
+            onProgress(pct);
+          });
+        }
+        var snap = await uploadTask;
+        var downloadUrl = await snap.ref.getDownloadURL();
+        return { url: downloadUrl, name: file.name, size: file.size, path: path };
+      } catch (err) {
+        console.warn("Firebase Storage upload skipped/failed:", err);
+        return null;
+      }
+    },
+
     saveProgress: function (key, patch) {
       if (!db || !key) return Promise.resolve();
       patch.updatedAt = window.firebase.firestore.FieldValue.serverTimestamp();
-      return db.collection("teams").doc(key).update(patch).catch(function (err) { console.warn("Progress save failed", err); });
+      return db.collection("teams").doc(key).update(patch).catch(function (err) {
+        if (err && err.code === "permission-denied" && (patch.zipUrl || patch.zipName || patch.zipCloudUrl)) {
+          var fallbackPatch = Object.assign({}, patch);
+          delete fallbackPatch.zipUrl;
+          delete fallbackPatch.zipName;
+          delete fallbackPatch.zipSize;
+          delete fallbackPatch.zipCloudUrl;
+          console.warn("Retrying progress update without zip fields due to Firestore rules restrictions", err);
+          return db.collection("teams").doc(key).update(fallbackPatch).catch(function (e2) {
+            console.warn("Fallback progress save also failed", e2);
+          });
+        }
+        console.warn("Progress save failed", err);
+      });
     },
 
     update: function (id, patch) {
       if (!db || !id) return Promise.resolve();
       // queued by Firestore if the phone is briefly offline
-      return db.collection("claims").doc(id).update(patch).catch(function (err) { console.warn("Ledger update failed", err); });
+      return db.collection("claims").doc(id).update(patch).catch(function (err) {
+        if (err && err.code === "permission-denied" && (patch.zipUrl || patch.zipName || patch.zipCloudUrl)) {
+          var fallbackPatch = Object.assign({}, patch);
+          delete fallbackPatch.zipUrl;
+          delete fallbackPatch.zipName;
+          delete fallbackPatch.zipSize;
+          delete fallbackPatch.zipCloudUrl;
+          return db.collection("claims").doc(id).update(fallbackPatch).catch(function () {});
+        }
+        console.warn("Ledger update failed", err);
+      });
     },
 
     release: function (id) { needUser(); return db.collection("claims").doc(id).delete(); },
@@ -266,9 +334,10 @@
     state.entries = Store.ledger().slice().sort(function (a, b) { return a.at - b.at; });
     var t = {};
     var progress = Store.prefs().progress || {};
+    var teamDetails = Store.prefs().teamDetails || {};
     function add(name, at) {
       var key = teamKey(name);
-      if (!t[key]) t[key] = Object.assign({ key: key, name: name, at: at || 0 }, progress[key] || {});
+      if (!t[key]) t[key] = Object.assign({ key: key, name: name, at: at || 0 }, teamDetails[key] || {}, progress[key] || {});
     }
     (Store.prefs().teams || []).forEach(function (n) { add(n); });
     state.entries.forEach(function (e) { add(e.team, e.at); });
@@ -277,13 +346,18 @@
   }
 
   var local = {
-    registerTeam: async function (name) {
+    registerTeam: async function (name, meta) {
       var key = teamKey(name);
       refreshLocal();
       if (state.teams[key]) return { ok: false, error: "That name is already written in the ledger. Choose another." };
       var names = Store.prefs().teams || [];
       names.push(name);
       Store.setPref("teams", names);
+      if (meta) {
+        var teamDetails = Store.prefs().teamDetails || {};
+        teamDetails[key] = Object.assign({ key: key, name: name }, meta);
+        Store.setPref("teamDetails", teamDetails);
+      }
       refreshLocal();
       return { ok: true, key: key };
     },
@@ -301,7 +375,8 @@
       refreshLocal();
     },
     release: async function (id) { Store.removeEntry(id); refreshLocal(); },
-    wipe: async function () { Store.wipe(); Store.setPref("teams", []); Store.setPref("progress", {}); refreshLocal(); },
+    uploadZip: async function () { return null; },
+    wipe: async function () { Store.wipe(); Store.setPref("teams", []); Store.setPref("progress", {}); Store.setPref("teamDetails", {}); refreshLocal(); },
     setDelay: async function (min) { Store.setPref("delay", min); emit(); },
     signInHost: async function () {},
     signOutHost: async function () {}
@@ -359,9 +434,10 @@
       return Math.max(0, typeof p === "number" ? p : fallback);
     },
 
-    registerTeam: function (name) { return impl.registerTeam(name); },
+    registerTeam: function (name, meta) { return impl.registerTeam(name, meta); },
     claim: function (team, key, charId, problem) { return impl.claim(team, key, charId, problem); },
     update: function (id, patch) { return impl.update(id, patch); },
+    uploadZip: function (key, file, onProgress) { return impl.uploadZip ? impl.uploadZip(key, file, onProgress) : Promise.resolve(null); },
     release: function (id) { return impl.release(id); },
     wipe: function () { return impl.wipe(); },
     setDelay: function (m) { return impl.setDelay(m); },
