@@ -344,6 +344,13 @@
     welcome: function (done) {
       done = done || function () {};
       if (!scaresOn || !faceImg) { done(); return; }
+      // on a slow connection the picture may still be on its way: hit the moment it lands
+      if (!faceImg.complete) {
+        var go = function () { faceImg.onload = faceImg.onerror = null; Creatures.welcome(done); };
+        faceImg.onload = faceImg.onerror = go;
+        return;
+      }
+      if (!faceImg.naturalWidth) { done(); return; }
       var st = document.createElement("div");
       st.className = "face-scare";
       st.setAttribute("aria-hidden", "true");

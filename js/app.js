@@ -1225,21 +1225,39 @@
   el.scareBtn.addEventListener("click", function () { setScares(!window.Creatures.scaresOn); });
 
   /* ---------- the entry gate ---------- */
-  // Browsers only allow sound after a tap, so entering the crypt is that tap.
+  // The face hits the moment the site opens, with a scream. Browsers only allow
+  // sound after a tap, so where it would be silent it waits for the very first
+  // touch or key press anywhere on the page instead.
 
+  var welcome = "none", entered = false;   // welcome: none | playing | done
+  function startWelcome() {
+    welcome = "playing";
+    window.Creatures.welcome(function () {
+      welcome = "done";
+      if (entered) window.Creatures.opening();
+    });
+  }
   function enter(withSound) {
+    entered = true;
     el.gate.classList.add("gone");
     setSound(withSound);
     resetIdle();
-    if (window.Creatures.scaresOn) {
-      // a few seconds of calm while the crypt rises out of the dark… then the face
-      setTimeout(function () { window.Creatures.welcome(window.Creatures.opening); }, 2300 + Math.random() * 900);
-    } else {
-      setTimeout(function () { window.Creatures.opening(); }, 250);
-    }
+    if (welcome === "none" && window.Creatures.scaresOn) startWelcome();
+    else if (welcome !== "playing") setTimeout(function () { window.Creatures.opening(); }, 250);
+    // still playing: the opening follows as soon as the face is gone
   }
   $("gateEnter").addEventListener("click", function () { enter(true); });
   $("gateQuiet").addEventListener("click", function () { enter(false); });
+
+  function firstTouch(e) {
+    if (welcome !== "none" || entered || !window.Creatures.scaresOn) return;
+    // the gate's own buttons do it themselves, with or without sound
+    if (e.target && e.target.closest && e.target.closest("#gateEnter, #gateQuiet")) return;
+    setSound(true);
+    startWelcome();
+  }
+  document.addEventListener("pointerup", firstTouch, true);
+  document.addEventListener("keydown", firstTouch, true);
 
   /* ---------- host ledger ---------- */
 
@@ -1461,6 +1479,8 @@
   window.Creatures.init({ isBusy: function () { return busy || !el.reveal.hidden || !el.gate.classList.contains("gone"); } });
   setScares(window.Store.prefs().scares !== false);
   render(true);
+  // where the browser allows sound straight away, the face doesn't wait for a tap
+  if (window.Creatures.scaresOn && window.Sound.canAutoplay()) { setSound(true); startWelcome(); }
 
   function resumePending() {
     // a result was decided but the page reloaded before it was shown

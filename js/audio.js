@@ -533,6 +533,14 @@
   var Sound = {
     get enabled() { return enabled; },
 
+    /** True when this browser lets the page make sound before anyone has tapped. */
+    canAutoplay: function () {
+      if (navigator.getAutoplayPolicy) {
+        try { return navigator.getAutoplayPolicy("audiocontext") === "allowed"; } catch (e) {}
+      }
+      return init() && ctx.state === "running";
+    },
+
     setEnabled: function (on) {
       if (on && !init()) return false;
       enabled = !!on;
