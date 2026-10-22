@@ -589,7 +589,12 @@
     window.Sound.whoosh();
     wheel.spin(out.index, { onTick: function (v) { window.Sound.tick(v); } }).then(function () {
       el.stage.classList.remove("spinning");
-      setTimeout(function () { showCard(stage); }, 450);
+      if (stage === "soul" && window.Creatures.scaresOn) {
+        // this character's own jump scare first, then reveal the card once it's over
+        window.Creatures.characterScare(charById(session.charId), function () { showCard(stage); });
+      } else {
+        setTimeout(function () { showCard(stage); }, 450);
+      }
     });
   }
 
@@ -1226,7 +1231,12 @@
     el.gate.classList.add("gone");
     setSound(withSound);
     resetIdle();
-    setTimeout(function () { window.Creatures.opening(); }, 250);
+    if (window.Creatures.scaresOn) {
+      // a few seconds of calm while the crypt rises out of the dark… then the face
+      setTimeout(function () { window.Creatures.welcome(window.Creatures.opening); }, 2300 + Math.random() * 900);
+    } else {
+      setTimeout(function () { window.Creatures.opening(); }, 250);
+    }
   }
   $("gateEnter").addEventListener("click", function () { enter(true); });
   $("gateQuiet").addEventListener("click", function () { enter(false); });

@@ -709,6 +709,48 @@
       thump(t, 1.6);
     },
 
+    // the face at the door: a slam, strings bowed far too hard, and a shriek, all at once
+    stinger: function () {
+      if (!enabled) return;
+      var t = ctx.currentTime;
+      // the slam: a sub drop under a burst of noise
+      var o = ctx.createOscillator(), og = ctx.createGain();
+      o.type = "sine";
+      o.frequency.setValueAtTime(95, t); o.frequency.exponentialRampToValueAtTime(28, t + 0.9);
+      env(og, t, 0.005, 0.9, 1.1);
+      o.connect(og); og.connect(fxBus); o.start(t); o.stop(t + 1.2);
+      var n = noise(false), nf = ctx.createBiquadFilter(), ng = ctx.createGain();
+      nf.type = "lowpass"; nf.frequency.setValueAtTime(6000, t); nf.frequency.exponentialRampToValueAtTime(180, t + 0.6);
+      env(ng, t, 0.003, 0.7, 0.7);
+      n.connect(nf); nf.connect(ng); ng.connect(fxBus); n.start(t); n.stop(t + 0.8);
+      // the strings: a clashing cluster, each one sliding flat as it dies
+      var shaper = ctx.createWaveShaper(), curve = new Float32Array(1024);
+      for (var i = 0; i < 1024; i++) { var x = i / 512 - 1; curve[i] = Math.tanh(x * 4); }
+      shaper.curve = curve;
+      var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 500;
+      var out = ctx.createGain();
+      out.gain.setValueAtTime(0.0001, t);
+      out.gain.exponentialRampToValueAtTime(0.5, t + 0.012);
+      out.gain.setValueAtTime(0.5, t + 0.7);
+      out.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+      [1046, 1109, 1175, 1568, 1661, 2217].forEach(function (f, k) {
+        var s = ctx.createOscillator(); s.type = "sawtooth";
+        s.frequency.setValueAtTime(f * 1.06, t);
+        s.frequency.exponentialRampToValueAtTime(f, t + 0.08);
+        s.frequency.exponentialRampToValueAtTime(f * 0.94, t + 2.1);
+        var vib = ctx.createOscillator(), vg = ctx.createGain();
+        vib.frequency.value = 14 + Math.random() * 9; vg.gain.value = f * 0.025;
+        vib.connect(vg); vg.connect(s.frequency);
+        var g = ctx.createGain(); g.gain.value = 0.09;
+        var p = panner(k % 2 ? 0.45 : -0.45);
+        s.connect(g); g.connect(p); p.connect(shaper);
+        s.start(t); vib.start(t); s.stop(t + 2.25); vib.stop(t + 2.25);
+      });
+      shaper.connect(hp); hp.connect(out); out.connect(fxBus);
+      this.scream();
+      thump(t, 1.8);
+    },
+
     // "uuuurrrgh"
     groan: function (pan) {
       if (!enabled) return;

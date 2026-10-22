@@ -73,6 +73,43 @@ window.CURSE_DATA = {
     ]
   },
 
+  // The face that hits a couple of seconds after "Enter the Crypt".
+  // Any portrait picture on a dark background works; swap the file to change it.
+  welcomeScare: "assets/scares/face.jpg",
+
+  // The jump scare each character gives when a team lands on them (Wheel I).
+  //   line:  the creepy line shown as it lunges
+  //   sound: scream | groan | laugh | hiss | theremin
+  //   image: OPTIONAL path to your own scary picture (transparent PNG works best).
+  //          Leave it out to use the character's emoji as the face. Example:
+  //          image: "assets/scares/dracula.png"
+  characterScares: {
+    "tony-stark":   { sound: "theremin", line: "Sir… there is someone else inside the suit." },
+    "doraemon":     { sound: "whisper",  line: "Don't reach into the pocket. Something is already in there." },
+    "dracula":      { sound: "laugh",    line: "Welcome to my castle. You may leave. Eventually." },
+    "ben-10":       { sound: "theremin", line: "The Omnitrix is glowing red. It's not an alien you know." },
+    "naruto":       { sound: "scream",   line: "Believe it. The Nine-Tails is staring back." },
+    "goku":         { sound: "scream",   line: "His power level is over nine thousand. And he's angry." },
+    "spiderman":    { sound: "hiss",     line: "Your spider-sense is screaming. Don't look up." },
+    "shinchan":     { sound: "laugh",    line: "Shin-chan is smiling. Shin-chan is never this quiet." },
+    "pikachu":      { sound: "theremin", line: "Pika… pika… the lights aren't flickering by accident." },
+    "mario":        { sound: "scream",   line: "It's-a me. Behind you. Always behind you." },
+    "sherlock":     { sound: "theremin", line: "Elementary. You were the last one in the room." },
+    "batman":       { sound: "laugh",    line: "I am the night. And I am standing right behind you." },
+    "elsa":         { sound: "hiss",     line: "The cold never bothered her. It will bother you." },
+    "shrek":        { sound: "scream",   line: "WHAT ARE YOU DOING IN MY SWAMP?!" },
+    "jack-sparrow": { sound: "laugh",    line: "The rum is gone. The crew is gone. Only you remain." },
+    "gollum":       { sound: "hiss",     line: "Precious… we sees you. We sees you." },
+    "frankenstein": { sound: "groan",    line: "It's alive… and it has found you." },
+    "medusa":       { sound: "hiss",     line: "Whatever you do, don't look at her eyes." },
+    "chhota-bheem": { sound: "groan",    line: "Bheem has run out of laddoos. He is looking at you." },
+    "motu-patlu":   { sound: "groan",    line: "No samosas left. Motu has noticed you." },
+    "mr-bean":      { sound: "scream",   line: "Mr. Bean stares. And stares. And does not blink." },
+    "minion":       { sound: "scream",   line: "Bello. Bello. BELLO. BELLO." },
+    "spongebob":    { sound: "scream",   line: "Who lives in a pineapple under the sea? Not anymore." },
+    "wildcard":     { sound: "theremin", line: "Whoever you become… it is already watching." }
+  },
+
   characters: [
     {
       "id": "tony-stark",

@@ -449,6 +449,126 @@ body.judge-door::after {
 }
 
 /* =========================================================
+   THE FACE AT THE DOOR — the scare as you enter
+   It is simply there, filling the screen: the frame tears
+   red/cyan, the lights stutter, and it creeps closer.
+   ========================================================= */
+.face-scare {
+  position: fixed; inset: -3vmin; z-index: 100;
+  overflow: hidden; pointer-events: none;
+  background: #000;
+  opacity: 0; visibility: hidden;
+}
+.face-scare.on { opacity: 1; visibility: visible; }
+.face-scare.out { opacity: 0; transition: opacity .65s ease-in; }
+.face-scare.hit { animation: fsQuake .45s linear; }
+@keyframes fsQuake {
+  0%, 100% { transform: none; }
+  12% { transform: translate(-1.6vmin, .8vmin); } 25% { transform: translate(1.8vmin, -1vmin); }
+  37% { transform: translate(-1.2vmin, -.6vmin); } 50% { transform: translate(1.4vmin, .9vmin); }
+  62% { transform: translate(-.9vmin, .4vmin); } 75% { transform: translate(.7vmin, -.5vmin); }
+  87% { transform: translate(-.3vmin, .2vmin); }
+}
+
+/* the face: portrait, as big as the screen allows without losing the eyes */
+.fs-face {
+  position: absolute; left: 50%; top: 50%;
+  width: min(66.6vh, 100vw); aspect-ratio: 176 / 296;
+  transform: translate(-50%, -50%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 80%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 80%, transparent 100%);
+  animation: fsCreep 2.6s cubic-bezier(.15, .85, .3, 1) forwards;
+}
+@keyframes fsCreep {
+  0%   { transform: translate(-50%, -50%) scale(.9); }
+  6%   { transform: translate(-50%, -50%) scale(1.08); }
+  12%  { transform: translate(-50%, -50%) scale(1.02); }
+  100% { transform: translate(-50%, -50%) scale(1.12); }
+}
+.fs-face img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; user-select: none;
+  filter: contrast(1.18) brightness(1.06) saturate(.85);
+}
+.face-scare.cut .fs-face { visibility: hidden; }
+
+/* the tear: a red and a cyan copy, knocked out of line */
+.fs-face .fs-ghost { opacity: 0; mix-blend-mode: screen; }
+.fs-face .fs-r { filter: sepia(1) saturate(12) hue-rotate(-45deg) brightness(.75); }
+.fs-face .fs-c { filter: sepia(1) saturate(9) hue-rotate(140deg) brightness(.7); }
+.face-scare.hit .fs-ghost { opacity: .5; }
+.face-scare.hit .fs-r { animation: fsTearR .16s steps(1) infinite; }
+.face-scare.hit .fs-c { animation: fsTearC .16s steps(1) infinite; }
+@keyframes fsTearR { 0% { transform: translate(-3%, .6%); } 33% { transform: translate(2%, -1%); } 66% { transform: translate(-1.2%, 1.4%); } }
+@keyframes fsTearC { 0% { transform: translate(3%, -.4%); } 33% { transform: translate(-2.4%, .8%); } 66% { transform: translate(1.5%, -1.2%); } }
+
+.fs-vignette {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 75% at 50% 45%, transparent 45%, rgba(0, 0, 0, .8) 100%);
+  box-shadow: inset 0 0 20vmin rgba(90, 0, 0, .55);
+}
+.face-scare .scare-grain { opacity: .2; }
+.fs-flash { position: absolute; inset: 0; opacity: 0; background: #fff; }
+.face-scare.hit .fs-flash { animation: fsFlash .4s ease-out forwards; }
+@keyframes fsFlash {
+  0%   { opacity: .9; background: #fff; }
+  20%  { opacity: .55; background: #c00; }
+  100% { opacity: 0; background: #400; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .face-scare.hit, .fs-face, .face-scare.hit .fs-r, .face-scare.hit .fs-c { animation: none; }
+  .fs-face .fs-ghost { display: none; }
+}
+
+/* =========================================================
+   THE CHARACTER SCARE — the face of the character you got
+   ========================================================= */
+.scare-stage.cut .char-face { visibility: hidden; }
+.char-eyes {
+  position: absolute; left: 50%; top: 48%; transform: translate(-50%, -50%);
+  display: flex; gap: 5vmin; opacity: 0;
+}
+.char-eyes.show { opacity: 1; }
+.char-eyes i {
+  display: block; width: 3.4vmin; height: 1.7vmin; border-radius: 50%;
+  background: var(--c);
+  box-shadow: 0 0 2vmin var(--c), 0 0 7vmin var(--c);
+}
+.char-face {
+  position: absolute; left: 50%; top: 46%;
+  transform: translate(-50%, -50%) scale(var(--s, .2));
+  opacity: 0; line-height: 1;
+  filter: blur(var(--blur, 0px)) grayscale(.5) contrast(1.5) brightness(.85) drop-shadow(0 0 3vmin var(--c));
+}
+.char-face.show { opacity: 1; }
+.char-face span { display: block; font-size: min(80vh, 92vw); }
+.char-face img { display: block; height: 80vh; max-width: 94vw; object-fit: contain; }
+.char-face.lunge { animation: charLunge .45s cubic-bezier(.2, .9, .2, 1) forwards; }
+@keyframes charLunge {
+  0%   { transform: translate(-50%, -50%) scale(.6); }
+  55%  { transform: translate(-50%, -50%) scale(1.15); }
+  100% { transform: translate(-50%, -50%) scale(1.05); }
+}
+.scare-stage.hit .char-face span, .scare-stage.hit .char-face img { animation: charSmear .12s steps(2) 4; }
+@keyframes charSmear {
+  0%   { filter: drop-shadow(-1.2vmin 0 0 rgba(255, 0, 40, .8)) drop-shadow(1.2vmin 0 0 rgba(0, 220, 255, .6)); }
+  100% { filter: none; }
+}
+.char-line {
+  position: absolute; left: 0; right: 0; bottom: 6vh; padding: 0 6vw;
+  text-align: center; color: #fff; opacity: 0; transition: opacity .15s;
+  font-family: "Special Elite", "Courier New", monospace;
+  font-size: clamp(18px, 3.4vmin, 36px); line-height: 1.3;
+  text-shadow: 0 0 14px var(--c), 0 2px 0 #000, 0 0 4px #000;
+}
+.char-line.show { opacity: 1; }
+.char-line b {
+  display: block; margin-bottom: .35em; color: var(--c);
+  font-family: "Rye", "Special Elite", serif; font-weight: 400; letter-spacing: .06em;
+  font-size: 1.25em;
+}
+
+/* =========================================================
    THE SPIDER JUMPS AT YOU
    ========================================================= */
 .spider.leapt { visibility: hidden; }

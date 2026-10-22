@@ -215,6 +215,17 @@
     document.body.appendChild(st);
     return st;
   }
+  // The face at the door (CURSE_DATA.welcomeScare). Loaded and decoded while
+  // the gate is still up, so it is on screen the very frame it hits.
+  var FACE = (window.CURSE_DATA && window.CURSE_DATA.welcomeScare) || "";
+  var faceImg = null;
+  if (FACE) {
+    faceImg = new Image();
+    faceImg.src = FACE; faceImg.alt = ""; faceImg.draggable = false;
+    if (faceImg.decode) faceImg.decode().catch(function () {});
+  }
+  function buzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+
   // place the figure: h = height in vh, y = how far its feet sit below the screen
   function pose(node, h, x, y, blur) {
     node.style.setProperty("--h", h + "vh");
@@ -322,6 +333,111 @@
       });
       at(900, function () { st.classList.add("out"); });
       at(420, function () { st.remove(); });
+    },
+
+    /**
+     * The welcome. Out of nowhere the face is right against the screen with
+     * a shriek: the frame tears, the lights stutter, it stares and creeps
+     * closer… then it's gone. Calls done() when it is over.
+     * Reduced motion still gets the face, just without the shake and zoom.
+     */
+    welcome: function (done) {
+      done = done || function () {};
+      if (!scaresOn || !faceImg) { done(); return; }
+      var st = document.createElement("div");
+      st.className = "face-scare";
+      st.setAttribute("aria-hidden", "true");
+      st.innerHTML = '<div class="fs-face"></div><div class="fs-vignette"></div><div class="scare-grain"></div><div class="fs-flash"></div>';
+      var face = st.firstChild;
+      face.appendChild(faceImg);
+      // two colour-split copies of it, for the instant the frame tears
+      ["fs-ghost fs-r", "fs-ghost fs-c"].forEach(function (cls) {
+        var g = faceImg.cloneNode(false); g.className = cls; face.appendChild(g);
+      });
+      document.body.appendChild(st);
+      void st.offsetWidth;
+
+      // HERE
+      st.classList.add("on", "hit");
+      if (S().stinger) S().stinger();
+      buzz([450, 70, 250, 70, 600]);
+
+      var t = 0;
+      function at(ms, fn) { t += ms; setTimeout(fn, t); }
+      function dark() { st.classList.add("cut"); }
+      function lit() { st.classList.remove("cut"); }
+      at(170, dark);                                                   // the lights stutter
+      at(55, lit);
+      at(120, dark);
+      at(45, function () { lit(); st.classList.remove("hit"); });
+      at(1050, dark);                                                  // it stares… and creeps closer
+      at(70, lit);
+      at(160, dark);
+      at(80, lit);
+      at(140, function () { dark(); st.classList.add("out"); });       // gone, and the dark lifts
+      at(650, function () { st.remove(); done(); });
+    },
+
+    /**
+     * A jump scare themed on the character a team just got.
+     * Lights out, two glowing eyes open in the dark, the character's face
+     * creeps closer in the flickering dark, then lunges with a sound and a
+     * creepy line in their voice. Calls done() when it is over.
+     * ch = a character from CURSE_DATA.characters.
+     */
+    characterScare: function (ch, done) {
+      done = done || function () {};
+      if (!ch || !scaresOn || reduceMotion) { done(); return; }
+      var cfg = ((window.CURSE_DATA && window.CURSE_DATA.characterScares) || {})[ch.id] || {};
+      var st = stage(ch.color);
+
+      var eyes = document.createElement("div");
+      eyes.className = "char-eyes";
+      eyes.innerHTML = "<i></i><i></i>";
+
+      var face = document.createElement("div");
+      face.className = "char-face";
+      if (cfg.image) {
+        var im = document.createElement("img");
+        im.src = cfg.image; im.alt = ""; im.draggable = false;
+        face.appendChild(im);
+      } else {
+        var g = document.createElement("span");
+        g.textContent = ch.glyph;
+        face.appendChild(g);
+      }
+      function size(s, blur) { face.style.setProperty("--s", s); face.style.setProperty("--blur", (blur || 0) + "px"); }
+      size(0.16, 3);
+
+      var cap = document.createElement("div");
+      cap.className = "char-line";
+      var nm = document.createElement("b"); nm.textContent = ch.name;
+      var ln = document.createElement("span"); ln.textContent = cfg.line || "";
+      cap.appendChild(nm); cap.appendChild(ln);
+
+      st.appendChild(eyes); st.appendChild(face); st.appendChild(cap);
+      st.classList.add("on", "cut");
+      if (S().breath) S().breath();
+
+      var t = 0;
+      function at(ms, fn) { t += ms; setTimeout(fn, t); }
+      at(500, function () { eyes.classList.add("show"); });                        // two eyes open
+      at(900, function () { eyes.classList.remove("show"); face.classList.add("show"); st.classList.remove("cut"); });  // a face, far away
+      at(700, function () { st.classList.add("cut"); });
+      at(90, function () { size(0.5, 1); st.classList.remove("cut"); });          // closer
+      at(650, function () { st.classList.add("cut"); });
+      at(100, function () {                                                        // HERE
+        st.classList.remove("cut");
+        face.classList.add("lunge");
+        st.classList.add("hit");
+        var snd = S()[cfg.sound] || S().scream;
+        if (snd) snd.call(window.Sound);
+        if (cfg.sound && cfg.sound !== "scream" && S().scream) setTimeout(function () { S().scream(); }, 120);
+        flash(); shake();
+      });
+      at(300, function () { cap.classList.add("show"); });
+      at(1500, function () { st.classList.add("out"); });
+      at(420, function () { st.remove(); done(); });
     },
 
     /** The twist wakes: the lights stutter, lightning, and a zombie crosses the moon. */
