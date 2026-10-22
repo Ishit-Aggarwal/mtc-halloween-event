@@ -478,6 +478,12 @@ body.judge-door::after {
   -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 80%, transparent 100%);
   mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 80%, transparent 100%);
   animation: fsCreep 2.6s cubic-bezier(.15, .85, .3, 1) forwards;
+  will-change: transform;
+}
+/* phones held upright: as tall as the screen allows, losing only a sliver
+   of cheek at the sides (the eyes stay whole) */
+@media (max-aspect-ratio: 3/4) {
+  .fs-face { width: min(110vw, 66.6dvh); }
 }
 @keyframes fsCreep {
   0%   { transform: translate(-50%, -50%) scale(.9); }

@@ -1249,8 +1249,15 @@
   $("gateEnter").addEventListener("click", function () { enter(true); });
   $("gateQuiet").addEventListener("click", function () { enter(false); });
 
+  var touchFrom = null;
+  document.addEventListener("touchstart", function (e) {
+    var p = e.touches[0]; touchFrom = p ? [p.clientX, p.clientY] : null;
+  }, { capture: true, passive: true });
   function firstTouch(e) {
     if (welcome !== "none" || entered || !window.Creatures.scaresOn) return;
+    // a swipe isn't a tap, and phones won't start sound on one: wait for a real tap
+    if (e.type === "touchend" && touchFrom && e.changedTouches[0] &&
+        Math.abs(e.changedTouches[0].clientX - touchFrom[0]) + Math.abs(e.changedTouches[0].clientY - touchFrom[1]) > 12) return;
     // the gate's own buttons do it themselves, with or without sound
     if (e.target && e.target.closest && e.target.closest("#gateEnter, #gateQuiet")) return;
     setSound(true);
