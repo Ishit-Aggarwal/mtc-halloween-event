@@ -224,7 +224,12 @@
     faceImg.src = FACE; faceImg.alt = ""; faceImg.draggable = false;
     if (faceImg.decode) faceImg.decode().catch(function () {});
   }
-  function buzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+  function buzz(pattern) {
+    try {
+      var ua = navigator.userActivation;   // phones refuse to buzz before the first tap
+      if (navigator.vibrate && (!ua || ua.hasBeenActive)) navigator.vibrate(pattern);
+    } catch (e) {}
+  }
 
   // place the figure: h = height in vh, y = how far its feet sit below the screen
   function pose(node, h, x, y, blur) {

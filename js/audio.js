@@ -32,6 +32,8 @@
   function init() {
     if (ctx || !Ctx) return !!ctx;
     try {
+      // iPhones: play even with the ring/silent switch on
+      try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
       ctx = new Ctx();
       var comp = ctx.createDynamicsCompressor();
       comp.threshold.value = -14; comp.ratio.value = 4;

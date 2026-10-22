@@ -1256,8 +1256,10 @@
     setSound(true);
     startWelcome();
   }
-  document.addEventListener("pointerup", firstTouch, true);
-  document.addEventListener("keydown", firstTouch, true);
+  // the events every browser (iPhone Safari included) counts as a tap that may start sound
+  ["touchend", "mousedown", "keydown"].forEach(function (type) {
+    document.addEventListener(type, firstTouch, true);
+  });
 
   /* ---------- host ledger ---------- */
 
@@ -1479,8 +1481,18 @@
   window.Creatures.init({ isBusy: function () { return busy || !el.reveal.hidden || !el.gate.classList.contains("gone"); } });
   setScares(window.Store.prefs().scares !== false);
   render(true);
-  // where the browser allows sound straight away, the face doesn't wait for a tap
-  if (window.Creatures.scaresOn && window.Sound.canAutoplay()) { setSound(true); startWelcome(); }
+  // where the browser allows sound straight away, the face doesn't wait for a tap —
+  // only for the page to finish drawing, so nobody misses it behind a blank screen
+  function autoWelcome() {
+    if (document.hidden) { document.addEventListener("visibilitychange", autoWelcome, { once: true }); return; }
+    setTimeout(function () {
+      if (welcome === "none" && !entered && window.Creatures.scaresOn) { setSound(true); startWelcome(); }
+    }, 700);
+  }
+  if (window.Creatures.scaresOn && window.Sound.canAutoplay()) {
+    if (document.readyState === "complete") autoWelcome();
+    else window.addEventListener("load", autoWelcome, { once: true });
+  }
 
   function resumePending() {
     // a result was decided but the page reloaded before it was shown
