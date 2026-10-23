@@ -62,7 +62,7 @@
     return Promise.race([
       promise,
       new Promise(function (_, reject) {
-        setTimeout(function () { var e = new Error("The crypt didn't answer. Check the internet connection and try again."); e.code = "timeout"; reject(e); }, ms);
+        setTimeout(function () { var e = new Error("The Other Side didn't answer. Check the internet connection and try again."); e.code = "timeout"; reject(e); }, ms);
       })
     ]);
   }
@@ -70,14 +70,14 @@
   function friendly(err) {
     var code = (err && err.code) || "";
     if (code === "timeout") return err.message;
-    if (code === "unavailable" || !navigator.onLine) return "No connection to the crypt. Check the internet and try again.";
-    if (code === "permission-denied") return "The crypt refused that action (permission denied).";
+    if (code === "unavailable" || !navigator.onLine) return "No connection to The Other Side. Check the internet and try again.";
+    if (code === "permission-denied") return "The Other Side refused that action (permission denied).";
     if (code.indexOf("auth/") === 0) {
       if (code === "auth/invalid-credential" || code === "auth/wrong-password" || code === "auth/user-not-found" || code === "auth/invalid-login-credentials") return "Wrong host email or password.";
       if (code === "auth/operation-not-allowed") return "This sign-in method isn't enabled in Firebase.";
       return "Sign-in failed (" + code + ").";
     }
-    return (err && err.message) || "Something went wrong in the crypt.";
+    return (err && err.message) || "Something went wrong in The Other Side.";
   }
 
   /* =========================================================
@@ -185,7 +185,7 @@
 
   function needUser() {
     if (!db || !state.user) {
-      var e = new Error(state.error || "Still connecting to the crypt — try again in a moment.");
+      var e = new Error(state.error || "Still connecting to The Other Side — try again in a moment.");
       e.code = "timeout";
       throw e;
     }

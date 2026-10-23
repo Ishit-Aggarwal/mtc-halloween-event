@@ -13,12 +13,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Oswald:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/creepy.css">
+  <link rel="stylesheet" href="css/cutscene.css">
   <link rel="preload" as="image" href="assets/scares/face.jpg">
 </head>
 <body>
   <!--
     ☠  So. You read the source.
-    The crypt rewards the curious. Anywhere on the page (not inside a text box),
+    The Other Side rewards the curious. Anywhere on the page (not inside a text box),
     type the only word the Raven ever spoke.        — Quoth the Raven, “…”
     Elsewhere, pumpkins hide in plain sight. Look between the words.
   -->
@@ -143,16 +144,19 @@
   <!-- creatures that peek in from the dark (js/creatures.js) -->
   <div class="creatures" id="creatures" aria-hidden="true"></div>
 
-  <!-- ============ ENTRY GATE (also unlocks audio) ============ -->
+  <!-- ============ ENTRY GATE (also unlocks audio & starts cutscene) ============ -->
   <div class="gate" id="gate">
     <div class="gate-inner">
       <svg class="pixel-pumpkin" data-pixel-pumpkin viewBox="0 0 15 13" aria-hidden="true"></svg>
       <p class="gate-kicker">Microsoft Tech Community</p>
-      <h1 class="gate-title logo">Welcome to the Crypt</h1>
+      <h1 class="gate-title logo">Welcome to the Other Side</h1>
       <p class="motto">Creep. Code. Create.</p>
       <p class="ransom" data-ransom>Spooky Stories. Killer Interfaces.</p>
       <p class="gate-text">Round 2 is upon you. The spirits are restless tonight.<br>Turn your sound up…<button class="egg" type="button" tabindex="-1" data-egg="gate" aria-label="pumpkin">🎃</button> and enter, if you dare.</p>
-      <button class="btn btn-blood gate-btn" id="gateEnter" type="button">Enter the Crypt</button>
+      <button class="btn btn-blood gate-btn gate-other-side-btn" id="gateEnter" type="button">
+        <span class="btn-glow-pulse" aria-hidden="true"></span>
+        <span>ENTER THE OTHER SIDE</span>
+      </button>
       <button class="gate-quiet" id="gateQuiet" type="button">enter quietly (no sound)</button>
       <p class="gate-when"><span>29 Oct '26</span><i aria-hidden="true"></i><span>2:30 PM onwards</span></p>
     </div>
@@ -167,6 +171,12 @@
       <span class="brand-text">Microsoft Tech Community<small>Amity Noida</small></span>
     </div>
     <div class="topbar-actions">
+      <button class="icon-btn" id="decreeTopBtn" type="button" aria-label="The Decree of the Other Side" title="The Decree of the Other Side">
+        <span>📜</span>
+      </button>
+      <button class="icon-btn" id="cutsceneTopBtn" type="button" aria-label="Replay Other Side Transmission" title="Replay Other Side Transmission">
+        <span>⚡</span>
+      </button>
       <button class="icon-btn" id="scareBtn" type="button" aria-pressed="true" aria-label="Jump scares on" title="Jump scares">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path class="ghost" d="M12 3a7 7 0 0 0-7 7v10l2.3-1.6L9.7 20l2.3-1.6 2.3 1.6 2.4-1.6L19 20V10a7 7 0 0 0-7-7z"/><circle class="ghost-eye" cx="9.5" cy="10" r="1.2"/><circle class="ghost-eye" cx="14.5" cy="10" r="1.2"/><path class="mute" d="M3 3l18 18"/></svg>
       </button>
@@ -185,7 +195,7 @@
     </section>
 
     <ol class="seals" id="seals" aria-label="Ritual progress">
-      <li data-step="1"><span class="seal-num">I</span><span class="seal-name">The Soul</span></li>
+      <li data-step="1"><span class="seal-num">I</span><span class="seal-name">The Wheel of Evil</span></li>
       <li data-step="2"><span class="seal-num">II</span><span class="seal-name">The Curse</span></li>
       <li data-step="3"><span class="seal-num">III</span><span class="seal-name">The Hex</span><button class="egg" type="button" tabindex="-1" data-egg="seals" aria-label="pumpkin">🎃</button></li>
       <li data-step="4"><span class="seal-num">IV</span><span class="seal-name">The Twist</span></li>
@@ -258,8 +268,8 @@
           </button>
         </form>
         <ul class="rules">
-          <li><b>I.</b><span>The first wheel gives you a soul — and that soul spins the rest for you.</span></li>
-          <li><b>II.</b><span>Your soul's curse: the small site you must build to help it.</span></li>
+          <li><b>I.</b><span>The Wheel of Evil binds your team to a monster — and that entity commands the wheel thereafter.</span></li>
+          <li><b>II.</b><span>Your monster's dilemma: the web experience you must craft to exploit its weakness.</span></li>
           <li><b>III.</b><span>A hex on how you're allowed to build your UI.</span></li>
           <li><b>IV.</b><span><span id="rulesDelay">15</span> minutes later, the twist awakens.</span></li>
         </ul>
@@ -270,8 +280,11 @@
     <section class="panel wheel-panel" id="wheelPanel" hidden>
       <div class="wheel-col">
         <header class="wheel-head">
-          <p class="wheel-kicker" id="wheelKicker">Wheel I</p>
-          <h2 class="wheel-title" id="wheelTitle">Choose Your Soul</h2>
+          <p class="wheel-kicker" id="wheelKicker">Wheel I · The Wheel of Evil</p>
+          <div class="wheel-title-row">
+            <h2 class="wheel-title" id="wheelTitle">The Wheel of Evil</h2>
+            <button class="prologue-pill" id="prologuePill" type="button" title="View The Decree of Fate">📜 The Decree</button>
+          </div>
           <p class="wheel-sub" id="wheelSub"></p>
         </header>
 
@@ -379,7 +392,7 @@
           <ol class="fate-list" id="fateList">
             <li class="fate" data-slot="1">
               <span class="fate-num">I</span>
-              <div class="fate-body"><p class="fate-label">The Soul</p><p class="fate-name">???</p><p class="fate-desc"></p></div>
+              <div class="fate-body"><p class="fate-label">The Wheel of Evil</p><p class="fate-name">???</p><p class="fate-desc"></p></div>
             </li>
             <li class="fate" data-slot="2">
               <span class="fate-num">II</span>
@@ -387,7 +400,14 @@
             </li>
             <li class="fate" data-slot="3">
               <span class="fate-num">III</span>
-              <div class="fate-body"><p class="fate-label">The Hex</p><p class="fate-name">???</p><p class="fate-desc"></p></div>
+              <div class="fate-body">
+                <p class="fate-label">The Hex</p>
+                <p class="fate-name">???</p>
+                <p class="fate-desc"></p>
+                <div class="fate-must-have" hidden>
+                  <span class="must-tag">Must-Have:</span> <span class="must-text"></span>
+                </div>
+              </div>
             </li>
             <li class="fate" data-slot="4">
               <span class="fate-num">IV</span>
@@ -517,13 +537,45 @@
         </div>
         <div class="card-face card-front">
           <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span><button class="egg" type="button" tabindex="-1" data-egg="card" aria-label="pumpkin">🎃</button>
-          <p class="card-kicker" id="cardKicker">Your soul is</p>
-          <div class="card-glyph" id="cardGlyph" aria-hidden="true"></div>
+          <p class="card-kicker" id="cardKicker">The Wheel of Evil Has Chosen</p>
+
+          <!-- Character Portrait / Visual Media -->
+          <div class="card-media-wrap" id="cardMediaWrap">
+            <div class="card-portrait-frame" id="cardPortraitFrame" hidden>
+              <img class="card-portrait-img" id="cardPortraitImg" src="" alt="Character portrait">
+              <div class="card-portrait-badge" id="cardPortraitBadge" aria-hidden="true"></div>
+              <div class="card-portrait-vignette"></div>
+            </div>
+            <!-- Fallback Glyph / Non-Soul Stage Icon -->
+            <div class="card-glyph" id="cardGlyph" aria-hidden="true"></div>
+          </div>
+
+          <!-- Archetype Tag Badge -->
+          <div class="card-archetype-wrap" id="cardArchetypeWrap" hidden>
+            <span class="card-archetype-tag" id="cardArchetypeTag"></span>
+          </div>
+
           <h3 class="card-name" id="cardName"></h3>
           <p class="card-lore" id="cardLore"></p>
+
+          <!-- Prepared Mission Brief Box (Wheel of Evil only) -->
+          <div class="card-brief-box" id="cardBriefBox" hidden>
+            <span class="card-brief-label">⚡ MISSION BRIEF</span>
+            <p class="card-brief-text" id="cardBriefText"></p>
+          </div>
+
+          <!-- Character Voice Line / Quote Block -->
+          <blockquote class="card-quote" id="cardQuote" hidden>
+            <span class="card-quote-text" id="cardQuoteText"></span>
+          </blockquote>
+
           <p class="card-desc" id="cardDesc"></p>
+          <div class="card-must-have" id="cardMustHave" hidden>
+            <span class="must-have-badge-label">⚡ MUST-HAVE REQUIREMENT</span>
+            <p class="must-have-badge-text" id="cardMustHaveText"></p>
+          </div>
           <p class="card-scope" id="cardScope"></p>
-          <button class="btn btn-blood card-btn" id="cardBtn" type="button">Accept your fate</button>
+          <button class="btn btn-blood card-btn" id="cardBtn" type="button">Accept your destiny</button>
         </div>
       </div>
     </div>
@@ -585,6 +637,136 @@
     </div>
   </div>
 
+  <!-- ============ PROLOGUE DECREE MODAL ============ -->
+  <div class="modal prologue-modal" id="prologueModal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-box prologue-box" role="dialog" aria-modal="true" aria-labelledby="prologueTitle">
+      <span class="corner tl"></span><span class="corner tr"></span>
+      <span class="corner bl"></span><span class="corner br"></span>
+
+      <header class="prologue-head">
+        <span class="prologue-kicker">⚡ THE OTHER SIDE SPEAKS</span>
+        <h2 class="prologue-title" id="prologueTitle">The Wheel of Evil</h2>
+        <p class="prologue-sub">The Official Decree of Fate &amp; Destiny</p>
+      </header>
+
+      <div class="prologue-body">
+        <div class="prologue-stanza">
+          <p>Every world has its monsters.</p>
+          <p>Every monster has a weakness.</p>
+          <p class="prologue-em">And every weakness is an opportunity for someone clever enough to exploit it.</p>
+        </div>
+
+        <div class="prologue-stanza prologue-highlight">
+          <p class="prologue-decree">The Wheel of Evil will now decide which character your team must help.</p>
+          <p>You cannot choose your favourite. You cannot negotiate with the darkness.</p>
+          <p class="prologue-destiny">Whatever the wheel gives you, that is your mission, that's your destiny!!</p>
+        </div>
+
+        <div class="prologue-stanza">
+          <p>You may get a clown. You may get a cursed spirit.</p>
+          <p>You may get a witch, a serial killer, or something that should never have existed in the first place.</p>
+        </div>
+
+        <div class="prologue-stanza">
+          <p>Your character will have a problem.</p>
+          <p class="prologue-creative">Find your problem, show your creativity.</p>
+          <p class="prologue-watching">And the Other Side will be watching.</p>
+        </div>
+
+        <p class="prologue-coda">Let's see who fate has chosen.</p>
+      </div>
+
+      <footer class="prologue-foot">
+        <button class="btn btn-blood btn-lg prologue-btn" id="prologueCloseBtn" type="button">
+          <span>🎡 Confront The Wheel of Evil</span>
+        </button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- ============ THE OTHER SIDE: HORROR CUTSCENE ============ -->
+  <div class="cutscene-layer" id="cutsceneLayer" aria-hidden="true" hidden>
+    <!-- Background Occult Cyber Canvas -->
+    <canvas class="cutscene-canvas" id="cutsceneCanvas"></canvas>
+
+    <!-- Distortion & Post-Processing Overlays -->
+    <div class="cutscene-vortex" id="cutsceneVortex"></div>
+    <div class="cutscene-scanlines"></div>
+    <div class="cutscene-chroma" id="cutsceneChroma"></div>
+    <div class="cutscene-vignette"></div>
+
+    <!-- Persistent Skip & Accessibility Controls -->
+    <div class="cutscene-controls">
+      <button type="button" class="cutscene-skip-btn" id="cutsceneSkipBtn" aria-label="Skip Cutscene">
+        <span>SKIP TRANSMISSION</span>
+        <kbd>ESC</kbd>
+      </button>
+    </div>
+
+    <!-- Stage Container -->
+    <div class="cutscene-stage" id="cutsceneStage">
+      <!-- Phase 2 & 3: Cyber-Occult HUD & System Alert -->
+      <div class="cutscene-hud" id="cutsceneHud">
+        <div class="hud-header">
+          <span class="hud-tag"><i class="hud-blink"></i> OCCULT_NET // TOPOLOGY OVERLAY</span>
+          <span class="hud-ping">LATENCY: 666ms · LOSS: 99.4%</span>
+        </div>
+
+        <div class="cutscene-alert" id="cutsceneAlert" hidden>
+          <div class="alert-stripe"></div>
+          <div class="alert-content">
+            <div class="alert-icon">⚠</div>
+            <div class="alert-title-wrap">
+              <h2 class="alert-title">DIGITAL IDENTITIES COMPROMISED</h2>
+              <p class="alert-sub">SYSTEM INTEGRITY 0% · ROOTKIT: PHANTOM // 20 SOULS DETACHED</p>
+            </div>
+          </div>
+          <div class="alert-stripe"></div>
+        </div>
+      </div>
+
+      <!-- Phase 4: Narrative Dialogue Transmission -->
+      <div class="cutscene-dialogue" id="cutsceneDialogue" aria-live="polite">
+        <div class="dialogue-meta">
+          <span class="dialogue-sender">TRANSMISSION_ID: 0xDEAD_BEEF</span>
+          <span class="dialogue-status">DECRYPTING FREQUENCY...</span>
+        </div>
+        <div class="dialogue-body" id="dialogueBody"></div>
+      </div>
+
+      <!-- Phase 5: Climax End Card -->
+      <div class="cutscene-endcard" id="cutsceneEndcard" hidden>
+        <div class="endcard-inner">
+          <p class="endcard-kicker">Microsoft Tech Community · Round 02</p>
+          <h1 class="endcard-title">
+            MISSION 02<br><span class="highlight-glitch">WEBSITE RESURRECTION</span>
+          </h1>
+          <p class="endcard-desc">
+            The realms have collapsed. Their digital homes have vanished.<br>
+            Your purpose is no longer destruction. <strong>It is resurrection.</strong>
+          </p>
+
+          <div class="endcard-actions">
+            <button type="button" class="btn btn-blood endcard-proceed-btn" id="cutsceneProceedBtn">
+              <span>PROCEED TO THE WHEEL OF EVIL →</span>
+            </button>
+            <button type="button" class="endcard-replay-btn" id="cutsceneReplayBtn">
+              ↺ Rewatch Transmission
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <svg class="sr-only" aria-hidden="true">
+    <filter id="dimensionalWarp">
+      <feTurbulence type="fractalNoise" id="warpNoise" baseFrequency="0.02 0.03" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="40" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+    </filter>
+  </svg>
+
   <div class="sr-only" id="announcer" aria-live="polite"></div>
 
   <script src="js/data.js"></script>
@@ -595,6 +777,7 @@
   <script src="js/wheel.js"></script>
   <script src="js/fx.js"></script>
   <script src="js/creatures.js"></script>
+  <script src="js/cutscene.js"></script>
   <script src="js/app.js"></script>
   <script src="js/eggs.js"></script>
 </body>

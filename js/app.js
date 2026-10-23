@@ -28,7 +28,14 @@
     spinBtn: $("spinBtn"), spinLabel: $("spinLabel"), spinHint: $("spinHint"),
     fateList: $("fateList"), grimoireTeam: $("grimoireTeam"), grimoireRoster: $("grimoireRoster"), grimoireFoot: $("grimoireFoot"),
     reveal: $("reveal"), card: $("card"), cardKicker: $("cardKicker"), cardGlyph: $("cardGlyph"),
-    cardName: $("cardName"), cardLore: $("cardLore"), cardDesc: $("cardDesc"), cardBtn: $("cardBtn"),
+    cardPortraitFrame: $("cardPortraitFrame"), cardPortraitImg: $("cardPortraitImg"), cardPortraitBadge: $("cardPortraitBadge"),
+    cardArchetypeWrap: $("cardArchetypeWrap"), cardArchetypeTag: $("cardArchetypeTag"),
+    cardBriefBox: $("cardBriefBox"), cardBriefText: $("cardBriefText"),
+    cardQuote: $("cardQuote"), cardQuoteText: $("cardQuoteText"),
+    cardName: $("cardName"), cardLore: $("cardLore"), cardDesc: $("cardDesc"),
+    cardMustHave: $("cardMustHave"), cardMustHaveText: $("cardMustHaveText"), cardBtn: $("cardBtn"),
+    prologueModal: $("prologueModal"), prologueCloseBtn: $("prologueCloseBtn"), prologuePill: $("prologuePill"),
+    decreeTopBtn: $("decreeTopBtn"), cutsceneTopBtn: $("cutsceneTopBtn"),
     host: $("hostModal"), announcer: $("announcer"), soundBtn: $("soundBtn"),
     spinner: $("spinner"), spinnerFace: $("spinnerFace"), spinnerName: $("spinnerName"), spinnerLine: $("spinnerLine"),
     gate: $("gate"), scareBtn: $("scareBtn"), cardScope: $("cardScope"),
@@ -155,6 +162,7 @@
   function setFate(slot, data) {
     var li = el.fateList.querySelector('[data-slot="' + slot + '"]');
     var num = li.querySelector(".fate-num"), name = li.querySelector(".fate-name"), desc = li.querySelector(".fate-desc");
+    var must = li.querySelector(".fate-must-have");
     var roman = ["I", "II", "III", "IV"][slot - 1];
     li.classList.remove("is-filled", "is-current");
     if (data && data.name) {
@@ -164,11 +172,21 @@
       num.textContent = data.glyph || roman;
       name.textContent = data.name;
       desc.textContent = data.desc || "";
+      if (must) {
+        if (data.mustHave) {
+          must.hidden = false;
+          var textSpan = must.querySelector(".must-text");
+          if (textSpan) textSpan.textContent = data.mustHave;
+        } else {
+          must.hidden = true;
+        }
+      }
       if (wasEmpty && data.fresh) { li.classList.remove("is-new"); void li.offsetWidth; li.classList.add("is-new"); }
     } else {
       num.textContent = roman;
       name.textContent = data && data.pendingName ? data.pendingName : "???";
       desc.textContent = data && data.pendingDesc ? data.pendingDesc : "";
+      if (must) must.hidden = true;
       if (data && data.current) li.classList.add("is-current");
     }
   }
@@ -201,7 +219,7 @@
     setFate(2, p ? { name: p.t, desc: p.d, glyph: "📜", color: c.color, fresh: fresh } : { current: stage === "curse" });
 
     var h = typeof s.hex === "number" ? D.uiCurses[s.hex] : null;
-    setFate(3, h ? { name: h.t, desc: h.d, glyph: h.glyph, color: "#ff8a3d", fresh: fresh } : { current: stage === "hex" });
+    setFate(3, h ? { name: h.t, desc: h.d, mustHave: h.mustHave, glyph: h.glyph, color: "#ff8a3d", fresh: fresh } : { current: stage === "hex" });
 
     var t = typeof s.twist === "number" ? D.twists[s.twist] : null;
     if (t) setFate(4, { name: t.t, desc: fillTwist(t.d), glyph: t.glyph, color: "#ff5a4a", fresh: fresh });
@@ -270,8 +288,8 @@
     switch (stage) {
       case "soul":
         segs = soulSegments(); theme = THEMES.soul;
-        kicker = "Wheel I · The Soul"; title = "Choose Your Soul";
-        sub = D.characters.length + " souls wait in the dark. One of them is yours.";
+        kicker = "Wheel I · The Wheel of Evil"; title = "The Wheel of Evil";
+        sub = "Every monster has a weakness. The Wheel of Evil decides which dark entity your team must help.";
         break;
       case "curse":
         segs = curseSegments(c); theme = { a: THEMES.curse.a, b: THEMES.curse.b, accent: c.color };
@@ -560,7 +578,7 @@
     updateSpinner(stage, auto === true ? who.idle : who.spin);
     el.spinner.classList.remove("grab"); void el.spinner.offsetWidth; el.spinner.classList.add("grab");
     setSpinState(stage);
-    if (stage === "curse") el.spinLabel.textContent = "Consulting the crypt…";
+    if (stage === "curse") el.spinLabel.textContent = "Consulting The Other Side…";
     var out = await chooseOutcome(stage);
     if (out.error) {
       busy = false;
@@ -602,15 +620,24 @@
 
   function showCard(stage) {
     var c = charById(session.charId);
-    var kicker, glyph, name, lore = "", desc = "", btn, accent = "#c4161c";
+    var kicker, glyph, name, lore = "", desc = "", brief = "", quote = "", archetype = "", portrait = "", mustHave = "", btn, accent = "#c4161c";
     if (stage === "soul") {
-      kicker = "Your soul is"; glyph = c.glyph; name = c.name; lore = c.lore; btn = "Accept your soul"; accent = c.color;
+      kicker = "The Wheel of Evil Has Chosen";
+      glyph = c.glyph;
+      name = c.name;
+      lore = c.lore;
+      brief = c.brief || "Every monster has a weakness. Your team must build the digital experience that confronts this dilemma.";
+      quote = c.quote || c.spin;
+      archetype = c.archetype || "Dark Entity";
+      portrait = c.avatar || ("assets/characters/" + c.id + ".svg");
+      btn = "Accept your destiny";
+      accent = c.color;
     } else if (stage === "curse") {
       var p = c.problems[session.problem];
       kicker = c.short + "'s curse"; glyph = c.glyph; name = p.t; desc = p.d; btn = "Accept the curse"; accent = c.color;
     } else if (stage === "hex") {
       var h = D.uiCurses[session.hex];
-      kicker = "A hex upon your UI"; glyph = h.glyph; name = h.t; desc = h.d; btn = "Accept the hex"; accent = "#ff7a1a";
+      kicker = "A hex upon your UI"; glyph = h.glyph; name = h.t; desc = h.d; mustHave = h.mustHave || ""; btn = "Accept the hex"; accent = "#ff7a1a";
     } else {
       var t = D.twists[session.twist];
       kicker = "The twist"; glyph = t.glyph; name = t.t; desc = fillTwist(t.d); btn = "Seal my fate"; accent = "#ff3326";
@@ -621,6 +648,63 @@
     el.cardName.textContent = name;
     el.cardLore.textContent = lore;
     el.cardDesc.textContent = desc;
+
+    // Visual Portrait & Graceful Fallback
+    if (el.cardPortraitFrame && el.cardPortraitImg) {
+      if (stage === "soul" && portrait) {
+        el.cardPortraitImg.src = portrait;
+        el.cardPortraitImg.alt = name;
+        if (el.cardPortraitBadge) el.cardPortraitBadge.textContent = glyph;
+        el.cardPortraitFrame.hidden = false;
+        el.cardGlyph.hidden = true;
+        el.cardPortraitImg.onerror = function () {
+          el.cardPortraitFrame.hidden = true;
+          el.cardGlyph.hidden = false;
+        };
+      } else {
+        el.cardPortraitFrame.hidden = true;
+        el.cardGlyph.hidden = false;
+      }
+    }
+
+    // Archetype Tag Badge
+    if (el.cardArchetypeWrap && el.cardArchetypeTag) {
+      if (stage === "soul" && archetype) {
+        el.cardArchetypeWrap.hidden = false;
+        el.cardArchetypeTag.textContent = archetype;
+      } else {
+        el.cardArchetypeWrap.hidden = true;
+      }
+    }
+
+    // Mission Brief Box
+    if (el.cardBriefBox && el.cardBriefText) {
+      if (stage === "soul" && brief) {
+        el.cardBriefBox.hidden = false;
+        el.cardBriefText.textContent = brief;
+      } else {
+        el.cardBriefBox.hidden = true;
+      }
+    }
+
+    // Voice Line / Quote Block
+    if (el.cardQuote && el.cardQuoteText) {
+      if (stage === "soul" && quote) {
+        el.cardQuote.hidden = false;
+        el.cardQuoteText.textContent = "“" + quote + "”";
+      } else {
+        el.cardQuote.hidden = true;
+      }
+    }
+
+    if (el.cardMustHave && el.cardMustHaveText) {
+      if (mustHave) {
+        el.cardMustHave.hidden = false;
+        el.cardMustHaveText.textContent = mustHave;
+      } else {
+        el.cardMustHave.hidden = true;
+      }
+    }
     el.cardScope.textContent = stage === "curse" ? D.scopeNote : "";
     el.cardBtn.textContent = btn;
     el.card.querySelector(".card-front").style.setProperty("--accent", accent);
@@ -629,7 +713,7 @@
     el.reveal.hidden = false;
     el.card.style.animation = "none"; void el.card.offsetWidth; el.card.style.animation = "";
     window.Sound.reveal();
-    announce(kicker + ": " + name + ". " + desc);
+    announce(kicker + ": " + name + ". " + (brief || desc || lore) + (mustHave ? " Must have: " + mustHave : ""));
     setTimeout(function () { el.cardBtn.focus({ preventScroll: true }); }, 900);
   }
 
@@ -869,6 +953,10 @@
     resetIdle();
     window.Sound.whoosh();
     render(true);
+    if (el.prologueModal) {
+      el.prologueModal.hidden = false;
+      if (window.Sound && window.Sound.farBell) window.Sound.farBell();
+    }
     el.stage.scrollIntoView({ behavior: "smooth", block: "center" });
   });
 
@@ -1224,27 +1312,28 @@
   }
   el.scareBtn.addEventListener("click", function () { setScares(!window.Creatures.scaresOn); });
 
-  /* ---------- the entry gate ---------- */
-  // The face hits the moment the site opens, with a scream. Browsers only allow
-  // sound after a tap, so where it would be silent it waits for the very first
-  // touch or key press anywhere on the page instead.
+  /* ---------- the entry gate & horror cutscene ---------- */
+  // Browsers only allow sound after a user tap; entering The Other Side is that tap.
 
   var welcome = "none", entered = false;   // welcome: none | playing | done
   function startWelcome() {
     welcome = "playing";
     window.Creatures.welcome(function () {
       welcome = "done";
-      if (entered) window.Creatures.opening();
+      if (entered && window.Creatures.opening) window.Creatures.opening();
     });
   }
   function enter(withSound) {
     entered = true;
-    el.gate.classList.add("gone");
     setSound(withSound);
     resetIdle();
-    if (welcome === "none" && window.Creatures.scaresOn) startWelcome();
-    else if (welcome !== "playing") setTimeout(function () { window.Creatures.opening(); }, 250);
-    // still playing: the opening follows as soon as the face is gone
+    if (window.OtherSideCutscene && typeof window.OtherSideCutscene.play === "function") {
+      window.OtherSideCutscene.play();
+    } else {
+      el.gate.classList.add("gone");
+      if (welcome === "none" && window.Creatures.scaresOn) startWelcome();
+      else if (welcome !== "playing") setTimeout(function () { window.Creatures.opening(); }, 250);
+    }
   }
   $("gateEnter").addEventListener("click", function () { enter(true); });
   $("gateQuiet").addEventListener("click", function () { enter(false); });
@@ -1267,6 +1356,29 @@
   ["touchend", "mousedown", "keydown"].forEach(function (type) {
     document.addEventListener(type, firstTouch, true);
   });
+
+  /* ---------- the decree modal (storyline) ---------- */
+
+  function openDecree() {
+    if (el.prologueModal) {
+      el.prologueModal.hidden = false;
+      if (window.Sound && window.Sound.farBell) window.Sound.farBell();
+    }
+  }
+  function closeDecree() {
+    if (el.prologueModal) {
+      el.prologueModal.hidden = true;
+      if (window.Sound && window.Sound.whoosh) window.Sound.whoosh();
+    }
+  }
+  if (el.prologueCloseBtn) el.prologueCloseBtn.addEventListener("click", closeDecree);
+  if (el.prologuePill) el.prologuePill.addEventListener("click", openDecree);
+  if (el.decreeTopBtn) el.decreeTopBtn.addEventListener("click", openDecree);
+  if (el.cutsceneTopBtn) {
+    el.cutsceneTopBtn.addEventListener("click", function () {
+      if (window.OtherSideCutscene) window.OtherSideCutscene.play();
+    });
+  }
 
   /* ---------- host ledger ---------- */
 
@@ -1457,7 +1569,7 @@
   /* ---------- live updates ---------- */
 
   function statusText(s) {
-    return { connecting: "Summoning the crypt…", online: "Crypt linked", offline: "Offline — reconnecting", error: "Crypt unreachable", local: "Local mode" }[s] || s;
+    return { connecting: "Summoning The Other Side…", online: "The Other Side Linked", offline: "Offline — reconnecting", error: "The Other Side Unreachable", local: "Local mode" }[s] || s;
   }
 
   var liveQueued = false;

@@ -60,10 +60,12 @@
       : st === "waiting" ? (t.unlockAt && t.unlockAt > Date.now() ? "Twist in " + fmt(t.unlockAt - Date.now()) : "Twist awake")
       : c ? "Spinning…" : "Signed in";
 
-    function row(cls, label, title, text, glyph) {
+    function row(cls, label, title, text, glyph, extra) {
       return '<div class="trow ' + cls + '"><span class="trow-label">' + label + "</span><div>" +
         (title ? '<p class="trow-title">' + (glyph ? '<span class="g">' + esc(glyph) + "</span>" : "") + esc(title) + "</p>" : '<p class="trow-title pending">Not spun yet</p>') +
-        (text ? '<p class="trow-text">' + esc(text) + "</p>" : "") + "</div></div>";
+        (text ? '<p class="trow-text">' + esc(text) + "</p>" : "") +
+        (extra ? extra : "") +
+        "</div></div>";
     }
 
     var rosterHtml = "";
@@ -85,7 +87,7 @@
       rosterHtml +
       row("soul", "Soul", c && c.name, c && c.lore, c && c.glyph) +
       row("curse", "Curse", p && p.t, p && p.d) +
-      row("hex", "Hex", h && h.t, h && h.d, h && h.glyph) +
+      row("hex", "Hex", h && h.t, h && h.d, h && h.glyph, h && h.mustHave ? '<div class="hex-must-have-badge"><strong>Must-Have:</strong> ' + esc(h.mustHave) + '</div>' : '') +
       row("twist", "Twist", tw && tw.t, tw && (t.twistText || tw.d), tw && tw.glyph) +
       (t.submissionUrl ? '<div class="trow submission"><span class="trow-label">Project</span><div>' +
         '<a class="judge-live-btn" href="' + esc(t.submissionUrl) + '" target="_blank" rel="noopener">🌐 Open Live Website ↗</a>' +
@@ -138,7 +140,7 @@
     var crypt = $("crypt");
     crypt.hidden = L.mode !== "cloud";
     crypt.setAttribute("data-state", L.status);
-    $("cryptText").textContent = { connecting: "Summoning the crypt…", online: "Live", offline: "Offline — reconnecting", error: "Crypt unreachable" }[L.status] || L.status;
+    $("cryptText").textContent = { connecting: "Summoning The Other Side…", online: "Live", offline: "Offline — reconnecting", error: "The Other Side Unreachable" }[L.status] || L.status;
   }
 
   var queued = false;

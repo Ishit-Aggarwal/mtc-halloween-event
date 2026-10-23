@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#3d0a0a"/>
+      <stop offset="70%" stop-color="#0d0101"/>
+      <stop offset="100%" stop-color="#020104"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="frameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#2a080c" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#e63946" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="320" height="400" fill="url(#bgGrad)"/>
+
+  <!-- Cyber-Occult Grid Pattern in Background -->
+  <g stroke="#e63946" stroke-width="0.5" opacity="0.12">
+    <line x1="0" y1="80" x2="320" y2="80"/>
+    <line x1="0" y1="160" x2="320" y2="160"/>
+    <line x1="0" y1="240" x2="320" y2="240"/>
+    <line x1="0" y1="320" x2="320" y2="320"/>
+    <line x1="80" y1="0" x2="80" y2="400"/>
+    <line x1="160" y1="0" x2="160" y2="400"/>
+    <line x1="240" y1="0" x2="240" y2="400"/>
+  </g>
+
+  <!-- Character Vector Features -->
+  <g id="character-artwork">
+    
+      <!-- Red and Olive Striped Knit Sweater -->
+      <path d="M 75 400 L 105 270 L 160 240 L 215 270 L 245 400 Z" fill="#1b4332"/>
+      <path d="M 85 300 L 235 300 L 238 325 L 82 325 Z" fill="#9e0012"/>
+      <path d="M 78 350 L 242 350 L 245 375 L 75 375 Z" fill="#9e0012"/>
+      <!-- Brown Fedora Hat -->
+      <ellipse cx="160" cy="115" rx="55" ry="14" fill="#3d2618" stroke="#1f130b" stroke-width="2"/>
+      <path d="M 130 115 C 130 75 145 68 160 68 C 175 68 190 75 190 115 Z" fill="#543724"/>
+      <rect x="131" y="108" width="58" height="6" fill="#1f130b"/>
+      <!-- Severely Burned Scarred Flesh -->
+      <path d="M 132 170 C 128 135 138 115 160 115 C 182 115 192 135 188 170 C 185 205 176 228 160 228 C 144 228 135 205 132 170 Z" fill="#9d432b"/>
+      <!-- Burn Cicatrix Patterns -->
+      <path d="M 138 140 Q 155 160 148 185" stroke="#540b0e" stroke-width="2.5" fill="none"/>
+      <path d="M 182 140 Q 165 160 172 185" stroke="#540b0e" stroke-width="2.5" fill="none"/>
+      <!-- Malevolent Grinning Eyes -->
+      <circle cx="146" cy="152" r="3.5" fill="#ffb703" filter="url(#glow)"/>
+      <circle cx="174" cy="152" r="3.5" fill="#ffb703" filter="url(#glow)"/>
+      <!-- Sneering Rotting Teeth -->
+      <path d="M 148 198 Q 160 210 172 198" stroke="#370617" stroke-width="3" fill="none"/>
+      <!-- The Razor-Claw Glove in Foreground -->
+      <path d="M 65 340 L 95 300 L 115 320 L 85 360 Z" fill="#8f5b34" stroke="#4a2e1b" stroke-width="2"/>
+      <!-- 4 Steel Blades Extending Out -->
+      <line x1="90" y1="295" x2="80" y2="230" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
+      <line x1="98" y1="298" x2="95" y2="220" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
+      <line x1="106" y1="305" x2="110" y2="225" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
+      <line x1="114" y1="315" x2="125" y2="240" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
+    
+  </g>
+
+  <!-- Gothic Framing & Corner Brackets -->
+  <rect x="10" y="10" width="300" height="380" rx="4" fill="none" stroke="url(#frameGrad)" stroke-width="2"/>
+  <rect x="15" y="15" width="290" height="370" rx="2" fill="none" stroke="#e63946" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- Ornate Corner Accents -->
+  <path d="M 10 35 L 35 10 M 10 22 L 22 10" stroke="#e63946" stroke-width="1.5"/>
+  <path d="M 310 35 L 285 10 M 310 22 L 298 10" stroke="#e63946" stroke-width="1.5"/>
+  <path d="M 10 365 L 35 390 M 10 378 L 22 390" stroke="#e63946" stroke-width="1.5"/>
+  <path d="M 310 365 L 285 390 M 310 378 L 298 390" stroke="#e63946" stroke-width="1.5"/>
+
+  <!-- Name Banner Plate at Bottom -->
+  <rect x="25" y="340" width="270" height="42" rx="3" fill="#0a0204" fill-opacity="0.88" stroke="#e63946" stroke-width="1.2"/>
+  <text x="160" y="360" text-anchor="middle" font-family="'Rye', 'Oswald', serif" font-size="14" font-weight="bold" fill="#f8f9fa" letter-spacing="1.5">FREDDY KRUEGER</text>
+  <text x="160" y="374" text-anchor="middle" font-family="'Pixelify Sans', monospace" font-size="9" fill="#e63946" letter-spacing="1">SPRINGWOOD DREAM DEMON</text>
+</svg>

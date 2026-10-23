@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 400" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="38%" r="65%">
+      <stop offset="0%" stop-color="#4a0404"/>
+      <stop offset="70%" stop-color="#0d0000"/>
+      <stop offset="100%" stop-color="#020104"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <linearGradient id="frameGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e63946" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#2a080c" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#e63946" stop-opacity="0.8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="320" height="400" fill="url(#bgGrad)"/>
+
+  <!-- Cyber-Occult Grid Pattern in Background -->
+  <g stroke="#e63946" stroke-width="0.5" opacity="0.12">
+    <line x1="0" y1="80" x2="320" y2="80"/>
+    <line x1="0" y1="160" x2="320" y2="160"/>
+    <line x1="0" y1="240" x2="320" y2="240"/>
+    <line x1="0" y1="320" x2="320" y2="320"/>
+    <line x1="80" y1="0" x2="80" y2="400"/>
+    <line x1="160" y1="0" x2="160" y2="400"/>
+    <line x1="240" y1="0" x2="240" y2="400"/>
+  </g>
+
+  <!-- Character Vector Features -->
+  <g id="character-artwork">
+    
+      <!-- High Winged Gothic Vampire Collar -->
+      <path d="M 85 260 L 95 120 L 135 190 L 185 190 L 225 120 L 235 260 Z" fill="#9e0012" stroke="#e63946" stroke-width="1.5"/>
+      <!-- Black Silk Cape with Red Satin Lining -->
+      <path d="M 70 400 L 90 250 L 160 220 L 230 250 L 250 400 Z" fill="#0d0d0d"/>
+      <path d="M 130 240 L 160 280 L 190 240 L 160 225 Z" fill="#ffffff"/>
+      <!-- Medallion on Red Ribbon -->
+      <path d="M 148 245 L 160 265 L 172 245" stroke="#9e0012" stroke-width="3" fill="none"/>
+      <circle cx="160" cy="268" r="7" fill="#ffd166" stroke="#9e0012" stroke-width="1"/>
+      <!-- Aristocratic Gaunt Face -->
+      <path d="M 126 175 C 122 120 134 98 160 98 C 186 98 198 120 194 175 C 190 215 176 235 160 235 C 144 235 130 215 126 175 Z" fill="#eae2b7"/>
+      <!-- Slicked-back Widow's Peak Hair -->
+      <path d="M 124 140 C 118 100 130 70 160 70 C 190 70 202 100 196 140 C 185 110 175 105 160 120 C 145 105 135 110 124 140 Z" fill="#111111"/>
+      <!-- Hypnotic Crimson Eyes -->
+      <ellipse cx="145" cy="155" rx="7" ry="4" fill="#3a0105"/>
+      <circle cx="145" cy="155" r="3.2" fill="#ff002b" filter="url(#glow)"/>
+      <ellipse cx="175" cy="155" rx="7" ry="4" fill="#3a0105"/>
+      <circle cx="175" cy="155" r="3.2" fill="#ff002b" filter="url(#glow)"/>
+      <!-- Pointed Ears -->
+      <path d="M 123 150 L 110 142 L 124 162 Z" fill="#eae2b7"/>
+      <path d="M 197 150 L 210 142 L 196 162 Z" fill="#eae2b7"/>
+      <!-- Fangs and Blood Drip -->
+      <path d="M 148 202 Q 160 206 172 202" stroke="#540b0e" stroke-width="2" fill="none"/>
+      <polygon points="151,202 153,212 155,202" fill="#ffffff"/>
+      <polygon points="165,202 167,212 169,202" fill="#ffffff"/>
+      <circle cx="153" cy="214" r="1.5" fill="#e63946"/>
+      <!-- Flapping Bat Silhouettes in Background -->
+      <path d="M 50 80 Q 60 70 70 80 Q 75 65 80 80 Q 70 90 50 80 Z" fill="#ff002b" opacity="0.3"/>
+      <path d="M 230 90 Q 240 80 250 90 Q 255 75 260 90 Q 250 100 230 90 Z" fill="#ff002b" opacity="0.3"/>
+    
+  </g>
+
+  <!-- Gothic Framing & Corner Brackets -->
+  <rect x="10" y="10" width="300" height="380" rx="4" fill="none" stroke="url(#frameGrad)" stroke-width="2"/>
+  <rect x="15" y="15" width="290" height="370" rx="2" fill="none" stroke="#e63946" stroke-width="0.8" opacity="0.4"/>
+
+  <!-- Ornate Corner Accents -->
+  <path d="M 10 35 L 35 10 M 10 22 L 22 10" stroke="#e63946" stroke-width="1.5"/>
+  <path d="M 310 35 L 285 10 M 310 22 L 298 10" stroke="#e63946" stroke-width="1.5"/>
+  <path d="M 10 365 L 35 390 M 10 378 L 22 390" stroke="#e63946" stroke-width="1.5"/>
+  <path d="M 310 365 L 285 390 M 310 378 L 298 390" stroke="#e63946" stroke-width="1.5"/>
+
+  <!-- Name Banner Plate at Bottom -->
+  <rect x="25" y="340" width="270" height="42" rx="3" fill="#0a0204" fill-opacity="0.88" stroke="#e63946" stroke-width="1.2"/>
+  <text x="160" y="360" text-anchor="middle" font-family="'Rye', 'Oswald', serif" font-size="14" font-weight="bold" fill="#f8f9fa" letter-spacing="1.5">COUNT DRACULA</text>
+  <text x="160" y="374" text-anchor="middle" font-family="'Pixelify Sans', monospace" font-size="9" fill="#e63946" letter-spacing="1">SOVEREIGN OF THE NOSFERATU</text>
+</svg>

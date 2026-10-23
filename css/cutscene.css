@@ -1,0 +1,619 @@
+/* =========================================================
+   THE OTHER SIDE: HORROR CUTSCENE & WHEEL OF EVIL STYLES
+   MTC Halloween Build · Round 2
+   Hardware-accelerated 60fps animations, zero external assets
+   ========================================================= */
+
+/* ============ CUTSCENE FULLSCREEN LAYER ============ */
+.cutscene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #030002;
+  color: #fff;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  font-family: var(--f-pixel), monospace;
+}
+
+.cutscene-layer.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ---------- Canvas Background ---------- */
+.cutscene-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ---------- Portal Vortex (Phase 1) ---------- */
+.cutscene-vortex {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 250vmax; height: 250vmax;
+  transform: translate(-50%, -50%) scale(0.01);
+  background: radial-gradient(circle at center, 
+    rgba(255, 51, 38, 0.9) 0%, 
+    rgba(196, 22, 28, 0.6) 25%, 
+    rgba(34, 7, 8, 0.8) 50%, 
+    transparent 70%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: transform 2.2s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.8s ease;
+}
+
+.cutscene-vortex.pull {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1) rotate(540deg);
+}
+
+/* ---------- CRT Scanlines & Chromatic Aberration ---------- */
+.cutscene-scanlines {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.45) 0px,
+    rgba(0, 0, 0, 0.45) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  animation: scanlineJitter 0.2s steps(2) infinite;
+}
+
+@keyframes scanlineJitter {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(2px); }
+}
+
+.cutscene-chroma {
+  position: absolute;
+  inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.cutscene-chroma.glitching {
+  opacity: 0.8;
+  animation: rgbSplit 0.18s infinite;
+}
+
+@keyframes rgbSplit {
+  0% {
+    box-shadow: inset -4px 0 0 rgba(255, 51, 38, 0.5), inset 4px 0 0 rgba(0, 255, 238, 0.5);
+  }
+  50% {
+    box-shadow: inset 3px 2px 0 rgba(255, 51, 38, 0.7), inset -3px -2px 0 rgba(0, 255, 238, 0.7);
+  }
+  100% {
+    box-shadow: inset -2px -1px 0 rgba(255, 51, 38, 0.5), inset 2px 1px 0 rgba(0, 255, 238, 0.5);
+  }
+}
+
+.cutscene-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(3, 1, 2, 0.92) 100%);
+}
+
+/* ---------- Top Controls (Skip) ---------- */
+.cutscene-controls {
+  position: absolute;
+  top: calc(16px + var(--safe-t, 0px));
+  right: var(--gutter, 20px);
+  z-index: 100;
+}
+
+.cutscene-skip-btn {
+  background: rgba(18, 4, 5, 0.88);
+  border: 1px solid rgba(255, 51, 38, 0.5);
+  color: var(--bone, #f4e3d7);
+  font-family: var(--f-pixel), monospace;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.cutscene-skip-btn kbd {
+  background: rgba(255, 51, 38, 0.25);
+  color: var(--blood-hot, #ff3326);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+}
+
+.cutscene-skip-btn:hover,
+.cutscene-skip-btn:focus-visible {
+  border-color: var(--blood-hot, #ff3326);
+  box-shadow: 0 0 15px rgba(255, 51, 38, 0.6);
+  transform: translateY(-1px);
+}
+
+/* ---------- Stage & Phase Layout ---------- */
+.cutscene-stage {
+  position: relative;
+  z-index: 20;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px var(--gutter, 20px);
+  box-sizing: border-box;
+}
+
+/* ---------- Phase 3: System Alert ---------- */
+.cutscene-hud {
+  position: absolute;
+  top: calc(20px + var(--safe-t, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(920px, 94vw);
+  z-index: 30;
+}
+
+.hud-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: rgba(255, 80, 50, 0.8);
+  margin-bottom: 12px;
+}
+
+.hud-blink {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff3326;
+  box-shadow: 0 0 8px #ff3326;
+  margin-right: 6px;
+  animation: cursorBlink 0.8s infinite;
+}
+
+.cutscene-alert {
+  background: rgba(20, 2, 4, 0.94);
+  border: 2px solid var(--blood-hot, #ff3326);
+  box-shadow: 0 0 40px rgba(255, 51, 38, 0.7);
+  padding: 14px 20px;
+  text-align: center;
+  animation: alertPulse 0.4s infinite alternate;
+}
+
+@keyframes alertPulse {
+  0% { border-color: var(--blood-hot, #ff3326); box-shadow: 0 0 20px rgba(255, 51, 38, 0.4); }
+  100% { border-color: #ff8a7a; box-shadow: 0 0 50px rgba(255, 51, 38, 0.95); }
+}
+
+.alert-stripe {
+  height: 6px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--blood-hot, #ff3326),
+    var(--blood-hot, #ff3326) 12px,
+    #140405 12px,
+    #140405 24px
+  );
+}
+
+.alert-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 12px 0;
+}
+
+.alert-icon {
+  font-size: 36px;
+  color: var(--blood-hot, #ff3326);
+}
+
+.alert-title {
+  margin: 0;
+  font-family: var(--f-sc, 'IM Fell English SC', serif);
+  font-size: clamp(22px, 4.5vw, 38px);
+  letter-spacing: 0.14em;
+  color: #fff;
+  text-shadow: 0 0 12px var(--blood-hot, #ff3326);
+}
+
+.alert-sub {
+  margin: 6px 0 0;
+  font-family: var(--f-pixel), monospace;
+  font-size: clamp(11px, 2vw, 14px);
+  color: var(--ember, #ff7a1a);
+  letter-spacing: 0.08em;
+}
+
+/* ---------- Phase 4: Narrative Dialogue Crawl ---------- */
+.cutscene-dialogue {
+  position: absolute;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(840px, 92vw);
+  background: rgba(10, 2, 3, 0.9);
+  border-left: 4px solid var(--blood-hot, #ff3326);
+  padding: 22px 28px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dialogue-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: rgba(255, 90, 42, 0.7);
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 51, 38, 0.2);
+  padding-bottom: 6px;
+}
+
+.dialogue-body {
+  font-family: var(--f-body, 'Special Elite', monospace);
+  font-size: clamp(18px, 3vw, 26px);
+  line-height: 1.45;
+  color: var(--bone, #f4e3d7);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+  min-height: 2.8em;
+}
+
+.dialogue-cursor {
+  display: inline-block;
+  width: 9px;
+  height: 1.15em;
+  vertical-align: -0.15em;
+  background: var(--blood-hot, #ff3326);
+  box-shadow: 0 0 8px var(--blood-hot, #ff3326);
+  margin-left: 4px;
+  animation: cursorBlink 0.7s infinite;
+}
+
+@keyframes cursorBlink { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0; } }
+
+/* ---------- Phase 5: Climax End Card ---------- */
+.cutscene-endcard {
+  position: relative;
+  z-index: 50;
+  max-width: 740px;
+  width: 90vw;
+  text-align: center;
+  padding: 44px 32px;
+  background: radial-gradient(ellipse at 50% 50%, #1e0508 0%, #080102 95%);
+  border: 1px solid rgba(255, 51, 38, 0.5);
+  box-shadow: 0 0 65px rgba(196, 22, 28, 0.5);
+  clip-path: var(--chamfer, polygon(16px 0, calc(100% - 16px) 0, 100% 16px, 100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px), 0 16px));
+  animation: cardRise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes cardRise {
+  from { opacity: 0; transform: translateY(30px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.endcard-kicker {
+  margin: 0 0 10px;
+  font-family: var(--f-sc, 'IM Fell English SC', serif);
+  font-size: 14px;
+  letter-spacing: 0.28em;
+  color: var(--ember, #ff7a1a);
+}
+
+.endcard-title {
+  margin: 0;
+  font-family: var(--f-type, 'Rye', serif);
+  font-size: clamp(30px, 6.5vw, 52px);
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 51, 38, 0.8);
+}
+
+.highlight-glitch {
+  color: var(--blood-hot, #ff3326);
+  text-shadow: 0 0 25px rgba(255, 51, 38, 0.95);
+}
+
+.endcard-desc {
+  margin: 20px auto 30px;
+  font-family: var(--f-sans, system-ui, sans-serif);
+  font-size: clamp(16px, 2.2vw, 19px);
+  color: var(--bone-dim, #d0b8a8);
+  max-width: 540px;
+  line-height: 1.5;
+}
+
+.endcard-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.endcard-proceed-btn {
+  --h: 60px;
+  font-size: 20px;
+  min-width: 320px;
+  box-shadow: 0 0 30px rgba(255, 51, 38, 0.6);
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 0.08em;
+}
+
+.endcard-proceed-btn:hover {
+  box-shadow: 0 0 50px rgba(255, 51, 38, 0.95);
+  transform: translateY(-2px);
+}
+
+.endcard-replay-btn {
+  background: none;
+  border: none;
+  font-family: var(--f-pixel), monospace;
+  font-size: 13px;
+  color: rgba(244, 227, 215, 0.6);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.endcard-replay-btn:hover { color: #fff; }
+
+/* ============ FATE CARD CHARACTER DOSSIER REVEAL ============ */
+.card-media-wrap {
+  position: relative;
+  margin: 12px auto 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-portrait-frame {
+  position: relative;
+  width: 160px;
+  height: 200px;
+  border-radius: 8px;
+  border: 2px solid var(--accent, #c4161c);
+  box-shadow: 
+    0 0 30px color-mix(in srgb, var(--accent, #c4161c) 50%, transparent),
+    inset 0 0 20px rgba(0, 0, 0, 0.9);
+  overflow: hidden;
+  background: #0d0204;
+}
+
+.card-portrait-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.card-portrait-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+.card-portrait-badge {
+  position: absolute;
+  bottom: 6px;
+  right: 8px;
+  font-size: 22px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.9));
+}
+
+.card-archetype-wrap {
+  margin: 6px 0 4px;
+}
+
+.card-archetype-tag {
+  display: inline-block;
+  font-family: var(--f-pixel), monospace;
+  font-size: 11.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: #ffb347;
+  background: rgba(255, 179, 71, 0.12);
+  border: 1px solid rgba(255, 179, 71, 0.4);
+  padding: 3px 14px;
+  border-radius: 12px;
+}
+
+.card-brief-box {
+  margin: 10px 0 6px;
+  padding: 10px 14px;
+  background: rgba(18, 4, 7, 0.9);
+  border: 1px solid rgba(240, 115, 90, 0.35);
+  border-radius: 6px;
+  text-align: left;
+}
+
+.card-brief-label {
+  display: block;
+  font-family: var(--f-pixel), monospace;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  color: #ff7a1a;
+  margin-bottom: 3px;
+}
+
+.card-brief-text {
+  margin: 0;
+  font-family: var(--f-sans), system-ui, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #f7ebe1;
+}
+
+.card-quote {
+  margin: 8px 0 4px;
+  padding: 8px 14px;
+  border-left: 2px solid var(--accent, #c4161c);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 0 6px 6px 0;
+  font-family: var(--f-serif, 'IM Fell English', serif);
+  font-style: italic;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #ffd8cc;
+  text-align: left;
+}
+
+/* ============ PROLOGUE DECREE MODAL ============ */
+.prologue-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--gutter, 20px);
+}
+
+.prologue-box {
+  width: min(640px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: radial-gradient(ellipse at 50% 20%, #1c0507 0%, #0a0102 90%);
+  border: 1px solid rgba(255, 51, 38, 0.4);
+  box-shadow: 0 0 60px rgba(196, 22, 28, 0.45);
+  padding: 36px 30px;
+  text-align: center;
+}
+
+.prologue-kicker {
+  display: block;
+  font-family: var(--f-pixel), monospace;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--blood-hot, #ff3326);
+  margin-bottom: 6px;
+}
+
+.prologue-title {
+  margin: 0;
+  font-family: var(--f-type, 'Rye', serif);
+  font-size: clamp(28px, 5.5vw, 42px);
+  color: #fff;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 15px rgba(255, 51, 38, 0.7);
+}
+
+.prologue-sub {
+  margin: 6px 0 20px;
+  font-family: var(--f-sc, 'IM Fell English SC', serif);
+  font-size: 14px;
+  letter-spacing: 0.16em;
+  color: var(--ember, #ff7a1a);
+}
+
+.prologue-body {
+  font-family: var(--f-serif, 'IM Fell English', serif);
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--bone, #f4e3d7);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prologue-stanza p {
+  margin: 4px 0;
+}
+
+.prologue-em {
+  color: #ff9e80;
+  font-style: italic;
+}
+
+.prologue-highlight {
+  padding: 12px 16px;
+  background: rgba(255, 51, 38, 0.08);
+  border-left: 3px solid var(--blood-hot, #ff3326);
+  border-right: 3px solid var(--blood-hot, #ff3326);
+  border-radius: 4px;
+}
+
+.prologue-destiny {
+  color: var(--blood-hot, #ff3326);
+  font-weight: bold;
+  font-family: var(--f-sans, system-ui, sans-serif);
+  letter-spacing: 0.04em;
+}
+
+.prologue-watching {
+  color: var(--ember, #ff7a1a);
+  font-style: italic;
+}
+
+.prologue-coda {
+  margin-top: 10px;
+  font-family: var(--f-sc, 'IM Fell English SC', serif);
+  font-size: 19px;
+  letter-spacing: 0.14em;
+  color: #fff;
+}
+
+.prologue-foot {
+  margin-top: 24px;
+}
+
+.wheel-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.prologue-pill {
+  font-family: var(--f-pixel), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: rgba(255, 51, 38, 0.15);
+  border: 1px solid rgba(255, 51, 38, 0.4);
+  color: var(--bone, #f4e3d7);
+  cursor: pointer;
+  vertical-align: middle;
+  transition: all 0.2s ease;
+}
+
+.prologue-pill:hover {
+  background: var(--blood-hot, #ff3326);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(255, 51, 38, 0.6);
+}

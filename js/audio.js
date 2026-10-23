@@ -827,6 +827,113 @@
       beat();
     },
 
+    /* ---------- The Other Side: Cutscene Synthesizers ---------- */
+
+    cutsceneVortexHum: function (on) {
+      if (!enabled || !ctx) return;
+      if (!on) {
+        if (Sound._vortexOscs) {
+          Sound._vortexOscs.forEach(function (n) { try { n.stop(); n.disconnect(); } catch (e) {} });
+          Sound._vortexOscs = null;
+        }
+        return;
+      }
+      if (Sound._vortexOscs) return;
+      var t = ctx.currentTime;
+      var sub = ctx.createOscillator(); sub.type = "sawtooth";
+      sub.frequency.setValueAtTime(42, t);
+      sub.frequency.exponentialRampToValueAtTime(110, t + 2.5);
+
+      var lfo = ctx.createOscillator(); lfo.frequency.value = 6;
+      var lfoGain = ctx.createGain(); lfoGain.gain.value = 18;
+      lfo.connect(lfoGain); lfoGain.connect(sub.frequency);
+
+      var filter = ctx.createBiquadFilter(); filter.type = "lowpass";
+      filter.frequency.setValueAtTime(120, t);
+      filter.frequency.exponentialRampToValueAtTime(1400, t + 2.5);
+      filter.Q.value = 6;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.4, t + 0.5);
+
+      sub.connect(filter); filter.connect(g); g.connect(fxBus);
+      sub.start(t); lfo.start(t);
+      Sound._vortexOscs = [sub, lfo, g, filter];
+    },
+
+    cutsceneTypeTick: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      var osc = ctx.createOscillator(); osc.type = "sine";
+      osc.frequency.setValueAtTime(2200 + Math.random() * 800, t);
+      osc.frequency.exponentialRampToValueAtTime(400, t + 0.025);
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.07, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.025);
+
+      osc.connect(g); g.connect(fxBus);
+      osc.start(t); osc.stop(t + 0.03);
+    },
+
+    cutsceneAlarm: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      [0, 0.28, 0.56, 0.84].forEach(function (off, i) {
+        var freq = i % 2 === 0 ? 880 : 620; // Tritone alarm
+        var osc = ctx.createOscillator(); osc.type = "square";
+        osc.frequency.setValueAtTime(freq, t + off);
+
+        var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
+        bp.frequency.value = freq; bp.Q.value = 4;
+
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(0.001, t + off);
+        g.gain.linearRampToValueAtTime(0.22, t + off + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + off + 0.22);
+
+        osc.connect(bp); bp.connect(g); g.connect(fxBus);
+        osc.start(t + off); osc.stop(t + off + 0.24);
+      });
+    },
+
+    cutsceneStaticBurst: function () {
+      if (!enabled || !ctx || !noiseBuf) return;
+      var t = ctx.currentTime;
+      var src = ctx.createBufferSource(); src.buffer = noiseBuf;
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
+      bp.frequency.setValueAtTime(1400, t);
+      bp.frequency.exponentialRampToValueAtTime(3800, t + 0.15);
+      bp.Q.value = 5;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.35, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
+
+      src.connect(bp); bp.connect(g); g.connect(fxBus);
+      src.start(t); src.stop(t + 0.18);
+    },
+
+    cutsceneImpact: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      var osc = ctx.createOscillator(); osc.type = "triangle";
+      osc.frequency.setValueAtTime(130, t);
+      osc.frequency.exponentialRampToValueAtTime(32, t + 1.8);
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.85, t + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 2.2);
+
+      osc.connect(g); g.connect(fxBus);
+      osc.start(t); osc.stop(t + 2.3);
+      if (Sound.thunder) Sound.thunder();
+    },
+
     // browsers suspend audio in background tabs; resume on return
     wake: function () { if (ctx && enabled && ctx.state === "suspended") ctx.resume(); }
   };
