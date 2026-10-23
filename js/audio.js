@@ -829,6 +829,195 @@
 
     /* ---------- The Other Side: Cutscene Synthesizers ---------- */
 
+    cutsceneFleshRip: function () {
+      if (!enabled || !ctx || !noiseBuf) return;
+      var t = ctx.currentTime;
+      var src = ctx.createBufferSource(); src.buffer = noiseBuf;
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
+      bp.frequency.setValueAtTime(350, t);
+      bp.frequency.exponentialRampToValueAtTime(1400, t + 0.18);
+      bp.frequency.exponentialRampToValueAtTime(180, t + 0.6);
+      bp.Q.value = 4.5;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.7, t + 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.65);
+
+      // Low squelch body
+      var osc = ctx.createOscillator(); osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(160, t);
+      osc.frequency.exponentialRampToValueAtTime(45, t + 0.5);
+      var og = ctx.createGain();
+      og.gain.setValueAtTime(0.5, t);
+      og.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+
+      src.connect(bp); bp.connect(g); g.connect(fxBus);
+      osc.connect(og); og.connect(fxBus);
+      src.start(t); src.stop(t + 0.7);
+      osc.start(t); osc.stop(t + 0.55);
+    },
+
+    cutsceneDemonicScreech: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      var osc1 = ctx.createOscillator(); osc1.type = "sawtooth";
+      var osc2 = ctx.createOscillator(); osc2.type = "sine";
+      osc1.frequency.setValueAtTime(580, t);
+      osc1.frequency.exponentialRampToValueAtTime(1650, t + 0.6);
+      osc1.frequency.exponentialRampToValueAtTime(420, t + 1.4);
+
+      osc2.frequency.setValueAtTime(592, t); // sour beating dissonance
+      osc2.frequency.exponentialRampToValueAtTime(1680, t + 0.6);
+      osc2.frequency.exponentialRampToValueAtTime(430, t + 1.4);
+
+      var lfo = ctx.createOscillator(); lfo.frequency.value = 14;
+      var lfoGain = ctx.createGain(); lfoGain.gain.value = 90;
+      lfo.connect(lfoGain); lfoGain.connect(osc1.frequency);
+
+      var filter = ctx.createBiquadFilter(); filter.type = "bandpass";
+      filter.frequency.setValueAtTime(800, t);
+      filter.frequency.exponentialRampToValueAtTime(2200, t + 0.6);
+      filter.frequency.exponentialRampToValueAtTime(600, t + 1.4);
+      filter.Q.value = 5;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.38, t + 0.2);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 1.45);
+
+      osc1.connect(filter); osc2.connect(filter);
+      filter.connect(g); g.connect(fxBus);
+      osc1.start(t); osc2.start(t); lfo.start(t);
+      osc1.stop(t + 1.5); osc2.stop(t + 1.5); lfo.stop(t + 1.5);
+    },
+
+    cutsceneClawGrab: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      // High-impact transient bone crunch
+      var osc = ctx.createOscillator(); osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(3200, t);
+      osc.frequency.exponentialRampToValueAtTime(140, t + 0.12);
+
+      var bp = ctx.createBiquadFilter(); bp.type = "bandpass";
+      bp.frequency.setValueAtTime(2800, t); bp.Q.value = 4;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.65, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.14);
+
+      osc.connect(bp); bp.connect(g); g.connect(fxBus);
+      osc.start(t); osc.stop(t + 0.15);
+
+      // Sub-bass heavy screen thud
+      var sub = ctx.createOscillator(); sub.type = "sine";
+      sub.frequency.setValueAtTime(120, t);
+      sub.frequency.exponentialRampToValueAtTime(32, t + 0.38);
+
+      var subG = ctx.createGain();
+      subG.gain.setValueAtTime(0.85, t);
+      subG.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+
+      sub.connect(subG); subG.connect(fxBus);
+      sub.start(t); sub.stop(t + 0.42);
+    },
+
+    cutsceneGlassCrack: function () {
+      if (!enabled || !ctx || !noiseBuf) return;
+      var t = ctx.currentTime;
+      var src = ctx.createBufferSource(); src.buffer = noiseBuf;
+      var hp = ctx.createBiquadFilter(); hp.type = "highpass";
+      hp.frequency.value = 4800;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.55, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.09);
+
+      src.connect(hp); hp.connect(g); g.connect(fxBus);
+      src.start(t); src.stop(t + 0.1);
+    },
+
+    cutsceneDragRoar: function () {
+      if (!enabled || !ctx || !noiseBuf) return;
+      var t = ctx.currentTime;
+      var src = ctx.createBufferSource(); src.buffer = noiseBuf;
+      var lp = ctx.createBiquadFilter(); lp.type = "lowpass";
+      lp.frequency.setValueAtTime(100, t);
+      lp.frequency.exponentialRampToValueAtTime(1100, t + 0.6);
+      lp.frequency.exponentialRampToValueAtTime(70, t + 1.5);
+      lp.Q.value = 5.5;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.01, t);
+      g.gain.linearRampToValueAtTime(0.8, t + 0.45);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 1.6);
+
+      // Low frequency sub-rumble
+      var sub = ctx.createOscillator(); sub.type = "triangle";
+      sub.frequency.setValueAtTime(65, t);
+      sub.frequency.exponentialRampToValueAtTime(25, t + 1.5);
+      var subG = ctx.createGain();
+      subG.gain.setValueAtTime(0.01, t);
+      subG.gain.linearRampToValueAtTime(0.7, t + 0.35);
+      subG.gain.exponentialRampToValueAtTime(0.001, t + 1.5);
+
+      src.connect(lp); lp.connect(g); g.connect(fxBus);
+      sub.connect(subG); subG.connect(fxBus);
+      src.start(t); src.stop(t + 1.65);
+      sub.start(t); sub.stop(t + 1.6);
+    },
+
+    cutsceneWarpEngine: function (on) {
+      if (!enabled || !ctx) return;
+      if (!on) {
+        if (Sound._warpNodes) {
+          Sound._warpNodes.forEach(function (n) { try { n.stop(); n.disconnect(); } catch (e) {} });
+          Sound._warpNodes = null;
+        }
+        return;
+      }
+      if (Sound._warpNodes) return;
+      var t = ctx.currentTime;
+      var osc = ctx.createOscillator(); osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(75, t);
+      osc.frequency.exponentialRampToValueAtTime(2100, t + 2.8);
+
+      var lfo = ctx.createOscillator(); lfo.frequency.setValueAtTime(5, t);
+      lfo.frequency.linearRampToValueAtTime(32, t + 2.8);
+      var lfoGain = ctx.createGain(); lfoGain.gain.value = 50;
+      lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
+
+      var filter = ctx.createBiquadFilter(); filter.type = "bandpass";
+      filter.frequency.setValueAtTime(220, t);
+      filter.frequency.exponentialRampToValueAtTime(2800, t + 2.8);
+      filter.Q.value = 6;
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.001, t);
+      g.gain.linearRampToValueAtTime(0.65, t + 0.5);
+
+      osc.connect(filter); filter.connect(g); g.connect(fxBus);
+      osc.start(t); lfo.start(t);
+      Sound._warpNodes = [osc, lfo, g, filter];
+    },
+
+    cutsceneFlashBang: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      var osc = ctx.createOscillator(); osc.type = "triangle";
+      osc.frequency.setValueAtTime(160, t);
+      osc.frequency.exponentialRampToValueAtTime(26, t + 1.8);
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.95, t);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 2.1);
+
+      osc.connect(g); g.connect(fxBus);
+      osc.start(t); osc.stop(t + 2.2);
+      if (Sound.thunder) Sound.thunder();
+    },
+
     cutsceneVortexHum: function (on) {
       if (!enabled || !ctx) return;
       if (!on) {
