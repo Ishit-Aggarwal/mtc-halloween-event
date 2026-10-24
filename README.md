@@ -15,8 +15,8 @@ The styling follows the event poster: blood red on black, the Rye headline, Oswa
 ## The flow
 0. **The gate.** "Enter the Crypt" turns on the sound; browsers only allow audio after a tap. "Enter quietly" skips the sound.
 1. Teams sign the ledger by entering a team name. Duplicate names are blocked. **Each phone can register only once.** After that, the phone is bound to its team for good. There is no "next team" button, and reopening the site (even after clearing the page) brings back that team's fate. The host can free a phone from the host ledger if needed, e.g. after a test run.
-2. **Wheel I · The Soul** gives one of 15 Halloween characters. *The Eye* spins it.
-3. **Wheel II · The Curse** gives that character's problem: a small, one-page site the team must build. Each character has its own 10 problems. Once a (character, problem) pair is claimed, no other team can get it. A taken problem is struck out on the wheel. When a character runs out of problems, it's struck out on the first wheel.
+2. **Wheel I · The Soul** gives one of 10 characters. *The Eye* spins it.
+3. **Wheel II · The Curse** gives that character's problem: a small, one-page site the team must build. Each character has its own problems. Once a (character, problem) pair is claimed, no other team can get it. A taken problem is struck out on the wheel. When a character runs out of problems, it's struck out on the first wheel.
 4. **Wheel III · The Hex** gives a UI constraint.
 5. **Wheel IV · The Twist** stays chained for 15 minutes after the hex, then unlocks. In the last minute a heartbeat speeds up.
 
@@ -115,6 +115,6 @@ Without a Firebase config (`js/firebase-config.js` left as `null`), the site run
 
 ## Editing content
 All characters, problems, hexes, and twists live in `js/data.js`.
-- Each character needs a unique `id` and exactly 10 problems.
+- Each character needs a unique `id` and a `problems` list.
 - In twists, `{char}`, `{randomChar}` and `{randomCurse}` are filled in automatically.
 - Each character's `spin` and `idle` lines are what it says when it spins, and when it loses patience.

@@ -33,7 +33,7 @@
   }
   // who looms when a character loses patience (anything not listed: a random one)
   var LOOMS = {
-    keeper: "contorted", dracula: "nosferatu-reach", victor: "nosferatu-stand", monster: "zombie-shambler",
+    keeper: "contorted", victor: "nosferatu-stand", monster: "zombie-shambler",
     zombie: "zombie-shambler", mummy: "zombie-shambler", reaper: "reaper", ghost: "contorted",
     skeleton: "crawler", invisible: "nosferatu-stand", witch: "contorted", scarecrow: "contorted"
   };
