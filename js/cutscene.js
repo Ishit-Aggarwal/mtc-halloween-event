@@ -303,10 +303,41 @@
       this.resizeCanvas();
       this.resetVisuals();
       this.startTime = performance.now();
-      this.canvasMode = MODE.PORTAL;
 
       var S = window.Sound || {};
       var self = this;
+
+      if (this.cutsceneType === "hex") {
+        // ========================================================
+        // HEX CUTSCENE: PURE DARK VOID & BLOOD-INSCRIBED TEXT
+        // (No portal, hands, or wormhole — opens straight into dark void)
+        // ========================================================
+        this.canvasMode = MODE.DARK_VOID;
+        this.startRenderLoop();
+
+        // Reveal spooky figures lurking in the shadows & glowing eyes
+        if (this.voidFigures) {
+          this.voidFigures.hidden = false;
+          void this.voidFigures.offsetWidth;
+          this.voidFigures.classList.add("revealed");
+        }
+
+        if (S.whisper) S.whisper();
+
+        // Begin narrative text right away (after brief 650ms atmospheric settle)
+        this.delay(function () {
+          if (!self.isActive) return;
+          if (self.cinemaWrap) self.cinemaWrap.hidden = false;
+          self.playCinematicNarrative();
+        }, 650);
+
+        return;
+      }
+
+      // ========================================================
+      // ENTRY CUTSCENE: FULL HORROR PORTAL & WORMHOLE PIPELINE
+      // ========================================================
+      this.canvasMode = MODE.PORTAL;
 
       // ========================================================
       // PHASE 1: BLOODY PORTAL TEARS OPEN (0.0s - 2.0s)
