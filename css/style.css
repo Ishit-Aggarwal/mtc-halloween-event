@@ -1981,6 +1981,7 @@ body.lit .circuit-grid {
 .gh-body details[open] summary { border-bottom: 1px solid rgba(244, 227, 215, .08); }
 .gh-body details > :not(summary) { margin-left: 14px; margin-right: 14px; }
 .gh-foot { margin: 18px 0 0; text-align: center; color: var(--bone-dim); }
+.help-mark { font-family: var(--f-title); font-size: 22px; line-height: 1; color: var(--ember); }
 .gh-open {
   margin: 4px 0 14px; padding: 10px 14px; width: 100%; cursor: pointer; text-align: left;
   font-family: var(--f-type); font-size: 14px; letter-spacing: .04em; color: var(--bone);
