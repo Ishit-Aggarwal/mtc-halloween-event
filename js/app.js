@@ -21,6 +21,7 @@
     ledgerPanel: $("ledgerPanel"), wheelPanel: $("wheelPanel"),
     form: $("ledgerForm"), teamInput: $("teamInput"), teamError: $("teamError"),
     leaderNameInput: $("leaderNameInput"), leaderYearInput: $("leaderYearInput"), leaderBranchInput: $("leaderBranchInput"),
+    leaderPhoneInput: $("leaderPhoneInput"), leaderEmailInput: $("leaderEmailInput"),
     membersContainer: $("membersContainer"), addMemberBtn: $("addMemberBtn"), membersLimitNote: $("membersLimitNote"),
     seals: $("seals"), kicker: $("wheelKicker"), title: $("wheelTitle"), sub: $("wheelSub"),
     stage: $("wheelStage"), rotor: $("wheelRotor"), canvas: $("wheelCanvas"), pointer: $("pointer"),
@@ -65,7 +66,7 @@
 
   var session = window.Store.session();
   var timerId = null, lastBpm = 0;
-  var busy = false, replaying = false;
+  var busy = false, replaying = false, cardSeq = 0;
   var activeView = "mission";
   var baseTitle = document.title;
 
@@ -661,6 +662,20 @@
     el.cardKicker.textContent = kicker;
     el.cardGlyph.textContent = glyph;
     el.cardGlyph.classList.toggle("text-glyph", !isEmoji(glyph));
+    // the curse card shows the character's face in the circle (the emoji stays if the photo is missing)
+    el.cardGlyph.classList.remove("has-photo");
+    var seq = ++cardSeq;
+    if (stage === "curse") {
+      var face = document.createElement("img");
+      face.className = "card-glyph-photo";
+      face.alt = c.name;
+      face.draggable = false;
+      face.onload = function () {
+        if (seq !== cardSeq) return; // another card has been shown since
+        el.cardGlyph.textContent = ""; el.cardGlyph.appendChild(face); el.cardGlyph.classList.add("has-photo");
+      };
+      face.src = c.face || ("assets/characters/" + c.id + "-face.jpg");
+    }
     el.cardName.textContent = name;
     el.cardLore.textContent = lore;
     el.cardDesc.textContent = desc;
@@ -860,6 +875,16 @@
             '<input class="member-branch-input" type="text" maxlength="40" placeholder="e.g. CSE, IT, ECE" spellcheck="false" autocapitalize="characters" required>' +
           '</label>' +
         '</div>' +
+        '<div class="field-row">' +
+          '<label class="field">' +
+            '<span class="field-label">Phone Number</span>' +
+            '<input class="member-phone-input" type="tel" inputmode="tel" maxlength="16" placeholder="10-digit mobile number" required>' +
+          '</label>' +
+          '<label class="field">' +
+            '<span class="field-label">Email</span>' +
+            '<input class="member-email-input" type="email" inputmode="email" maxlength="80" placeholder="name@example.com" spellcheck="false" autocapitalize="off" required>' +
+          '</label>' +
+        '</div>' +
       '</div>';
 
     var removeBtn = card.querySelector(".member-remove-btn");
@@ -895,6 +920,19 @@
     el.addMemberBtn.addEventListener("click", function () {
       addMemberRow();
     });
+  }
+
+  // Phone numbers are stored as plain 10-digit Indian mobile numbers, so they
+  // match up however they were typed (+91, spaces, dashes, a leading 0).
+  function cleanPhone(raw) {
+    var d = String(raw || "").replace(/\D/g, "");
+    if (d.length === 12 && d.indexOf("91") === 0) d = d.slice(2);
+    else if (d.length === 11 && d.charAt(0) === "0") d = d.slice(1);
+    return /^[6-9]\d{9}$/.test(d) ? d : "";
+  }
+  function cleanEmail(raw) {
+    var e = String(raw || "").trim().toLowerCase();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e) ? e : "";
   }
 
   var signing = false;
@@ -946,6 +984,18 @@
       if (el.leaderBranchInput) el.leaderBranchInput.focus();
       return;
     }
+    var leaderPhone = cleanPhone(el.leaderPhoneInput ? el.leaderPhoneInput.value : "");
+    var leaderEmail = cleanEmail(el.leaderEmailInput ? el.leaderEmailInput.value : "");
+    if (!leaderPhone) {
+      el.teamError.textContent = "Please enter the team leader's 10-digit mobile number.";
+      if (el.leaderPhoneInput) el.leaderPhoneInput.focus();
+      return;
+    }
+    if (!leaderEmail) {
+      el.teamError.textContent = "Please enter a valid email for the team leader.";
+      if (el.leaderEmailInput) el.leaderEmailInput.focus();
+      return;
+    }
 
     var memberCards = el.membersContainer ? el.membersContainer.querySelectorAll(".member-card") : [];
     var members = [];
@@ -974,7 +1024,31 @@
         if (mBranchInput) mBranchInput.focus();
         return;
       }
-      members.push({ name: mName, year: mYear, branch: mBranch });
+      var mPhoneInput = card.querySelector(".member-phone-input");
+      var mEmailInput = card.querySelector(".member-email-input");
+      var mPhone = cleanPhone(mPhoneInput ? mPhoneInput.value : "");
+      var mEmail = cleanEmail(mEmailInput ? mEmailInput.value : "");
+      if (!mPhone) {
+        el.teamError.textContent = "Please enter Member " + studentNum + "'s 10-digit mobile number.";
+        if (mPhoneInput) mPhoneInput.focus();
+        return;
+      }
+      if (mPhone === leaderPhone) {
+        el.teamError.textContent = "Member " + studentNum + " needs their own phone number, not the leader's.";
+        if (mPhoneInput) mPhoneInput.focus();
+        return;
+      }
+      if (!mEmail) {
+        el.teamError.textContent = "Please enter a valid email for Member " + studentNum + ".";
+        if (mEmailInput) mEmailInput.focus();
+        return;
+      }
+      if (mEmail === leaderEmail) {
+        el.teamError.textContent = "Member " + studentNum + " needs their own email, not the leader's.";
+        if (mEmailInput) mEmailInput.focus();
+        return;
+      }
+      members.push({ name: mName, year: mYear, branch: mBranch, phone: mPhone, email: mEmail });
     }
 
     if (members.length > 1) {
@@ -982,7 +1056,7 @@
       return;
     }
 
-    var leaderObj = { name: leaderName, year: leaderYear, branch: leaderBranch };
+    var leaderObj = { name: leaderName, year: leaderYear, branch: leaderBranch, phone: leaderPhone, email: leaderEmail };
     el.teamError.textContent = "";
 
     var btn = el.form.querySelector("button[type=submit] span");
@@ -1029,6 +1103,8 @@
   if (el.leaderNameInput) el.leaderNameInput.addEventListener("input", function () { el.teamError.textContent = ""; });
   if (el.leaderYearInput) el.leaderYearInput.addEventListener("input", function () { el.teamError.textContent = ""; });
   if (el.leaderBranchInput) el.leaderBranchInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderPhoneInput) el.leaderPhoneInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderEmailInput) el.leaderEmailInput.addEventListener("input", function () { el.teamError.textContent = ""; });
   if (el.membersContainer) el.membersContainer.addEventListener("input", function () { el.teamError.textContent = ""; });
 
   /* ---------- controls ---------- */
@@ -1582,12 +1658,13 @@
   });
   $("hostCsv").addEventListener("click", function () {
     var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
-    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Members", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Joined at"].map(q).join(",")];
+    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Leader Phone", "Leader Email",
+      "Member Name", "Member Year", "Member Branch", "Member Phone", "Member Email",
+      "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Joined at"].map(q).join(",")];
     teamRecords().forEach(function (e) {
       var ldr = e.leader || {};
-      var memList = (e.members || []).map(function (m) {
-        return m.name + (m.year || m.branch ? " (" + [m.year, m.branch].filter(Boolean).join(" - ") + ")" : "");
-      }).join("; ");
+      // one column per detail; if a team ever has more than one member they're joined with "; "
+      var mem = function (k) { return (e.members || []).map(function (m) { return m[k] || ""; }).join("; "); };
       var c = charById(e.charId), p = c && c.problems[e.problem];
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null, t = typeof e.twist === "number" ? D.twists[e.twist] : null;
       var subTime = e.submittedAt ? new Date(e.submittedAt).toLocaleString() : "";
@@ -1596,7 +1673,13 @@
         ldr.name || "",
         ldr.year || "",
         ldr.branch || "",
-        memList,
+        ldr.phone || "",
+        ldr.email || "",
+        mem("name"),
+        mem("year"),
+        mem("branch"),
+        mem("phone"),
+        mem("email"),
         c && c.name,
         p && p.t,
         p && p.d,
