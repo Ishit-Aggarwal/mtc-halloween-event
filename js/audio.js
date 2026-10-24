@@ -1067,6 +1067,23 @@
       osc.start(t); osc.stop(t + 0.03);
     },
 
+    cutsceneBloodDripTick: function () {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      var osc = ctx.createOscillator(); osc.type = "sine";
+      var f0 = 980 + (Math.random() * 320 - 160);
+      osc.frequency.setValueAtTime(f0, t);
+      osc.frequency.exponentialRampToValueAtTime(160, t + 0.042);
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.038, t + 0.005);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+
+      osc.connect(g); g.connect(fxBus);
+      osc.start(t); osc.stop(t + 0.048);
+    },
+
     cutsceneAlarm: function () {
       if (!enabled || !ctx) return;
       var t = ctx.currentTime;

@@ -718,54 +718,139 @@
     },
 
     // ----------------------------------------------------
-    // BIG CINEMATIC GLOWING NARRATIVE TEXT CONTROLLER
+    // SPOOKY BLOOD-INSCRIBED LETTER-BY-LETTER NARRATIVE CONTROLLER
     // ----------------------------------------------------
     playCinematicNarrative: function () {
       var self = this;
       var lineIdx = 0;
       var textEl = this.cinemaTextLine;
+      var stageEl = this.cinemaWrap;
       if (!textEl) return;
+
+      var currentTypeTimer = null;
+      var isTyping = false;
+      var pendingChars = [];
+
+      function escapeHtml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function buildLineMarkup(text) {
+        var words = text.split(" ");
+        return words.map(function (word) {
+          var charsHtml = word.split("").map(function (ch) {
+            var lower = ch.toLowerCase();
+            // Drop a blood drip on punctuation ('.', '!', '?') or descenders with low probability
+            var isPunct = (ch === "." || ch === "!" || ch === "?");
+            var hasDescender = ("ypgjqdltr".indexOf(lower) !== -1);
+            var shouldDrip = isPunct || (hasDescender && Math.random() < 0.14);
+            var dripClass = shouldDrip ? " has-drip" : "";
+            return '<span class="blood-char pending' + dripClass + '" data-char="' + escapeHtml(ch) + '">' + escapeHtml(ch) + '</span>';
+          }).join("");
+          return '<span class="blood-word">' + charsHtml + '</span>';
+        }).join(" ");
+      }
 
       function showLine() {
         if (!self.isActive) return;
 
         if (lineIdx >= NARRATIVE_LINES.length) {
-          // All lines completed! Pause on final line, then reveal Mission 02 End Card
+          // All lines completed! Linger on final sentence, then dissolve into Mission 02 End Card
           self.delay(function () {
             if (!self.isActive) return;
-            textEl.classList.remove("active");
             textEl.classList.add("exit");
             self.delay(function () {
               if (!self.isActive) return;
               self.showEndCard();
-            }, 600);
-          }, 2000);
+            }, 650);
+          }, 2400);
           return;
         }
 
         var text = NARRATIVE_LINES[lineIdx];
         lineIdx++;
 
-        // Step 1: Fade out previous line
-        textEl.classList.remove("active");
+        // Step 1: Liquefied blood dissolve of previous line
         textEl.classList.add("exit");
 
         self.delay(function () {
           if (!self.isActive) return;
-          textEl.textContent = text;
+
+          // Render new sentence with all characters in pending (invisible) state
           textEl.classList.remove("exit");
+          textEl.innerHTML = buildLineMarkup(text);
           void textEl.offsetWidth;
-          // Step 2: Fade in new line with subtle red glow
-          textEl.classList.add("active");
 
           if (window.Sound && window.Sound.whisper && lineIdx % 2 === 1) {
             window.Sound.whisper();
           }
 
-          // Line pacing: 2.2s for short lines, 2.8s for longer lines
-          var waitTime = text.length > 50 ? 2800 : 2200;
-          self.delay(showLine, waitTime);
-        }, 550);
+          var charEls = Array.prototype.slice.call(textEl.querySelectorAll(".blood-char"));
+          var charIdx = 0;
+          isTyping = true;
+          pendingChars = charEls;
+
+          // Letter-by-letter blood emergence with natural spooky cadence
+          function revealNextChar() {
+            if (!self.isActive) {
+              isTyping = false;
+              return;
+            }
+            if (charIdx >= charEls.length) {
+              isTyping = false;
+              // Finished writing current line! Linger for reading
+              var lingerTime = text.length > 55 ? 2600 : 2100;
+              self.delay(showLine, lingerTime);
+              return;
+            }
+
+            var el = charEls[charIdx];
+            charIdx++;
+            el.classList.remove("pending");
+            el.classList.add("bleeding");
+
+            // Play visceral blood inscribe / drip audio
+            var Sound = window.Sound || {};
+            if (Sound.cutsceneBloodDripTick && (charIdx % 2 === 1 || el.classList.contains("has-drip"))) {
+              Sound.cutsceneBloodDripTick();
+            }
+
+            var ch = el.getAttribute("data-char") || "";
+            var delayMs = 38;
+            if (ch === "." || ch === "!" || ch === "?") {
+              delayMs = 280; // Dramatic pause on punctuation
+            } else if (ch === "," || ch === ";") {
+              delayMs = 150;
+            } else {
+              delayMs = 32 + Math.floor(Math.random() * 14);
+            }
+
+            currentTypeTimer = self.delay(revealNextChar, delayMs);
+          }
+
+          revealNextChar();
+        }, 580);
+      }
+
+      // Fast-forward line on click (if user clicks screen, immediately finish writing current line)
+      if (stageEl && !stageEl._clickBound) {
+        stageEl._clickBound = true;
+        stageEl.addEventListener("click", function () {
+          if (isTyping && pendingChars.length > 0) {
+            if (currentTypeTimer) clearTimeout(currentTypeTimer);
+            pendingChars.forEach(function (el) {
+              el.classList.remove("pending");
+              el.classList.add("bleeding");
+            });
+            isTyping = false;
+            self.delay(showLine, 2100);
+          }
+        });
       }
 
       showLine();
