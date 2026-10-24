@@ -40,107 +40,6 @@ const characters = [
     `
   },
   {
-    id: 'joker',
-    name: 'THE JOKER',
-    title: 'Clown Prince of Crime',
-    c1: '#3c096c', c2: '#0b0014', glow: '#70e000',
-    features: `
-      <!-- Purple Suit Coat & Orange Vest -->
-      <path d="M 70 400 L 100 270 L 160 240 L 220 270 L 250 400 Z" fill="#240046" stroke="#5a189a" stroke-width="2"/>
-      <path d="M 120 270 L 160 330 L 200 270 L 160 245 Z" fill="#ff6b35"/>
-      <path d="M 140 260 L 160 300 L 180 260 Z" fill="#007200"/>
-      <!-- White Chalk Face -->
-      <path d="M 122 170 C 118 115 130 95 160 95 C 190 95 202 115 198 170 C 195 215 178 238 160 238 C 142 238 125 215 122 170 Z" fill="#f8f9fa"/>
-      <!-- Wild Messy Green Hair -->
-      <path d="M 112 140 C 105 100 120 65 160 65 C 200 65 215 100 208 140 C 215 110 225 80 195 60 C 165 40 130 55 110 80 C 100 95 105 125 112 140 Z" fill="#38b000" filter="url(#glow)"/>
-      <path d="M 115 110 Q 130 85 160 85 Q 190 85 205 110" fill="#007200"/>
-      <!-- Manic Eyes with Blue Triangles -->
-      <polygon points="144,138 138,150 150,150" fill="#0077b6"/>
-      <polygon points="144,166 138,154 150,154" fill="#0077b6"/>
-      <circle cx="144" cy="152" r="3.5" fill="#111"/>
-      <polygon points="176,138 170,150 182,150" fill="#0077b6"/>
-      <polygon points="176,166 170,154 182,154" fill="#0077b6"/>
-      <circle cx="176" cy="152" r="3.5" fill="#111"/>
-      <!-- Red Clown Nose -->
-      <circle cx="160" cy="172" r="6" fill="#d90429"/>
-      <!-- Glasgow Smear Smile (Blood Red) -->
-      <path d="M 126 188 Q 160 240 194 188 Q 160 215 126 188 Z" fill="#d90429" filter="url(#glow)"/>
-      <path d="M 136 198 Q 160 218 184 198" stroke="#ffffff" stroke-width="3" fill="none"/>
-      <!-- Playing Card Accents -->
-      <rect x="235" y="270" width="35" height="50" rx="3" fill="#fff" stroke="#d90429" stroke-width="1.5" transform="rotate(15, 235, 270)"/>
-      <text x="246" y="300" font-size="20" fill="#d90429" transform="rotate(15, 235, 270)">🃏</text>
-    `
-  },
-  {
-    id: 'dracula',
-    name: 'COUNT DRACULA',
-    title: 'Sovereign of the Nosferatu',
-    c1: '#4a0404', c2: '#0d0000', glow: '#e63946',
-    features: `
-      <!-- High Winged Gothic Vampire Collar -->
-      <path d="M 85 260 L 95 120 L 135 190 L 185 190 L 225 120 L 235 260 Z" fill="#9e0012" stroke="#e63946" stroke-width="1.5"/>
-      <!-- Black Silk Cape with Red Satin Lining -->
-      <path d="M 70 400 L 90 250 L 160 220 L 230 250 L 250 400 Z" fill="#0d0d0d"/>
-      <path d="M 130 240 L 160 280 L 190 240 L 160 225 Z" fill="#ffffff"/>
-      <!-- Medallion on Red Ribbon -->
-      <path d="M 148 245 L 160 265 L 172 245" stroke="#9e0012" stroke-width="3" fill="none"/>
-      <circle cx="160" cy="268" r="7" fill="#ffd166" stroke="#9e0012" stroke-width="1"/>
-      <!-- Aristocratic Gaunt Face -->
-      <path d="M 126 175 C 122 120 134 98 160 98 C 186 98 198 120 194 175 C 190 215 176 235 160 235 C 144 235 130 215 126 175 Z" fill="#eae2b7"/>
-      <!-- Slicked-back Widow's Peak Hair -->
-      <path d="M 124 140 C 118 100 130 70 160 70 C 190 70 202 100 196 140 C 185 110 175 105 160 120 C 145 105 135 110 124 140 Z" fill="#111111"/>
-      <!-- Hypnotic Crimson Eyes -->
-      <ellipse cx="145" cy="155" rx="7" ry="4" fill="#3a0105"/>
-      <circle cx="145" cy="155" r="3.2" fill="#ff002b" filter="url(#glow)"/>
-      <ellipse cx="175" cy="155" rx="7" ry="4" fill="#3a0105"/>
-      <circle cx="175" cy="155" r="3.2" fill="#ff002b" filter="url(#glow)"/>
-      <!-- Pointed Ears -->
-      <path d="M 123 150 L 110 142 L 124 162 Z" fill="#eae2b7"/>
-      <path d="M 197 150 L 210 142 L 196 162 Z" fill="#eae2b7"/>
-      <!-- Fangs and Blood Drip -->
-      <path d="M 148 202 Q 160 206 172 202" stroke="#540b0e" stroke-width="2" fill="none"/>
-      <polygon points="151,202 153,212 155,202" fill="#ffffff"/>
-      <polygon points="165,202 167,212 169,202" fill="#ffffff"/>
-      <circle cx="153" cy="214" r="1.5" fill="#e63946"/>
-      <!-- Flapping Bat Silhouettes in Background -->
-      <path d="M 50 80 Q 60 70 70 80 Q 75 65 80 80 Q 70 90 50 80 Z" fill="#ff002b" opacity="0.3"/>
-      <path d="M 230 90 Q 240 80 250 90 Q 255 75 260 90 Q 250 100 230 90 Z" fill="#ff002b" opacity="0.3"/>
-    `
-  },
-  {
-    id: 'vecna',
-    name: 'VECNA',
-    title: 'Curse of the Upside Down',
-    c1: '#3d0c26', c2: '#0b0108', glow: '#f72585',
-    features: `
-      <!-- Upside Down Organic Tendrils & Veins -->
-      <path d="M 60 400 Q 100 300 130 270 Q 90 230 70 180" stroke="#7209b7" stroke-width="6" fill="none" opacity="0.8"/>
-      <path d="M 260 400 Q 220 300 190 270 Q 230 230 250 180" stroke="#7209b7" stroke-width="6" fill="none" opacity="0.8"/>
-      <!-- Muscular Desiccated Torso -->
-      <path d="M 85 400 L 105 270 L 160 240 L 215 270 L 235 400 Z" fill="#2d132c" stroke="#5c1d4a" stroke-width="2"/>
-      <!-- Tendrils wrapped around body -->
-      <path d="M 100 320 Q 160 300 220 340" stroke="#f72585" stroke-width="3" fill="none" opacity="0.7"/>
-      <path d="M 110 360 Q 160 340 210 380" stroke="#f72585" stroke-width="3" fill="none" opacity="0.7"/>
-      <!-- Vine-Strangled Skull Head -->
-      <path d="M 124 175 C 118 115 130 92 160 92 C 190 92 202 115 196 175 C 192 215 178 238 160 238 C 142 238 128 215 124 175 Z" fill="#523a4e"/>
-      <!-- Skinless Tendril Textures on Face -->
-      <path d="M 128 115 Q 160 140 150 220" stroke="#800f2f" stroke-width="3" fill="none"/>
-      <path d="M 192 115 Q 160 140 170 220" stroke="#800f2f" stroke-width="3" fill="none"/>
-      <!-- Hollow Glowing Red Eyes -->
-      <ellipse cx="143" cy="154" rx="8" ry="5" fill="#1a040d"/>
-      <circle cx="143" cy="154" r="3" fill="#f72585" filter="url(#glow)"/>
-      <ellipse cx="177" cy="154" rx="8" ry="5" fill="#1a040d"/>
-      <circle cx="177" cy="154" r="3" fill="#f72585" filter="url(#glow)"/>
-      <!-- Flat Skeletal Nose Cavity -->
-      <polygon points="160,172 156,183 164,183" fill="#1a040d"/>
-      <!-- Grandfather Clock Motif in Background -->
-      <rect x="235" y="60" width="30" height="70" rx="3" fill="#1a040d" stroke="#f72585" stroke-width="1.5" opacity="0.4"/>
-      <circle cx="250" cy="80" r="10" fill="none" stroke="#f72585" stroke-width="1.5" opacity="0.6"/>
-      <line x1="250" y1="80" x2="250" y2="74" stroke="#f72585" stroke-width="1.5" opacity="0.7"/>
-      <line x1="250" y1="80" x2="255" y2="80" stroke="#f72585" stroke-width="1.5" opacity="0.7"/>
-    `
-  },
-  {
     id: 'stree',
     name: 'STREE',
     title: 'The Legend of Chanderi',
@@ -243,67 +142,6 @@ const characters = [
     `
   },
   {
-    id: 'valak',
-    name: 'VALAK',
-    title: 'The Defiler (The Nun)',
-    c1: '#262010', c2: '#080703', glow: '#d4af37',
-    features: `
-      <!-- Black Nun Wimple and Habit -->
-      <path d="M 60 400 L 90 260 L 160 220 L 230 260 L 260 400 Z" fill="#080808" stroke="#1f1f1f" stroke-width="2"/>
-      <!-- White Starched Cowl Frame -->
-      <path d="M 100 240 C 95 140 110 80 160 80 C 210 80 225 140 220 240 C 205 250 185 255 160 255 C 135 255 115 250 100 240 Z" fill="#e9ecef" stroke="#adb5bd" stroke-width="1.5"/>
-      <!-- Inverted Hanging Silver Crucifix -->
-      <rect x="157" y="270" width="6" height="35" fill="#ced4da" filter="url(#glow)"/>
-      <rect x="148" y="290" width="24" height="6" fill="#ced4da" filter="url(#glow)"/>
-      <!-- Corpse-Pale Demonic Face -->
-      <path d="M 125 180 C 120 130 132 105 160 105 C 188 105 200 130 195 180 C 190 215 178 235 160 235 C 142 235 130 215 125 180 Z" fill="#dee2e6"/>
-      <!-- Heavy Black Necrotic Eye Sockets -->
-      <circle cx="144" cy="155" r="14" fill="#0b090a"/>
-      <circle cx="144" cy="155" r="4" fill="#ffb703" filter="url(#glow)"/>
-      <circle cx="144" cy="155" r="1.5" fill="#000"/>
-      <circle cx="176" cy="155" r="14" fill="#0b090a"/>
-      <circle cx="176" cy="155" r="4" fill="#ffb703" filter="url(#glow)"/>
-      <circle cx="176" cy="155" r="1.5" fill="#000"/>
-      <!-- Cracked Black Veins across Cheeks -->
-      <path d="M 132 170 Q 140 190 135 210" stroke="#1b1b1b" stroke-width="1.5" fill="none"/>
-      <path d="M 188 170 Q 180 190 185 210" stroke="#1b1b1b" stroke-width="1.5" fill="none"/>
-      <!-- Sharp Needle-Teeth Maw -->
-      <path d="M 144 200 Q 160 215 176 200 Q 160 225 144 200 Z" fill="#0b090a"/>
-      <path d="M 148 206 L 150 212 L 152 206 L 154 212 L 156 206 L 158 212 L 160 206 L 162 212 L 164 206 L 166 212 L 168 206 L 170 212 L 172 206" stroke="#fff" stroke-width="1.2" fill="none"/>
-    `
-  },
-  {
-    id: 'maleficent',
-    name: 'MALEFICENT',
-    title: 'Mistress of All Evil',
-    c1: '#2b0938', c2: '#09010d', glow: '#9d4edd',
-    features: `
-      <!-- Sweeping Horned Headdress -->
-      <path d="M 135 110 C 115 50 60 40 40 10 C 70 30 110 50 140 95 Z" fill="#10002b" stroke="#7b2cbf" stroke-width="1.5"/>
-      <path d="M 185 110 C 205 50 260 40 280 10 C 250 30 210 50 180 95 Z" fill="#10002b" stroke="#7b2cbf" stroke-width="1.5"/>
-      <!-- High Winged Black Collar -->
-      <path d="M 80 400 L 100 250 L 160 220 L 220 250 L 240 400 Z" fill="#10002b" stroke="#3c096c" stroke-width="2"/>
-      <path d="M 85 240 L 95 150 L 130 210 Z" fill="#240046"/>
-      <path d="M 235 240 L 225 150 L 190 210 Z" fill="#240046"/>
-      <!-- Chiseled Alabaster Face & High Cheekbones -->
-      <path d="M 130 170 C 126 125 136 100 160 100 C 184 100 194 125 190 170 C 187 210 176 230 160 230 C 144 230 133 210 130 170 Z" fill="#d8f3dc"/>
-      <!-- Angular Razor Cheekbones -->
-      <line x1="130" y1="170" x2="148" y2="185" stroke="#95d5b2" stroke-width="2"/>
-      <line x1="190" y1="170" x2="172" y2="185" stroke="#95d5b2" stroke-width="2"/>
-      <!-- Piercing Bright Green Sorceress Eyes -->
-      <ellipse cx="145" cy="150" rx="7" ry="4" fill="#081c15"/>
-      <circle cx="145" cy="150" r="3.5" fill="#70e000" filter="url(#glow)"/>
-      <ellipse cx="175" cy="150" rx="7" ry="4" fill="#081c15"/>
-      <circle cx="175" cy="150" r="3.5" fill="#70e000" filter="url(#glow)"/>
-      <!-- Dark Blood Lip Arch -->
-      <path d="M 148 200 Q 160 195 172 200 Q 160 212 148 200 Z" fill="#9d0208"/>
-      <!-- Green Flame Staff in Hand -->
-      <rect x="55" y="160" width="6" height="240" fill="#240046"/>
-      <circle cx="58" cy="155" r="14" fill="#70e000" opacity="0.8" filter="url(#glow)"/>
-      <circle cx="58" cy="155" r="7" fill="#ffff3f"/>
-    `
-  },
-  {
     id: 'annabelle',
     name: 'ANNABELLE',
     title: 'The Cursed Conduit',
@@ -376,231 +214,136 @@ const characters = [
     `
   },
   {
-    id: 'ghostface',
-    name: 'GHOSTFACE',
-    title: 'The Woodsboro Slasher',
-    c1: '#1f2026', c2: '#06070a', glow: '#e0e1dd',
+    id: 'thanos',
+    name: 'THANOS',
+    title: 'The Mad Titan',
+    c1: '#2a1747', c2: '#0a0514', glow: '#ffb703',
     features: `
-      <!-- Black Grim Hood and Shroud -->
-      <path d="M 70 400 L 95 240 C 90 120 115 70 160 70 C 205 70 230 120 225 240 L 250 400 Z" fill="#0a0a0d" stroke="#2b2d42" stroke-width="2"/>
-      <!-- The Iconic Screaming White Rubber Mask -->
-      <path d="M 125 140 C 120 95 135 90 160 90 C 185 90 200 95 195 140 C 190 190 178 245 160 245 C 142 245 130 190 125 140 Z" fill="#f8f9fa" stroke="#ced4da" stroke-width="1.5"/>
-      <!-- Drooping Hollow Black Eye Cavities -->
-      <path d="M 136 135 C 130 145 134 165 142 165 C 150 165 152 145 146 135 C 142 130 138 130 136 135 Z" fill="#0d0d11"/>
-      <path d="M 184 135 C 190 145 186 165 178 165 C 170 165 168 145 174 135 C 178 130 182 130 184 135 Z" fill="#0d0d11"/>
-      <!-- Triangle Nose Cavity -->
-      <polygon points="160,170 155,185 165,185" fill="#0d0d11"/>
-      <!-- Elongated Screaming Gaping Mouth -->
-      <ellipse cx="160" cy="215" rx="10" ry="22" fill="#0d0d11"/>
-      <!-- Buck 119 Slasher Knife with Chrome Sheen -->
-      <polygon points="230,360 238,230 246,240 244,360" fill="#e0e1dd" filter="url(#glow)"/>
-      <rect x="233" y="355" width="12" height="40" fill="#1b1b1e"/>
-      <path d="M 238 230 L 240 250" stroke="#ba181b" stroke-width="2"/>
-      <!-- 90s Corded Telephone in Background -->
-      <path d="M 50 160 Q 60 140 80 150 L 75 185 Q 55 175 50 160 Z" fill="#ced4da" opacity="0.4"/>
-      <path d="M 65 185 Q 50 220 70 250" stroke="#ced4da" stroke-width="2" fill="none" opacity="0.4"/>
+      <!-- Starfield -->
+      <circle cx="60" cy="70" r="1.5" fill="#fff" opacity="0.7"/>
+      <circle cx="260" cy="95" r="1.2" fill="#fff" opacity="0.6"/>
+      <circle cx="245" cy="45" r="1" fill="#fff" opacity="0.5"/>
+      <circle cx="75" cy="200" r="1" fill="#fff" opacity="0.5"/>
+      <!-- Armoured Body -->
+      <path d="M 60 400 L 90 260 L 160 238 L 230 260 L 260 400 Z" fill="#1d3557" stroke="#ffb703" stroke-width="2"/>
+      <path d="M 110 262 L 160 300 L 210 262 L 160 245 Z" fill="#ffb703" opacity="0.85"/>
+      <!-- Massive Head (purple, ridged chin) -->
+      <path d="M 112 175 C 108 105 128 82 160 82 C 192 82 212 105 208 175 C 205 222 186 244 160 244 C 134 244 115 222 112 175 Z" fill="#7b5ea7"/>
+      <path d="M 140 212 L 145 236 M 160 214 L 160 242 M 180 212 L 175 236" stroke="#4a3570" stroke-width="3" stroke-linecap="round"/>
+      <!-- Brow & Eyes -->
+      <path d="M 128 145 Q 143 136 154 146" stroke="#4a3570" stroke-width="4" fill="none"/>
+      <path d="M 166 146 Q 177 136 192 145" stroke="#4a3570" stroke-width="4" fill="none"/>
+      <ellipse cx="142" cy="156" rx="7" ry="4" fill="#89c2d9" filter="url(#glow)"/>
+      <ellipse cx="178" cy="156" rx="7" ry="4" fill="#89c2d9" filter="url(#glow)"/>
+      <path d="M 145 198 Q 160 203 175 198" stroke="#3c2a5c" stroke-width="3" fill="none"/>
+      <!-- Infinity Gauntlet raised -->
+      <path d="M 232 300 L 228 250 L 268 246 L 272 298 Z" fill="#ffb703" stroke="#9c6644" stroke-width="2"/>
+      <rect x="230" y="226" width="9" height="26" rx="4" fill="#ffb703"/>
+      <rect x="241" y="220" width="9" height="30" rx="4" fill="#ffb703"/>
+      <rect x="252" y="222" width="9" height="28" rx="4" fill="#ffb703"/>
+      <rect x="263" y="230" width="8" height="22" rx="4" fill="#ffb703"/>
+      <circle cx="250" cy="272" r="6" fill="#e9c46a" filter="url(#glow)"/>
+      <circle cx="234" cy="238" r="3" fill="#e63946" filter="url(#glow)"/>
+      <circle cx="245" cy="232" r="3" fill="#4361ee" filter="url(#glow)"/>
+      <circle cx="256" cy="234" r="3" fill="#9d4edd" filter="url(#glow)"/>
+      <circle cx="267" cy="240" r="3" fill="#2dc653" filter="url(#glow)"/>
+      <circle cx="250" cy="288" r="3" fill="#f77f00" filter="url(#glow)"/>
     `
   },
   {
-    id: 'freddy',
-    name: 'FREDDY KRUEGER',
-    title: 'Springwood Dream Demon',
-    c1: '#3d0a0a', c2: '#0d0101', glow: '#e63946',
+    id: 'kirmada',
+    name: 'KIRMADA',
+    title: 'Keeper of Forbidden Spells',
+    c1: '#06302c', c2: '#020c0b', glow: '#2ec4b6',
     features: `
-      <!-- Red and Olive Striped Knit Sweater -->
-      <path d="M 75 400 L 105 270 L 160 240 L 215 270 L 245 400 Z" fill="#1b4332"/>
-      <path d="M 85 300 L 235 300 L 238 325 L 82 325 Z" fill="#9e0012"/>
-      <path d="M 78 350 L 242 350 L 245 375 L 75 375 Z" fill="#9e0012"/>
-      <!-- Brown Fedora Hat -->
-      <ellipse cx="160" cy="115" rx="55" ry="14" fill="#3d2618" stroke="#1f130b" stroke-width="2"/>
-      <path d="M 130 115 C 130 75 145 68 160 68 C 175 68 190 75 190 115 Z" fill="#543724"/>
-      <rect x="131" y="108" width="58" height="6" fill="#1f130b"/>
-      <!-- Severely Burned Scarred Flesh -->
-      <path d="M 132 170 C 128 135 138 115 160 115 C 182 115 192 135 188 170 C 185 205 176 228 160 228 C 144 228 135 205 132 170 Z" fill="#9d432b"/>
-      <!-- Burn Cicatrix Patterns -->
-      <path d="M 138 140 Q 155 160 148 185" stroke="#540b0e" stroke-width="2.5" fill="none"/>
-      <path d="M 182 140 Q 165 160 172 185" stroke="#540b0e" stroke-width="2.5" fill="none"/>
-      <!-- Malevolent Grinning Eyes -->
-      <circle cx="146" cy="152" r="3.5" fill="#ffb703" filter="url(#glow)"/>
-      <circle cx="174" cy="152" r="3.5" fill="#ffb703" filter="url(#glow)"/>
-      <!-- Sneering Rotting Teeth -->
-      <path d="M 148 198 Q 160 210 172 198" stroke="#370617" stroke-width="3" fill="none"/>
-      <!-- The Razor-Claw Glove in Foreground -->
-      <path d="M 65 340 L 95 300 L 115 320 L 85 360 Z" fill="#8f5b34" stroke="#4a2e1b" stroke-width="2"/>
-      <!-- 4 Steel Blades Extending Out -->
-      <line x1="90" y1="295" x2="80" y2="230" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
-      <line x1="98" y1="298" x2="95" y2="220" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
-      <line x1="106" y1="305" x2="110" y2="225" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
-      <line x1="114" y1="315" x2="125" y2="240" stroke="#ced4da" stroke-width="3" filter="url(#glow)"/>
+      <!-- Floating runes -->
+      <text x="58" y="120" font-family="serif" font-size="22" fill="#2ec4b6" opacity="0.5" filter="url(#glow)">ᚱ</text>
+      <text x="250" y="150" font-family="serif" font-size="20" fill="#2ec4b6" opacity="0.5" filter="url(#glow)">ᛟ</text>
+      <text x="70" y="250" font-family="serif" font-size="18" fill="#2ec4b6" opacity="0.4" filter="url(#glow)">ᛉ</text>
+      <!-- Staff with orb -->
+      <line x1="245" y1="400" x2="232" y2="170" stroke="#6b4423" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="231" cy="160" r="15" fill="#2ec4b6" opacity="0.85" filter="url(#glow)"/>
+      <!-- Hooded robe -->
+      <path d="M 70 400 L 100 245 C 92 120 118 72 160 72 C 202 72 228 120 220 245 L 250 400 Z" fill="#0b1f1d" stroke="#0f766e" stroke-width="2"/>
+      <!-- Horns -->
+      <path d="M 118 108 Q 92 70 104 40 Q 112 78 132 96 Z" fill="#3d2b1f"/>
+      <path d="M 202 108 Q 228 70 216 40 Q 208 78 188 96 Z" fill="#3d2b1f"/>
+      <!-- Shadowed face -->
+      <path d="M 126 172 C 122 125 134 100 160 100 C 186 100 198 125 194 172 C 190 212 178 230 160 230 C 142 230 130 212 126 172 Z" fill="#040a09"/>
+      <!-- Glowing eyes -->
+      <path d="M 135 158 L 152 162 L 135 166 Z" fill="#2ec4b6" filter="url(#glow)"/>
+      <path d="M 185 158 L 168 162 L 185 166 Z" fill="#2ec4b6" filter="url(#glow)"/>
+      <!-- Sinister grin -->
+      <path d="M 142 198 Q 160 210 178 198" stroke="#2ec4b6" stroke-width="2" fill="none" opacity="0.7"/>
+      <!-- Spell circle -->
+      <circle cx="160" cy="300" r="34" fill="none" stroke="#2ec4b6" stroke-width="1.5" stroke-dasharray="5,4" opacity="0.6" filter="url(#glow)"/>
     `
   },
   {
-    id: 'frankenstein',
-    name: 'FRANKENSTEIN',
-    title: 'The Reanimated Prometheus',
-    c1: '#0e271d', c2: '#020d08', glow: '#52b788',
+    id: 'spiderman',
+    name: 'SPIDER-MAN',
+    title: 'Friendly Neighbourhood Web-Slinger',
+    c1: '#0c1f4d', c2: '#030817', glow: '#e63946',
     features: `
-      <!-- Heavy Heavy-Set Ragged Black Coat -->
-      <path d="M 65 400 L 95 260 L 160 230 L 225 260 L 255 400 Z" fill="#1b1e23" stroke="#2d3139" stroke-width="2"/>
-      <!-- Square Flat-Topped Head -->
-      <path d="M 125 100 L 195 100 L 195 190 C 190 225 178 238 160 238 C 142 238 130 225 125 190 Z" fill="#74a57f"/>
-      <!-- Jagged Suture Scars Across Forehead -->
-      <path d="M 130 115 Q 160 125 190 115" stroke="#2d3139" stroke-width="2.5" fill="none"/>
-      <line x1="140" y1="110" x2="140" y2="122" stroke="#2d3139" stroke-width="2"/>
-      <line x1="155" y1="113" x2="155" y2="125" stroke="#2d3139" stroke-width="2"/>
-      <line x1="170" y1="113" x2="170" y2="125" stroke="#2d3139" stroke-width="2"/>
-      <line x1="185" y1="110" x2="185" y2="122" stroke="#2d3139" stroke-width="2"/>
-      <!-- Heavy Brow and Melancholy Eyes -->
-      <rect x="130" y="138" width="60" height="8" rx="3" fill="#406343"/>
-      <circle cx="145" cy="155" r="4" fill="#2d3139"/>
-      <circle cx="175" cy="155" r="4" fill="#2d3139"/>
-      <!-- Galvanic Neck Electrodes (Bolts) with Sparking Arcs -->
-      <rect x="110" y="210" width="16" height="10" fill="#a4ac86" stroke="#414833" stroke-width="1.5"/>
-      <rect x="194" y="210" width="16" height="10" fill="#a4ac86" stroke="#414833" stroke-width="1.5"/>
-      <path d="M 105 215 L 95 210 L 100 225" stroke="#70e000" stroke-width="2" fill="none" filter="url(#glow)"/>
-      <path d="M 215 215 L 225 210 L 220 225" stroke="#70e000" stroke-width="2" fill="none" filter="url(#glow)"/>
+      <!-- City skyline -->
+      <path d="M 20 330 L 20 260 L 50 260 L 50 230 L 75 230 L 75 280 L 95 280 L 95 330 Z" fill="#081229"/>
+      <path d="M 230 330 L 230 250 L 255 250 L 255 215 L 280 215 L 280 270 L 300 270 L 300 330 Z" fill="#081229"/>
+      <!-- Web thread -->
+      <line x1="160" y1="0" x2="160" y2="88" stroke="#e5e5e5" stroke-width="1.5" opacity="0.7"/>
+      <!-- Suit body -->
+      <path d="M 80 400 L 105 260 L 160 238 L 215 260 L 240 400 Z" fill="#c1121f" stroke="#1d4ed8" stroke-width="2"/>
+      <path d="M 80 400 L 100 300 L 125 300 L 120 400 Z" fill="#1d4ed8"/>
+      <path d="M 240 400 L 220 300 L 195 300 L 200 400 Z" fill="#1d4ed8"/>
+      <!-- Spider emblem -->
+      <ellipse cx="160" cy="285" rx="6" ry="10" fill="#111"/>
+      <path d="M 154 280 L 138 268 M 166 280 L 182 268 M 154 290 L 138 302 M 166 290 L 182 302" stroke="#111" stroke-width="2"/>
+      <!-- Masked head -->
+      <path d="M 118 172 C 114 112 132 88 160 88 C 188 88 206 112 202 172 C 198 218 182 238 160 238 C 138 238 122 218 118 172 Z" fill="#c1121f"/>
+      <!-- Web lines on mask -->
+      <g stroke="#3a0a0f" stroke-width="1" fill="none" opacity="0.8">
+        <line x1="160" y1="88" x2="160" y2="238"/>
+        <line x1="160" y1="160" x2="118" y2="130"/>
+        <line x1="160" y1="160" x2="202" y2="130"/>
+        <line x1="160" y1="160" x2="120" y2="200"/>
+        <line x1="160" y1="160" x2="200" y2="200"/>
+        <path d="M 132 120 Q 160 132 188 120"/>
+        <path d="M 124 160 Q 160 172 196 160"/>
+        <path d="M 130 205 Q 160 215 190 205"/>
+      </g>
+      <!-- Big white eyes -->
+      <path d="M 128 140 Q 132 168 154 166 Q 150 146 128 140 Z" fill="#f8f9fa" stroke="#111" stroke-width="3"/>
+      <path d="M 192 140 Q 188 168 166 166 Q 170 146 192 140 Z" fill="#f8f9fa" stroke="#111" stroke-width="3"/>
     `
   },
   {
-    id: 'grim-reaper',
-    name: 'THE GRIM REAPER',
-    title: 'Harvester of Lost Souls',
-    c1: '#0e141b', c2: '#020406', glow: '#00b4d8',
+    id: 'deadpool',
+    name: 'DEADPOOL',
+    title: 'The Merc with a Mouth',
+    c1: '#3d0306', c2: '#0d0102', glow: '#f8f9fa',
     features: `
-      <!-- Voluminous Midnight Cowl and Cloak -->
-      <path d="M 60 400 L 90 230 C 85 100 115 65 160 65 C 205 65 235 100 230 230 L 260 400 Z" fill="#080b0e" stroke="#161b22" stroke-width="2"/>
-      <!-- Deep Pitch-Black Void Inside Hood -->
-      <path d="M 120 160 C 115 105 130 90 160 90 C 190 90 205 105 200 160 C 195 215 180 230 160 230 C 140 230 125 215 120 160 Z" fill="#010203"/>
-      <!-- Glowing Blue/Cyan Spectral Eye Orbs -->
-      <circle cx="145" cy="155" r="4" fill="#00b4d8" filter="url(#glow)"/>
-      <circle cx="175" cy="155" r="4" fill="#00b4d8" filter="url(#glow)"/>
-      <!-- Weathered Bone Jaw Peeking from the Dark -->
-      <path d="M 150 195 L 170 195 L 165 215 L 155 215 Z" fill="#d8e2dc" opacity="0.6"/>
-      <!-- The Massive Death Scythe -->
-      <line x1="240" y1="390" x2="210" y2="70" stroke="#483c32" stroke-width="5"/>
-      <path d="M 210 70 Q 240 30 290 50 Q 260 80 205 90 Z" fill="#e0e1dd" stroke="#90e0ef" stroke-width="2" filter="url(#glow)"/>
-      <!-- Swirling Blue Souls in Background -->
-      <circle cx="80" cy="110" r="5" fill="#90e0ef" opacity="0.5" filter="url(#glow)"/>
-      <circle cx="65" cy="160" r="3" fill="#90e0ef" opacity="0.4" filter="url(#glow)"/>
-    `
-  },
-  {
-    id: 'medusa',
-    name: 'MEDUSA',
-    title: 'The Petrifying Gorgon',
-    c1: '#072e1e', c2: '#010c07', glow: '#52b788',
-    features: `
-      <!-- Writhing Crown of Venomous Serpents -->
-      <path d="M 120 120 Q 80 70 60 90 Q 75 110 100 120" stroke="#2d6a4f" stroke-width="6" fill="none"/>
-      <circle cx="58" cy="88" r="4" fill="#52b788"/>
-      <path d="M 130 100 Q 100 40 120 20 Q 140 40 135 80" stroke="#2d6a4f" stroke-width="6" fill="none"/>
-      <circle cx="120" cy="18" r="4" fill="#52b788"/>
-      <path d="M 160 90 Q 160 30 180 20 Q 190 40 170 80" stroke="#40916c" stroke-width="6" fill="none"/>
-      <circle cx="180" cy="18" r="4" fill="#52b788"/>
-      <path d="M 190 100 Q 220 40 240 50 Q 230 80 200 110" stroke="#2d6a4f" stroke-width="6" fill="none"/>
-      <circle cx="242" cy="48" r="4" fill="#52b788"/>
-      <path d="M 200 120 Q 240 70 260 90 Q 245 110 220 120" stroke="#40916c" stroke-width="6" fill="none"/>
-      <circle cx="262" cy="88" r="4" fill="#52b788"/>
-      <!-- Hellenic Robes & Snake Scales -->
-      <path d="M 75 400 L 105 270 L 160 240 L 215 270 L 245 400 Z" fill="#1b4332" stroke="#2d6a4f" stroke-width="2"/>
-      <!-- Classical Tragic Gorgon Face -->
-      <path d="M 130 170 C 126 125 136 105 160 105 C 184 105 194 125 190 170 C 187 210 176 230 160 230 C 144 230 133 210 130 170 Z" fill="#d8f3dc"/>
-      <!-- Petrifying Gold-Green Cat Eyes -->
-      <ellipse cx="145" cy="152" rx="7" ry="5" fill="#081c15"/>
-      <circle cx="145" cy="152" r="3.8" fill="#70e000" filter="url(#glow)"/>
-      <line x1="145" y1="147" x2="145" y2="157" stroke="#000" stroke-width="2"/>
-      <ellipse cx="175" cy="152" rx="7" ry="5" fill="#081c15"/>
-      <circle cx="175" cy="152" r="3.8" fill="#70e000" filter="url(#glow)"/>
-      <line x1="175" y1="147" x2="175" y2="157" stroke="#000" stroke-width="2"/>
-    `
-  },
-  {
-    id: 'sauron',
-    name: 'SAURON',
-    title: 'The Great Eye of Mordor',
-    c1: '#3d1300', c2: '#0d0400', glow: '#ff5400',
-    features: `
-      <!-- Barad-dur Spire Silhouette & Iron Crown -->
-      <path d="M 90 280 L 120 140 L 140 180 L 160 110 L 180 180 L 200 140 L 230 280 Z" fill="#1f0a00" stroke="#ff5400" stroke-width="1.5"/>
-      <path d="M 70 400 L 95 270 L 160 240 L 225 270 L 250 400 Z" fill="#0a0300" stroke="#3d1300" stroke-width="2"/>
-      <!-- The Massive Blazing Lidless Eye -->
-      <path d="M 100 170 Q 160 100 220 170 Q 160 240 100 170 Z" fill="#ff5400" filter="url(#glow)"/>
-      <path d="M 115 170 Q 160 120 205 170 Q 160 220 115 170 Z" fill="#ff9e00"/>
-      <!-- Cat-Slit Black Fiery Pupil -->
-      <ellipse cx="160" cy="170" rx="9" ry="34" fill="#000000"/>
-      <!-- The One Ring in Foreground with Elvish Inscription Glow -->
-      <circle cx="160" cy="330" r="28" fill="none" stroke="#ffb703" stroke-width="7" filter="url(#glow)"/>
-      <circle cx="160" cy="330" r="24" fill="none" stroke="#ff5400" stroke-width="1" stroke-dasharray="3,3"/>
-    `
-  },
-  {
-    id: 'chucky',
-    name: 'CHUCKY',
-    title: 'The Possessed Killer Doll',
-    c1: '#3a0808', c2: '#0d0101', glow: '#e63946',
-    features: `
-      <!-- Good Guy Denim Overalls & Rainbow Shirt -->
-      <path d="M 80 400 L 105 280 L 160 260 L 215 280 L 240 400 Z" fill="#0077b6" stroke="#023e8a" stroke-width="2"/>
-      <rect x="120" y="320" width="80" height="40" rx="3" fill="#0077b6" stroke="#03045e" stroke-width="1.5"/>
-      <text x="132" y="345" font-size="11" font-weight="bold" fill="#d90429">Good Guys</text>
-      <!-- Wild Messy Red Hair -->
-      <path d="M 115 140 C 95 90 120 60 160 60 C 200 60 225 90 205 140 C 230 110 235 150 215 170 C 205 140 195 120 160 120 C 125 120 115 140 105 170 C 85 150 90 110 115 140 Z" fill="#d90429" filter="url(#glow)"/>
-      <!-- Heavily Stitched Doll Face -->
-      <circle cx="160" cy="165" r="46" fill="#fcd5ce"/>
-      <path d="M 135 135 Q 155 170 145 205" stroke="#9d0208" stroke-width="2" fill="none"/>
-      <!-- Metal Staples across Cuts -->
-      <line x1="134" y1="145" x2="142" y2="145" stroke="#ced4da" stroke-width="2"/>
-      <line x1="138" y1="165" x2="146" y2="165" stroke="#ced4da" stroke-width="2"/>
-      <line x1="142" y1="185" x2="150" y2="185" stroke="#ced4da" stroke-width="2"/>
-      <!-- Maniacal Blue Doll Eyes -->
-      <circle cx="142" cy="155" r="7" fill="#0096c7"/>
-      <circle cx="142" cy="155" r="3" fill="#000"/>
-      <circle cx="178" cy="155" r="7" fill="#0096c7"/>
-      <circle cx="178" cy="155" r="3" fill="#000"/>
-      <!-- Wicked Kitchen Knife in Hand -->
-      <polygon points="65,340 50,220 70,230 80,340" fill="#e0e1dd" filter="url(#glow)"/>
-      <path d="M 50 220 L 55 240" stroke="#d90429" stroke-width="2"/>
-    `
-  },
-  {
-    id: 'headless-horseman',
-    name: 'HEADLESS HORSEMAN',
-    title: 'The Hessian of Sleepy Hollow',
-    c1: '#3d1a00', c2: '#0e0500', glow: '#fb8500',
-    features: `
-      <!-- Military Hessian Coat and High Collar (No Head!) -->
-      <path d="M 70 400 L 95 240 L 130 190 L 190 190 L 225 240 L 250 400 Z" fill="#140d07" stroke="#432818" stroke-width="2"/>
-      <path d="M 130 190 Q 160 215 190 190" stroke="#9d0208" stroke-width="4" fill="none"/>
-      <!-- Severed Neck Stump with Eerie Flame Glow -->
-      <ellipse cx="160" cy="190" rx="26" ry="10" fill="#6a040f"/>
-      <circle cx="160" cy="190" r="14" fill="#fb8500" opacity="0.8" filter="url(#glow)"/>
-      <!-- Fiery Jack-o'-Lantern Held under the Arm -->
-      <circle cx="95" cy="270" r="32" fill="#d9480f" stroke="#7f1d1d" stroke-width="2" filter="url(#glow)"/>
-      <!-- Carved Pumpkin Face -->
-      <polygon points="82,258 74,268 90,268" fill="#ffb703"/>
-      <polygon points="108,258 100,268 116,268" fill="#ffb703"/>
-      <polygon points="95,270 91,277 99,277" fill="#ffb703"/>
-      <path d="M 76,285 L 82,280 L 88,285 L 94,280 L 100,285 L 106,280 L 112,285" stroke="#ffb703" stroke-width="3" fill="none"/>
-      <!-- Heavy Cavalry Sword Raised on Other Side -->
-      <line x1="225" y1="360" x2="255" y2="150" stroke="#ced4da" stroke-width="4" filter="url(#glow)"/>
-    `
-  },
-  {
-    id: 'wildcard',
-    name: 'THE WILDCARD',
-    title: 'The Nameless Shadow Void',
-    c1: '#211833', c2: '#06040a', glow: '#b5179e',
-    features: `
-      <!-- Shrouded Enigmatic Silhouette -->
-      <path d="M 70 400 L 100 240 C 95 110 120 70 160 70 C 200 70 225 110 220 240 L 250 400 Z" fill="#0d0914" stroke="#7209b7" stroke-width="2"/>
-      <!-- Dark Glitching Void Face -->
-      <path d="M 125 170 C 120 120 132 95 160 95 C 188 95 200 120 195 170 C 190 215 178 235 160 235 C 142 235 130 215 125 170 Z" fill="#050308"/>
-      <!-- Floating Luminescent Question Glyph / Runic Mask -->
-      <text x="140" y="180" font-family="'Rye', serif" font-size="56" fill="#f72585" filter="url(#glow)">?</text>
-      <!-- Matrix Glitch Artifacts / Occult Scanlines -->
-      <line x1="90" y1="140" x2="230" y2="140" stroke="#4cc9f0" stroke-width="1.5" stroke-dasharray="8,6" opacity="0.6"/>
-      <line x1="110" y1="180" x2="210" y2="180" stroke="#4cc9f0" stroke-width="1.5" stroke-dasharray="14,4" opacity="0.6"/>
-      <line x1="80" y1="220" x2="240" y2="220" stroke="#4cc9f0" stroke-width="1.5" stroke-dasharray="6,8" opacity="0.6"/>
+      <!-- Crossed katanas behind -->
+      <line x1="70" y1="90" x2="230" y2="330" stroke="#adb5bd" stroke-width="4"/>
+      <line x1="250" y1="90" x2="90" y2="330" stroke="#adb5bd" stroke-width="4"/>
+      <rect x="62" y="74" width="10" height="26" rx="2" transform="rotate(-34 67 87)" fill="#212529"/>
+      <rect x="248" y="74" width="10" height="26" rx="2" transform="rotate(34 253 87)" fill="#212529"/>
+      <!-- Suit body -->
+      <path d="M 80 400 L 105 260 L 160 238 L 215 260 L 240 400 Z" fill="#9d0208" stroke="#212529" stroke-width="3"/>
+      <path d="M 92 330 L 228 330 L 226 346 L 94 346 Z" fill="#212529"/>
+      <circle cx="160" cy="338" r="9" fill="#9d0208" stroke="#e5e5e5" stroke-width="2"/>
+      <!-- Masked head -->
+      <path d="M 118 172 C 114 112 132 88 160 88 C 188 88 206 112 202 172 C 198 218 182 238 160 238 C 138 238 122 218 118 172 Z" fill="#b5070f"/>
+      <!-- Black eye patches -->
+      <path d="M 120 135 Q 122 185 156 172 Q 154 140 120 135 Z" fill="#111"/>
+      <path d="M 200 135 Q 198 185 164 172 Q 166 140 200 135 Z" fill="#111"/>
+      <!-- White eyes, one squinting -->
+      <ellipse cx="141" cy="160" rx="9" ry="6" fill="#f8f9fa"/>
+      <path d="M 170 160 Q 180 155 190 160 Q 180 163 170 160 Z" fill="#f8f9fa"/>
+      <!-- Smirk under the mask -->
+      <path d="M 145 210 Q 163 218 178 206" stroke="#5c0105" stroke-width="2.5" fill="none"/>
+      <!-- Speech bubble -->
+      <rect x="208" y="40" width="88" height="34" rx="8" fill="#f8f9fa" opacity="0.92"/>
+      <path d="M 220 74 L 214 88 L 232 74 Z" fill="#f8f9fa" opacity="0.92"/>
+      <text x="252" y="62" text-anchor="middle" font-family="'Pixelify Sans', monospace" font-size="11" fill="#9d0208">HI, READER</text>
     `
   }
 ];

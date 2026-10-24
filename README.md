@@ -15,12 +15,12 @@ The styling follows the event poster: blood red on black, the Rye headline, Oswa
 ## The flow
 0. **The gate.** "Enter the Crypt" turns on the sound; browsers only allow audio after a tap. "Enter quietly" skips the sound.
 1. Teams sign the ledger by entering a team name. Duplicate names are blocked. **Each phone can register only once.** After that, the phone is bound to its team for good. There is no "next team" button, and reopening the site (even after clearing the page) brings back that team's fate. The host can free a phone from the host ledger if needed, e.g. after a test run.
-2. **Wheel I · The Soul** gives one of 15 Halloween characters. *The Eye* spins it.
-3. **Wheel II · The Curse** gives that character's problem: a small, one-page site the team must build. Each character has its own 10 problems. Once a (character, problem) pair is claimed, no other team can get it. A taken problem is struck out on the wheel. When a character runs out of problems, it's struck out on the first wheel.
+2. **Wheel I · The Soul** gives one of 10 characters. *The Eye* spins it.
+3. **Step II · The Curse** is not a wheel: the team chooses one of that character's problems, a small, one-page site it must build. Characters and problems are never used up: several teams can get the same character and choose the same problem.
 4. **Wheel III · The Hex** gives a UI constraint.
 5. **Wheel IV · The Twist** stays chained for 15 minutes after the hex, then unlocks. In the last minute a heartbeat speeds up.
 
-From wheel II onwards, **the team's own character spins the wheels**. It has its own voice lines. If a team waits 60 seconds without spinning, the character grows impatient. Its shadow looms over the screen with a laugh, and it spins the wheel itself. The wait time is `idleSpinSeconds` in `js/data.js`.
+From wheel III onwards, **the team's own character spins the wheels**. It has its own voice lines. If a team waits 60 seconds without spinning, the character grows impatient. Its shadow looms over the screen with a laugh, and it spins the wheel itself. The wait time is `idleSpinSeconds` in `js/data.js`.
 
 The wheel stops slowly, like a casino wheel. The flapper arrow is knocked by every peg, and the wheel stays exactly where it lands. Every result is decided and saved *before* the wheel stops, so refreshing the page can't re-roll it. The timer also survives a refresh.
 
@@ -92,21 +92,19 @@ The board shows every team on one page: soul, curse, hex and twist with full des
 Open the host ledger by typing the **host word** into the team-name box and pressing Begin (works on phones and laptops). It is the only way in. The word is not written in the code, only its fingerprint (`hostKey` in `js/data.js`); to change it, run `Store.secret("new word")` in the browser console and paste the result there.
 
 From the ledger you can:
-- See how many curses each character has left, and every team's results
-- **Release** a claim, so its curse becomes available again
+- See how many teams each character has, and every team's results
 - Change the twist delay (useful for a dry run: set it to 0.5)
 - **Free this phone** so a new team can register on it (e.g. after a test run). In shared mode, sign out of the host account afterwards so the phone gets a fresh identity.
 - Export the ledger as JSON or CSV (CSV opens in Excel / Sheets)
 - Wipe everything (you must type `WIPE` to confirm)
 
-With the shared ledger on, anyone can *view* this panel. Releasing, changing the timer and wiping need the host sign-in.
+With the shared ledger on, anyone can *view* this panel. Changing the timer and wiping need the host sign-in.
 
 ## Teams on their own phones: the shared ledger
 To let every phone share one ledger, follow **[SETUP-FIREBASE.md](SETUP-FIREBASE.md)** (about 15 minutes, free plan).
 
 Once it's set up:
-- **One curse per team.** Each claim is stored under its curse's ID and written in a transaction. If two phones go for the same curse at the same moment, one wins and the other quietly re-rolls.
-- **Live strike-outs.** Curses claimed on one phone are struck out on every other phone within a second or so.
+- **Shared, not exclusive.** Any number of teams can have the same character and problem. Each team's choices live on its own team record.
 - **Status pill.** A pill at the top right shows the connection: **Crypt linked**, **Offline — reconnecting**, or **Crypt unreachable**.
 - **Host sign-in.** The host signs in inside the host ledger. Twist-delay changes then apply to every phone.
 - **Saved progress.** Each team's full progress is saved to the shared ledger, which is what the judges' board reads. If a phone loses its local data mid-event, reopening the site on that phone picks up where the team left off.
@@ -115,6 +113,6 @@ Without a Firebase config (`js/firebase-config.js` left as `null`), the site run
 
 ## Editing content
 All characters, problems, hexes, and twists live in `js/data.js`.
-- Each character needs a unique `id` and exactly 10 problems.
+- Each character needs a unique `id` and a `problems` list.
 - In twists, `{char}`, `{randomChar}` and `{randomCurse}` are filled in automatically.
 - Each character's `spin` and `idle` lines are what it says when it spins, and when it loses patience.

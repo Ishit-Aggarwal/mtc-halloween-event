@@ -21,6 +21,7 @@
     ledgerPanel: $("ledgerPanel"), wheelPanel: $("wheelPanel"),
     form: $("ledgerForm"), teamInput: $("teamInput"), teamError: $("teamError"),
     leaderNameInput: $("leaderNameInput"), leaderYearInput: $("leaderYearInput"), leaderBranchInput: $("leaderBranchInput"),
+    leaderPhoneInput: $("leaderPhoneInput"), leaderEmailInput: $("leaderEmailInput"),
     membersContainer: $("membersContainer"), addMemberBtn: $("addMemberBtn"), membersLimitNote: $("membersLimitNote"),
     seals: $("seals"), kicker: $("wheelKicker"), title: $("wheelTitle"), sub: $("wheelSub"),
     stage: $("wheelStage"), rotor: $("wheelRotor"), canvas: $("wheelCanvas"), pointer: $("pointer"),
@@ -54,9 +55,18 @@
   };
 
   var wheel = new window.Wheel(el.canvas, el.rotor, el.pointer);
+
+  // Step II isn't a wheel: the team chooses one of its character's problems.
+  var picker = document.createElement("div");
+  picker.className = "ps-picker";
+  picker.id = "psPicker";
+  picker.hidden = true;
+  el.stage.parentNode.insertBefore(picker, el.stage.nextSibling);
+  var wheelActions = el.spinBtn.closest(".wheel-actions");
+
   var session = window.Store.session();
   var timerId = null, lastBpm = 0;
-  var busy = false;
+  var busy = false, replaying = false, cardSeq = 0;
   var activeView = "mission";
   var baseTitle = document.title;
 
@@ -122,18 +132,15 @@
 
   /* ---------- wheel configs per stage ---------- */
 
+  // Any number of teams may share a character and a problem, so nothing is ever struck out.
   function soulSegments() {
     return D.characters.map(function (c) {
-      var used = window.Ledger.usedProblems(c.id);
-      var left = c.problems.length - Object.keys(used).length;
-      return { label: c.short, glyph: c.glyph, color: c.color, disabled: left <= 0 };
+      return { label: c.short, glyph: c.glyph, color: c.color, disabled: false };
     });
   }
   function curseSegments(c) {
-    var used = window.Ledger.usedProblems(c.id);
-    return c.problems.map(function (p, i) {
-      var mine = session && session.problem === i;
-      return { label: p.t, glyph: "", color: c.color, disabled: !!used[i] && !mine };
+    return c.problems.map(function (p) {
+      return { label: p.t, glyph: "", color: c.color, disabled: false };
     });
   }
   function hexSegments() {
@@ -159,17 +166,39 @@
     }
   }
 
+  // puts a character's face photo in a glyph box; the emoji shows until (and unless) the photo loads
+  function showFace(box, c, glyph) {
+    var src = c ? (c.face || ("assets/characters/" + c.id + "-face.jpg")) : "";
+    if (src && box.dataset.face === src && box.classList.contains("has-photo")) return;
+    box.dataset.face = src;
+    box.classList.remove("has-photo");
+    box.textContent = glyph;
+    if (!src) return;
+    var img = new Image();
+    img.className = "face-photo";
+    img.alt = "";
+    img.draggable = false;
+    img.onload = function () {
+      if (box.dataset.face !== src) return; // something else has been shown since
+      box.textContent = ""; box.appendChild(img); box.classList.add("has-photo");
+    };
+    img.src = src;
+  }
+
   function setFate(slot, data) {
     var li = el.fateList.querySelector('[data-slot="' + slot + '"]');
     var num = li.querySelector(".fate-num"), name = li.querySelector(".fate-name"), desc = li.querySelector(".fate-desc");
     var must = li.querySelector(".fate-must-have");
     var roman = ["I", "II", "III", "IV"][slot - 1];
     li.classList.remove("is-filled", "is-current");
-    if (data && data.name) {
+    var filled = !!(data && data.name);
+    li.tabIndex = filled ? 0 : -1;
+    if (filled) li.title = "Hover or tap to see this card again"; else li.removeAttribute("title");
+    if (filled) {
       var wasEmpty = name.textContent === "???";
       li.classList.add("is-filled");
       li.style.setProperty("--c", data.color || "#f4e3d7");
-      num.textContent = data.glyph || roman;
+      showFace(num, data.char, data.glyph || roman);
       name.textContent = data.name;
       desc.textContent = data.desc || "";
       if (must) {
@@ -183,7 +212,7 @@
       }
       if (wasEmpty && data.fresh) { li.classList.remove("is-new"); void li.offsetWidth; li.classList.add("is-new"); }
     } else {
-      num.textContent = roman;
+      showFace(num, null, roman);
       name.textContent = data && data.pendingName ? data.pendingName : "???";
       desc.textContent = data && data.pendingDesc ? data.pendingDesc : "";
       if (must) must.hidden = true;
@@ -213,7 +242,7 @@
       }
     }
 
-    setFate(1, c ? { name: c.name, desc: c.lore, glyph: c.glyph, color: c.color, fresh: fresh } : { current: stage === "soul" });
+    setFate(1, c ? { name: c.name, desc: c.lore, glyph: c.glyph, char: c, color: c.color, fresh: fresh } : { current: stage === "soul" });
 
     var p = c && typeof s.problem === "number" ? c.problems[s.problem] : null;
     setFate(2, p ? { name: p.t, desc: p.d, glyph: "📜", color: c.color, fresh: fresh } : { current: stage === "curse" });
@@ -293,8 +322,8 @@
         break;
       case "curse":
         segs = curseSegments(c); theme = { a: THEMES.curse.a, b: THEMES.curse.b, accent: c.color };
-        kicker = "Wheel II · The Curse"; title = c.short + "'s Curse";
-        sub = "Every soul carries a burden. Your site must lift it.";
+        kicker = "Step II · The Curse"; title = c.short + "'s Curse";
+        sub = "Choose the problem your team will build.";
         break;
       case "hex":
         segs = hexSegments(); theme = THEMES.hex;
@@ -324,7 +353,7 @@
   }
 
   function setSpinState(stage) {
-    var canSpin = !busy && (stage === "soul" || stage === "curse" || stage === "hex" || stage === "twist");
+    var canSpin = !busy && (stage === "soul" || stage === "hex" || stage === "twist");
     var who = spinnerFor(stage);
     el.spinBtn.disabled = !canSpin && stage !== "done";
     el.hub.disabled = !canSpin;
@@ -345,7 +374,7 @@
       var k = D.keeper;
       return { id: "keeper", name: k.name, short: k.name, glyph: k.glyph, color: k.color, spin: k.spin, idle: k.idle };
     }
-    return { id: c.id, name: c.name, short: c.short, glyph: c.glyph, color: c.color, spin: c.spin, idle: c.idle };
+    return { id: c.id, name: c.name, short: c.short, glyph: c.glyph, char: c, color: c.color, spin: c.spin, idle: c.idle };
   }
 
   var WHEEL_NAMES = { soul: "soul", curse: "curse", hex: "hex", twist: "twist" };
@@ -353,13 +382,14 @@
   function updateSpinner(stage, line) {
     var who = spinnerFor(stage);
     el.spinner.style.setProperty("--c", who.color);
-    el.spinnerFace.textContent = who.glyph;
+    showFace(el.spinnerFace, who.char, who.glyph);
     el.spinnerName.textContent = who.name;
     el.spinner.classList.remove("impatient");
     if (line) { el.spinnerLine.textContent = line; return; }
     if (stage === "soul") el.spinnerLine.textContent = "Spin, and I shall choose which soul you become…";
     else if (stage === "wait") el.spinnerLine.textContent = "The last wheel sleeps… I can hear it breathing.";
     else if (stage === "done") el.spinnerLine.textContent = "Our fate is sealed. Now build… before midnight.";
+    else if (stage === "curse") el.spinnerLine.textContent = "Choose my curse wisely… whichever you claim, you must lift.";
     else el.spinnerLine.textContent = "I'll spin your " + WHEEL_NAMES[stage] + " wheel myself. Give the word.";
   }
 
@@ -371,7 +401,8 @@
   setInterval(function () {
     if (!session || busy || !el.reveal.hidden || !el.gate.classList.contains("gone")) return;
     var stage = session.stage;
-    if (["soul", "curse", "hex", "twist"].indexOf(stage) < 0) return;
+    // the curse is the team's own choice, so nobody chooses it for them
+    if (["soul", "hex", "twist"].indexOf(stage) < 0) return;
     var left = (D.idleSpinSeconds || 60) * 1000 - (Date.now() - idleSince);
     if (left > 15000) return;
     var who = spinnerFor(stage);
@@ -412,6 +443,12 @@
     configureWheel(stage, animate);
     renderGrimoire(false);
     setSpinState(stage);
+
+    var choosing = stage === "curse";
+    el.stage.style.display = choosing ? "none" : "";
+    if (wheelActions) wheelActions.style.display = choosing ? "none" : "";
+    picker.hidden = !choosing;
+    if (choosing) renderPicker();
 
     if (stage === "done") {
       if (el.viewTabs) el.viewTabs.hidden = false;
@@ -483,38 +520,7 @@
   /* ---------- spinning ---------- */
 
   async function chooseOutcome(stage) {
-    var i, options = [];
-    if (stage === "soul") {
-      var segs = soulSegments();
-      for (i = 0; i < segs.length; i++) if (!segs[i].disabled) options.push(i);
-      if (!options.length) return { error: "Every soul has been claimed. Ask the host to open a new ledger." };
-      return { index: pick(options) };
-    }
-    if (stage === "curse") {
-      var c = charById(session.charId);
-      var myKey = session.teamKey || window.Ledger.teamKey(session.team);
-      // A claim that timed out on a bad network may still have landed — adopt
-      // it rather than letting this team take a second curse.
-      var mine = window.Ledger.entries().filter(function (e) { return e.teamKey === myKey && e.charId === c.id; })[0];
-      if (mine) { session.entryId = mine.id; return { index: mine.problem }; }
-      // Claim a free curse in the shared ledger. If another phone grabbed it a
-      // split-second earlier the claim is refused, and we try a different one.
-      for (var attempt = 0; attempt < 12; attempt++) {
-        var used = window.Ledger.usedProblems(c.id);
-        options = [];
-        for (i = 0; i < c.problems.length; i++) if (!used[i]) options.push(i);
-        if (!options.length) return { error: "exhausted" };
-        var idx = pick(options);
-        var entry;
-        try {
-          entry = await window.Ledger.claim(session.team, myKey, c.id, idx);
-        } catch (err) {
-          return { error: window.Ledger.friendly(err) };
-        }
-        if (entry) { session.entryId = entry.id; return { index: idx }; }
-      }
-      return { error: "exhausted" };
-    }
+    if (stage === "soul") return { index: rand(D.characters.length) };
     if (stage === "hex") return { index: rand(D.uiCurses.length) };
     if (stage === "twist") return { index: rand(D.twists.length) };
     return { error: "This wheel can't be spun right now." };
@@ -529,14 +535,15 @@
       session.hex = idx;
       session.hexAt = Date.now();
       session.unlockAt = session.hexAt + delayMinutes() * 60000;
-      window.Ledger.update(session.entryId, { hex: idx, hexAt: session.hexAt });
+      // older sessions still have a claim record; new ones keep everything on the team record
+      if (session.entryId) window.Ledger.update(session.entryId, { hex: idx, hexAt: session.hexAt });
     } else if (stage === "twist") {
       var me = session.charId, myHex = session.hex;
       var others = D.characters.filter(function (c) { return c.id !== me; });
       var curses = D.uiCurses.filter(function (h, i) { return i !== myHex; });
       session.twistExtra = { randomChar: pick(others).short, randomCurse: pick(curses).t };
       session.twist = idx;
-      window.Ledger.update(session.entryId, { twist: idx, twistText: fillTwist(D.twists[idx].d), doneAt: Date.now() });
+      if (session.entryId) window.Ledger.update(session.entryId, { twist: idx, twistText: fillTwist(D.twists[idx].d), doneAt: Date.now() });
     }
     // the result is locked in *before* the wheel stops — refreshing can't re-roll it
     session.pending = stage;
@@ -570,7 +577,7 @@
   async function spin(auto) {
     if (busy || !session) return;
     var stage = session.stage;
-    if (["soul", "curse", "hex", "twist"].indexOf(stage) < 0) return;
+    if (["soul", "hex", "twist"].indexOf(stage) < 0) return;
 
     busy = true;
     resetIdle();
@@ -578,29 +585,19 @@
     updateSpinner(stage, auto === true ? who.idle : who.spin);
     el.spinner.classList.remove("grab"); void el.spinner.offsetWidth; el.spinner.classList.add("grab");
     setSpinState(stage);
-    if (stage === "curse") el.spinLabel.textContent = "Consulting The Other Side…";
     var out = await chooseOutcome(stage);
     if (out.error) {
       busy = false;
       resetIdle();
       updateSpinner(stage);
-      if (out.error === "exhausted") {
-        // every problem for this character got taken — send them back to the first wheel
-        session.charId = null; session.stage = "soul"; save();
-        render(true);
-        el.sub.textContent = "That soul's curses have all been claimed. Spin for a new soul.";
-      } else {
-        setSpinState(stage);
-        el.sub.textContent = out.error;
-        el.stage.classList.add("shake");
-        setTimeout(function () { el.stage.classList.remove("shake"); }, 500);
-      }
+      setSpinState(stage);
+      el.sub.textContent = out.error;
+      el.stage.classList.add("shake");
+      setTimeout(function () { el.stage.classList.remove("shake"); }, 500);
       return;
     }
 
     recordOutcome(stage, out.index);
-    // the curse wheel shows the team's own claim as available
-    if (stage === "curse") wheel.setSegments(curseSegments(charById(session.charId)), wheel.theme);
 
     setSpinState(stage);
     el.stage.classList.add("spinning");
@@ -616,9 +613,48 @@
     });
   }
 
+  /* ---------- choosing the curse ---------- */
+
+  function renderPicker() {
+    var c = charById(session.charId);
+    if (!c) return;
+    picker.style.setProperty("--accent", c.color);
+    picker.innerHTML = "";
+    c.problems.forEach(function (p, i) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "ps-option";
+      b.disabled = busy;
+      b.innerHTML = '<span class="ps-num"></span><span class="ps-title"></span><span class="ps-desc"></span><span class="ps-state"></span>';
+      b.querySelector(".ps-num").textContent = "PS " + (i + 1);
+      b.querySelector(".ps-title").textContent = p.t;
+      b.querySelector(".ps-desc").textContent = p.d;
+      b.querySelector(".ps-state").textContent = "Choose this curse →";
+      b.addEventListener("click", function () { chooseProblem(i); });
+      picker.appendChild(b);
+    });
+  }
+
+  // The choice is saved on the team's own record (saveProgress), which the
+  // judges' board and the host ledger read. Other teams may choose it too.
+  function chooseProblem(idx) {
+    if (busy || !session || session.stage !== "curse") return;
+    resetIdle();
+    session.entryId = null;
+    recordOutcome("curse", idx);
+    window.Sound.whoosh();
+    showCard("curse");
+  }
+
   /* ---------- reveal card ---------- */
 
-  function showCard(stage) {
+  // opts.replay: re-show a card the team already accepted (from the grimoire);
+  // opts.peek: shown on hover only, so it can't be clicked and vanishes on mouse-out.
+  function showCard(stage, opts) {
+    opts = opts || {};
+    replaying = !!opts.replay;
+    el.reveal.classList.toggle("replay", replaying);
+    el.reveal.classList.toggle("peek", !!opts.peek);
     var c = charById(session.charId);
     var kicker, glyph, name, lore = "", desc = "", brief = "", quote = "", archetype = "", portrait = "", mustHave = "", btn, accent = "#c4161c";
     if (stage === "soul") {
@@ -645,6 +681,20 @@
     el.cardKicker.textContent = kicker;
     el.cardGlyph.textContent = glyph;
     el.cardGlyph.classList.toggle("text-glyph", !isEmoji(glyph));
+    // the curse card shows the character's face in the circle (the emoji stays if the photo is missing)
+    el.cardGlyph.classList.remove("has-photo");
+    var seq = ++cardSeq;
+    if (stage === "curse") {
+      var face = document.createElement("img");
+      face.className = "card-glyph-photo";
+      face.alt = c.name;
+      face.draggable = false;
+      face.onload = function () {
+        if (seq !== cardSeq) return; // another card has been shown since
+        el.cardGlyph.textContent = ""; el.cardGlyph.appendChild(face); el.cardGlyph.classList.add("has-photo");
+      };
+      face.src = c.face || ("assets/characters/" + c.id + "-face.jpg");
+    }
     el.cardName.textContent = name;
     el.cardLore.textContent = lore;
     el.cardDesc.textContent = desc;
@@ -706,18 +756,67 @@
       }
     }
     el.cardScope.textContent = stage === "curse" ? D.scopeNote : "";
-    el.cardBtn.textContent = btn;
+    el.cardBtn.textContent = replaying ? "Close" : btn;
     el.card.querySelector(".card-front").style.setProperty("--accent", accent);
     el.cardGlyph.style.setProperty("--accent", accent);
 
     el.reveal.hidden = false;
     el.card.style.animation = "none"; void el.card.offsetWidth; el.card.style.animation = "";
-    window.Sound.reveal();
+    if (opts.peek) return;
+    if (!replaying) window.Sound.reveal();
     announce(kicker + ": " + name + ". " + (brief || desc || lore) + (mustHave ? " Must have: " + mustHave : ""));
-    setTimeout(function () { el.cardBtn.focus({ preventScroll: true }); }, 900);
+    setTimeout(function () { el.cardBtn.focus({ preventScroll: true }); }, replaying ? 50 : 900);
   }
 
+  function closeReplay() {
+    el.reveal.hidden = true;
+    el.reveal.classList.remove("replay", "peek");
+    replaying = false;
+  }
+
+  /* ---------- the grimoire: hover (or tap) a filled seal to see its card again ---------- */
+
+  var SLOT_STAGE = { 1: "soul", 2: "curse", 3: "hex", 4: "twist" };
+  var peekTimer = null;
+  var canHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  function canReplay(li) {
+    return !!session && li.classList.contains("is-filled") && el.reveal.hidden && !busy;
+  }
+  function replayCard(li, peek) {
+    showCard(SLOT_STAGE[li.getAttribute("data-slot")], { replay: true, peek: peek });
+  }
+  Array.prototype.forEach.call(el.fateList.querySelectorAll(".fate"), function (li) {
+    if (canHover) {
+      li.addEventListener("mouseenter", function () {
+        clearTimeout(peekTimer);
+        peekTimer = setTimeout(function () { if (canReplay(li)) replayCard(li, true); }, 250);
+      });
+      li.addEventListener("mouseleave", function () {
+        clearTimeout(peekTimer);
+        if (replaying && el.reveal.classList.contains("peek")) closeReplay();
+      });
+    }
+    li.addEventListener("click", function (e) {
+      if (e.target.closest("button, a")) return;
+      clearTimeout(peekTimer);
+      // clicking while peeking keeps the card open so it can be read and closed
+      if (replaying && el.reveal.classList.contains("peek")) {
+        el.reveal.classList.remove("peek");
+        el.cardBtn.focus({ preventScroll: true });
+      } else if (canReplay(li)) {
+        replayCard(li, false);
+      }
+    });
+    li.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && canReplay(li)) { e.preventDefault(); replayCard(li, false); }
+    });
+  });
+  el.reveal.querySelector(".reveal-backdrop").addEventListener("click", function () { if (replaying) closeReplay(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && replaying) closeReplay(); });
+
   function acceptCard() {
+    if (replaying) { closeReplay(); return; }
     el.reveal.hidden = true;
     var stage = session.pending;
     session.pending = null;
@@ -795,6 +894,16 @@
             '<input class="member-branch-input" type="text" maxlength="40" placeholder="e.g. CSE, IT, ECE" spellcheck="false" autocapitalize="characters" required>' +
           '</label>' +
         '</div>' +
+        '<div class="field-row">' +
+          '<label class="field">' +
+            '<span class="field-label">Phone Number</span>' +
+            '<input class="member-phone-input" type="tel" inputmode="tel" maxlength="16" placeholder="10-digit mobile number" required>' +
+          '</label>' +
+          '<label class="field">' +
+            '<span class="field-label">Email</span>' +
+            '<input class="member-email-input" type="email" inputmode="email" maxlength="80" placeholder="name@example.com" spellcheck="false" autocapitalize="off" required>' +
+          '</label>' +
+        '</div>' +
       '</div>';
 
     var removeBtn = card.querySelector(".member-remove-btn");
@@ -830,6 +939,19 @@
     el.addMemberBtn.addEventListener("click", function () {
       addMemberRow();
     });
+  }
+
+  // Phone numbers are stored as plain 10-digit Indian mobile numbers, so they
+  // match up however they were typed (+91, spaces, dashes, a leading 0).
+  function cleanPhone(raw) {
+    var d = String(raw || "").replace(/\D/g, "");
+    if (d.length === 12 && d.indexOf("91") === 0) d = d.slice(2);
+    else if (d.length === 11 && d.charAt(0) === "0") d = d.slice(1);
+    return /^[6-9]\d{9}$/.test(d) ? d : "";
+  }
+  function cleanEmail(raw) {
+    var e = String(raw || "").trim().toLowerCase();
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e) ? e : "";
   }
 
   var signing = false;
@@ -881,6 +1003,18 @@
       if (el.leaderBranchInput) el.leaderBranchInput.focus();
       return;
     }
+    var leaderPhone = cleanPhone(el.leaderPhoneInput ? el.leaderPhoneInput.value : "");
+    var leaderEmail = cleanEmail(el.leaderEmailInput ? el.leaderEmailInput.value : "");
+    if (!leaderPhone) {
+      el.teamError.textContent = "Please enter the team leader's 10-digit mobile number.";
+      if (el.leaderPhoneInput) el.leaderPhoneInput.focus();
+      return;
+    }
+    if (!leaderEmail) {
+      el.teamError.textContent = "Please enter a valid email for the team leader.";
+      if (el.leaderEmailInput) el.leaderEmailInput.focus();
+      return;
+    }
 
     var memberCards = el.membersContainer ? el.membersContainer.querySelectorAll(".member-card") : [];
     var members = [];
@@ -909,7 +1043,31 @@
         if (mBranchInput) mBranchInput.focus();
         return;
       }
-      members.push({ name: mName, year: mYear, branch: mBranch });
+      var mPhoneInput = card.querySelector(".member-phone-input");
+      var mEmailInput = card.querySelector(".member-email-input");
+      var mPhone = cleanPhone(mPhoneInput ? mPhoneInput.value : "");
+      var mEmail = cleanEmail(mEmailInput ? mEmailInput.value : "");
+      if (!mPhone) {
+        el.teamError.textContent = "Please enter Member " + studentNum + "'s 10-digit mobile number.";
+        if (mPhoneInput) mPhoneInput.focus();
+        return;
+      }
+      if (mPhone === leaderPhone) {
+        el.teamError.textContent = "Member " + studentNum + " needs their own phone number, not the leader's.";
+        if (mPhoneInput) mPhoneInput.focus();
+        return;
+      }
+      if (!mEmail) {
+        el.teamError.textContent = "Please enter a valid email for Member " + studentNum + ".";
+        if (mEmailInput) mEmailInput.focus();
+        return;
+      }
+      if (mEmail === leaderEmail) {
+        el.teamError.textContent = "Member " + studentNum + " needs their own email, not the leader's.";
+        if (mEmailInput) mEmailInput.focus();
+        return;
+      }
+      members.push({ name: mName, year: mYear, branch: mBranch, phone: mPhone, email: mEmail });
     }
 
     if (members.length > 1) {
@@ -917,7 +1075,7 @@
       return;
     }
 
-    var leaderObj = { name: leaderName, year: leaderYear, branch: leaderBranch };
+    var leaderObj = { name: leaderName, year: leaderYear, branch: leaderBranch, phone: leaderPhone, email: leaderEmail };
     el.teamError.textContent = "";
 
     var btn = el.form.querySelector("button[type=submit] span");
@@ -964,6 +1122,8 @@
   if (el.leaderNameInput) el.leaderNameInput.addEventListener("input", function () { el.teamError.textContent = ""; });
   if (el.leaderYearInput) el.leaderYearInput.addEventListener("input", function () { el.teamError.textContent = ""; });
   if (el.leaderBranchInput) el.leaderBranchInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderPhoneInput) el.leaderPhoneInput.addEventListener("input", function () { el.teamError.textContent = ""; });
+  if (el.leaderEmailInput) el.leaderEmailInput.addEventListener("input", function () { el.teamError.textContent = ""; });
   if (el.membersContainer) el.membersContainer.addEventListener("input", function () { el.teamError.textContent = ""; });
 
   /* ---------- controls ---------- */
@@ -1272,6 +1432,31 @@
     if (e.key === "Escape") Array.prototype.forEach.call(document.querySelectorAll(".modal"), closeModal);
   });
 
+  // The beginner's hosting guide. Anything with data-guide="<tab>" opens it on that tab
+  // (top-bar "?", the Submit page's help links and hosting pills, the guide's own tabs);
+  // data-guide-section="<id>" also scrolls to that part of the tab.
+  var guide = $("githubModal");
+  function showGuideTab(name, sectionId) {
+    Array.prototype.forEach.call(guide.querySelectorAll(".gh-tab"), function (t) {
+      var on = t.getAttribute("data-guide") === name;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    Array.prototype.forEach.call(guide.querySelectorAll(".gh-panel"), function (p) {
+      p.hidden = p.getAttribute("data-panel") !== name;
+    });
+    guide.querySelector(".gh-body").scrollTop = 0;
+    var sec = sectionId && $(sectionId);
+    if (sec) setTimeout(function () { sec.scrollIntoView({ block: "start" }); }, 30);
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-guide]");
+    if (!b) return;
+    e.preventDefault(); // a help link inside a form label shouldn't focus the input
+    if (guide.hidden) openModal(guide);
+    showGuideTab(b.getAttribute("data-guide"), b.getAttribute("data-guide-section"));
+  });
+
   /* ---------- organisers: back to the sign-in page ---------- */
   // TEMPORARY testing aid. Type  mtchome  anywhere (not in a text box) to forget
   // this phone's team and return to the team-name form. Only this browser
@@ -1384,14 +1569,28 @@
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
+  /** One row per team: its own saved record, filled in from any older claim records. */
+  function teamRecords() {
+    var L = window.Ledger, byKey = {};
+    L.teams().forEach(function (t) { byKey[t.key] = Object.assign({}, t); });
+    L.entries().forEach(function (e) {
+      var key = e.teamKey || L.teamKey(e.team || "");
+      var t = byKey[key] || (byKey[key] = { key: key, name: e.team, at: e.at });
+      ["charId", "problem", "hex", "hexAt", "twist", "twistText", "submissionUrl", "repoUrl", "submittedAt", "zipUrl", "zipName", "zipCloudUrl"]
+        .forEach(function (k) { if (t[k] == null && e[k] != null) t[k] = e[k]; });
+    });
+    return Object.keys(byKey).map(function (k) { return byKey[k]; })
+      .sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
+  }
+
   function renderHost() {
     var L = window.Ledger;
-    var ledger = L.entries();
+    var ledger = teamRecords();
     var cloud = L.mode === "cloud";
     var canAct = L.isHost;
 
     $("hostMode").innerHTML = cloud
-      ? "Shared ledger · <b>" + esc(statusText(L.status)) + "</b> — every phone sees the same claims."
+      ? "Shared ledger · <b>" + esc(statusText(L.status)) + "</b> — every phone sees the same teams."
       : "Single-device mode — the ledger lives only in this browser. Add a Firebase config to share it across phones.";
     $("hostAuth").hidden = !cloud;
     $("hostSignedOut").hidden = canAct;
@@ -1406,23 +1605,26 @@
     $("hostCount").textContent = "(" + ledger.length + ")";
     if (document.activeElement !== $("hostDelay")) $("hostDelay").value = delayMinutes();
 
+    // how many teams each character has (characters can be shared, so this is just a tally)
+    var perChar = {}, most = 1;
+    ledger.forEach(function (t) { if (t.charId) { perChar[t.charId] = (perChar[t.charId] || 0) + 1; most = Math.max(most, perChar[t.charId]); } });
     $("hostStats").innerHTML = D.characters.map(function (c) {
-      var used = Object.keys(window.Ledger.usedProblems(c.id)).length, total = c.problems.length;
-      return '<div class="stat"><div class="stat-top"><span>' + c.glyph + " " + esc(c.short) + "</span><span>" + (total - used) + "/" + total + '</span></div><div class="stat-bar"><i style="width:' + (used / total * 100) + '%"></i></div></div>';
+      var n = perChar[c.id] || 0;
+      return '<div class="stat"><div class="stat-top"><span>' + c.glyph + " " + esc(c.short) + "</span><span>" + n + (n === 1 ? " team" : " teams") + '</span></div><div class="stat-bar"><i style="width:' + (n / most * 100) + '%"></i></div></div>';
     }).join("");
 
     var rows = ledger.slice().reverse().map(function (e, i) {
       var c = charById(e.charId);
-      var p = c && c.problems[e.problem];
+      var p = c && typeof e.problem === "number" ? c.problems[e.problem] : null;
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null;
       var t = typeof e.twist === "number" ? D.twists[e.twist] : null;
-      return "<tr><td class='muted'>" + (ledger.length - i) + "</td><td>" + esc(e.team) + "</td><td>" + (c ? c.glyph + " " + esc(c.short) : "?") +
-        "</td><td>" + (p ? esc(p.t) : "?") + "</td><td>" + (h ? esc(h.t) : "<span class='muted'>—</span>") +
-        "</td><td>" + (t ? esc(t.t) : "<span class='muted'>—</span>") + "</td><td class='muted'>" + new Date(e.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) +
-        "</td><td>" + (canAct ? "<button type='button' data-release='" + esc(e.id) + "'>Release</button>" : "") + "</td></tr>";
+      var dash = "<span class='muted'>—</span>";
+      return "<tr><td class='muted'>" + (ledger.length - i) + "</td><td>" + esc(e.name) + "</td><td>" + (c ? c.glyph + " " + esc(c.short) : dash) +
+        "</td><td>" + (p ? esc(p.t) : dash) + "</td><td>" + (h ? esc(h.t) : dash) +
+        "</td><td>" + (t ? esc(t.t) : dash) + "</td><td class='muted'>" + (e.at ? new Date(e.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—") + "</td></tr>";
     }).join("");
-    $("hostTable").innerHTML = "<thead><tr><th>#</th><th>Team</th><th>Soul</th><th>Curse</th><th>Hex</th><th>Twist</th><th>Time</th><th></th></tr></thead><tbody>" +
-      (rows || "<tr><td colspan='8' class='muted'>No souls claimed yet.</td></tr>") + "</tbody>";
+    $("hostTable").innerHTML = "<thead><tr><th>#</th><th>Team</th><th>Soul</th><th>Curse</th><th>Hex</th><th>Twist</th><th>Joined</th></tr></thead><tbody>" +
+      (rows || "<tr><td colspan='7' class='muted'>No teams yet.</td></tr>") + "</tbody>";
   }
 
   function openHost() { renderHost(); $("hostNote").textContent = ""; openModal(el.host); }
@@ -1433,16 +1635,6 @@
     n.classList.toggle("bad", !!bad);
   }
 
-  $("hostTable").addEventListener("click", async function (e) {
-    var b = e.target.closest("[data-release]");
-    if (!b) return;
-    if (!window.confirm("Release this claim? Its curse becomes available to other teams again.")) return;
-    try {
-      await window.Ledger.release(b.getAttribute("data-release"));
-      hostNote("Claim released.");
-    } catch (err) { hostNote(window.Ledger.friendly(err), true); }
-    renderHost();
-  });
 
   $("hostDelay").addEventListener("change", async function () {
     var v = parseFloat(this.value);
@@ -1481,28 +1673,32 @@
   function stamp() { return new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-"); }
 
   $("hostExport").addEventListener("click", function () {
-    download("wheel-of-curses-ledger-" + stamp() + ".json", JSON.stringify(window.Ledger.entries(), null, 2), "application/json");
+    download("wheel-of-curses-ledger-" + stamp() + ".json", JSON.stringify(teamRecords(), null, 2), "application/json");
   });
   $("hostCsv").addEventListener("click", function () {
     var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
-    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Members", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Claimed at"].map(q).join(",")];
-    var teamsByKey = {};
-    window.Ledger.teams().forEach(function (t) { teamsByKey[t.key] = t; });
-    window.Ledger.entries().forEach(function (e) {
-      var tDoc = teamsByKey[e.teamKey || window.Ledger.teamKey(e.team || "")] || {};
-      var ldr = tDoc.leader || {};
-      var memList = (tDoc.members || []).map(function (m) {
-        return m.name + (m.year || m.branch ? " (" + [m.year, m.branch].filter(Boolean).join(" - ") + ")" : "");
-      }).join("; ");
+    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Leader Phone", "Leader Email",
+      "Member Name", "Member Year", "Member Branch", "Member Phone", "Member Email",
+      "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Joined at"].map(q).join(",")];
+    teamRecords().forEach(function (e) {
+      var ldr = e.leader || {};
+      // one column per detail; if a team ever has more than one member they're joined with "; "
+      var mem = function (k) { return (e.members || []).map(function (m) { return m[k] || ""; }).join("; "); };
       var c = charById(e.charId), p = c && c.problems[e.problem];
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null, t = typeof e.twist === "number" ? D.twists[e.twist] : null;
       var subTime = e.submittedAt ? new Date(e.submittedAt).toLocaleString() : "";
       lines.push([
-        e.team,
+        e.name,
         ldr.name || "",
         ldr.year || "",
         ldr.branch || "",
-        memList,
+        ldr.phone || "",
+        ldr.email || "",
+        mem("name"),
+        mem("year"),
+        mem("branch"),
+        mem("phone"),
+        mem("email"),
         c && c.name,
         p && p.t,
         p && p.d,
@@ -1579,7 +1775,7 @@
     requestAnimationFrame(function () {
       liveQueued = false;
       $("rulesDelay").textContent = delayMinutes();
-      // other phones' claims strike out segments on this wheel as they happen
+      // keep this phone's wheel in step with the shared ledger
       if (session && !busy && el.reveal.hidden && (session.stage === "soul" || session.stage === "curse")) render(false);
       if (!el.host.hidden) renderHost();
     });
@@ -1656,7 +1852,6 @@
         eggs: (t.eggs || []).slice()
       };
       ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "zipUrl", "zipName", "zipSize", "zipCloudUrl", "submittedAt", "leader", "members"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
-      if (restored.charId && typeof restored.problem === "number") restored.entryId = restored.charId + "__" + restored.problem;
       // "<stage>-spun" = the wheel had stopped but the card wasn't accepted yet
       var m = /^(soul|curse|hex|twist)-spun$/.exec(restored.stage);
       if (m) { restored.stage = m[1]; restored.pending = m[1]; }
