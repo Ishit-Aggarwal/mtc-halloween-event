@@ -16,11 +16,11 @@ The styling follows the event poster: blood red on black, the Rye headline, Oswa
 0. **The gate.** "Enter the Crypt" turns on the sound; browsers only allow audio after a tap. "Enter quietly" skips the sound.
 1. Teams sign the ledger by entering a team name. Duplicate names are blocked. **Each phone can register only once.** After that, the phone is bound to its team for good. There is no "next team" button, and reopening the site (even after clearing the page) brings back that team's fate. The host can free a phone from the host ledger if needed, e.g. after a test run.
 2. **Wheel I · The Soul** gives one of 10 characters. *The Eye* spins it.
-3. **Wheel II · The Curse** gives that character's problem: a small, one-page site the team must build. Each character has its own problems. Once a (character, problem) pair is claimed, no other team can get it. A taken problem is struck out on the wheel. When a character runs out of problems, it's struck out on the first wheel.
+3. **Step II · The Curse** is not a wheel: the team chooses one of that character's problems, a small, one-page site it must build. Once a (character, problem) pair is claimed, no other team can get it. A taken problem is struck out on the list. When a character runs out of problems, it's struck out on the first wheel.
 4. **Wheel III · The Hex** gives a UI constraint.
 5. **Wheel IV · The Twist** stays chained for 15 minutes after the hex, then unlocks. In the last minute a heartbeat speeds up.
 
-From wheel II onwards, **the team's own character spins the wheels**. It has its own voice lines. If a team waits 60 seconds without spinning, the character grows impatient. Its shadow looms over the screen with a laugh, and it spins the wheel itself. The wait time is `idleSpinSeconds` in `js/data.js`.
+From wheel III onwards, **the team's own character spins the wheels**. It has its own voice lines. If a team waits 60 seconds without spinning, the character grows impatient. Its shadow looms over the screen with a laugh, and it spins the wheel itself. The wait time is `idleSpinSeconds` in `js/data.js`.
 
 The wheel stops slowly, like a casino wheel. The flapper arrow is knocked by every peg, and the wheel stays exactly where it lands. Every result is decided and saved *before* the wheel stops, so refreshing the page can't re-roll it. The timer also survives a refresh.
 

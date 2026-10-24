@@ -54,6 +54,15 @@
   };
 
   var wheel = new window.Wheel(el.canvas, el.rotor, el.pointer);
+
+  // Step II isn't a wheel: the team chooses one of its character's problems.
+  var picker = document.createElement("div");
+  picker.className = "ps-picker";
+  picker.id = "psPicker";
+  picker.hidden = true;
+  el.stage.parentNode.insertBefore(picker, el.stage.nextSibling);
+  var wheelActions = el.spinBtn.closest(".wheel-actions");
+
   var session = window.Store.session();
   var timerId = null, lastBpm = 0;
   var busy = false;
@@ -293,8 +302,8 @@
         break;
       case "curse":
         segs = curseSegments(c); theme = { a: THEMES.curse.a, b: THEMES.curse.b, accent: c.color };
-        kicker = "Wheel II · The Curse"; title = c.short + "'s Curse";
-        sub = "Every soul carries a burden. Your site must lift it.";
+        kicker = "Step II · The Curse"; title = c.short + "'s Curse";
+        sub = "Choose the problem your team will build. Once you claim it, no other team can.";
         break;
       case "hex":
         segs = hexSegments(); theme = THEMES.hex;
@@ -324,7 +333,7 @@
   }
 
   function setSpinState(stage) {
-    var canSpin = !busy && (stage === "soul" || stage === "curse" || stage === "hex" || stage === "twist");
+    var canSpin = !busy && (stage === "soul" || stage === "hex" || stage === "twist");
     var who = spinnerFor(stage);
     el.spinBtn.disabled = !canSpin && stage !== "done";
     el.hub.disabled = !canSpin;
@@ -360,6 +369,7 @@
     if (stage === "soul") el.spinnerLine.textContent = "Spin, and I shall choose which soul you become…";
     else if (stage === "wait") el.spinnerLine.textContent = "The last wheel sleeps… I can hear it breathing.";
     else if (stage === "done") el.spinnerLine.textContent = "Our fate is sealed. Now build… before midnight.";
+    else if (stage === "curse") el.spinnerLine.textContent = "Choose my curse wisely… whichever you claim, you must lift.";
     else el.spinnerLine.textContent = "I'll spin your " + WHEEL_NAMES[stage] + " wheel myself. Give the word.";
   }
 
@@ -371,7 +381,8 @@
   setInterval(function () {
     if (!session || busy || !el.reveal.hidden || !el.gate.classList.contains("gone")) return;
     var stage = session.stage;
-    if (["soul", "curse", "hex", "twist"].indexOf(stage) < 0) return;
+    // the curse is the team's own choice, so nobody chooses it for them
+    if (["soul", "hex", "twist"].indexOf(stage) < 0) return;
     var left = (D.idleSpinSeconds || 60) * 1000 - (Date.now() - idleSince);
     if (left > 15000) return;
     var who = spinnerFor(stage);
@@ -412,6 +423,12 @@
     configureWheel(stage, animate);
     renderGrimoire(false);
     setSpinState(stage);
+
+    var choosing = stage === "curse";
+    el.stage.style.display = choosing ? "none" : "";
+    if (wheelActions) wheelActions.style.display = choosing ? "none" : "";
+    picker.hidden = !choosing;
+    if (choosing) renderPicker();
 
     if (stage === "done") {
       if (el.viewTabs) el.viewTabs.hidden = false;
@@ -490,31 +507,6 @@
       if (!options.length) return { error: "Every soul has been claimed. Ask the host to open a new ledger." };
       return { index: pick(options) };
     }
-    if (stage === "curse") {
-      var c = charById(session.charId);
-      var myKey = session.teamKey || window.Ledger.teamKey(session.team);
-      // A claim that timed out on a bad network may still have landed — adopt
-      // it rather than letting this team take a second curse.
-      var mine = window.Ledger.entries().filter(function (e) { return e.teamKey === myKey && e.charId === c.id; })[0];
-      if (mine) { session.entryId = mine.id; return { index: mine.problem }; }
-      // Claim a free curse in the shared ledger. If another phone grabbed it a
-      // split-second earlier the claim is refused, and we try a different one.
-      for (var attempt = 0; attempt < 12; attempt++) {
-        var used = window.Ledger.usedProblems(c.id);
-        options = [];
-        for (i = 0; i < c.problems.length; i++) if (!used[i]) options.push(i);
-        if (!options.length) return { error: "exhausted" };
-        var idx = pick(options);
-        var entry;
-        try {
-          entry = await window.Ledger.claim(session.team, myKey, c.id, idx);
-        } catch (err) {
-          return { error: window.Ledger.friendly(err) };
-        }
-        if (entry) { session.entryId = entry.id; return { index: idx }; }
-      }
-      return { error: "exhausted" };
-    }
     if (stage === "hex") return { index: rand(D.uiCurses.length) };
     if (stage === "twist") return { index: rand(D.twists.length) };
     return { error: "This wheel can't be spun right now." };
@@ -570,7 +562,7 @@
   async function spin(auto) {
     if (busy || !session) return;
     var stage = session.stage;
-    if (["soul", "curse", "hex", "twist"].indexOf(stage) < 0) return;
+    if (["soul", "hex", "twist"].indexOf(stage) < 0) return;
 
     busy = true;
     resetIdle();
@@ -578,29 +570,19 @@
     updateSpinner(stage, auto === true ? who.idle : who.spin);
     el.spinner.classList.remove("grab"); void el.spinner.offsetWidth; el.spinner.classList.add("grab");
     setSpinState(stage);
-    if (stage === "curse") el.spinLabel.textContent = "Consulting The Other Side…";
     var out = await chooseOutcome(stage);
     if (out.error) {
       busy = false;
       resetIdle();
       updateSpinner(stage);
-      if (out.error === "exhausted") {
-        // every problem for this character got taken — send them back to the first wheel
-        session.charId = null; session.stage = "soul"; save();
-        render(true);
-        el.sub.textContent = "That soul's curses have all been claimed. Spin for a new soul.";
-      } else {
-        setSpinState(stage);
-        el.sub.textContent = out.error;
-        el.stage.classList.add("shake");
-        setTimeout(function () { el.stage.classList.remove("shake"); }, 500);
-      }
+      setSpinState(stage);
+      el.sub.textContent = out.error;
+      el.stage.classList.add("shake");
+      setTimeout(function () { el.stage.classList.remove("shake"); }, 500);
       return;
     }
 
     recordOutcome(stage, out.index);
-    // the curse wheel shows the team's own claim as available
-    if (stage === "curse") wheel.setSegments(curseSegments(charById(session.charId)), wheel.theme);
 
     setSpinState(stage);
     el.stage.classList.add("spinning");
@@ -614,6 +596,75 @@
         setTimeout(function () { showCard(stage); }, 450);
       }
     });
+  }
+
+  /* ---------- choosing the curse ---------- */
+
+  function renderPicker() {
+    var c = charById(session.charId);
+    if (!c) return;
+    var used = window.Ledger.usedProblems(c.id);
+    picker.style.setProperty("--accent", c.color);
+    picker.innerHTML = "";
+    c.problems.forEach(function (p, i) {
+      var taken = !!used[i] && session.problem !== i;
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "ps-option" + (taken ? " taken" : "");
+      b.disabled = taken || busy;
+      b.innerHTML = '<span class="ps-num"></span><span class="ps-title"></span><span class="ps-desc"></span><span class="ps-state"></span>';
+      b.querySelector(".ps-num").textContent = "PS " + (i + 1);
+      b.querySelector(".ps-title").textContent = p.t;
+      b.querySelector(".ps-desc").textContent = p.d;
+      b.querySelector(".ps-state").textContent = taken ? "Claimed by another team" : "Choose this curse →";
+      b.addEventListener("click", function () { chooseProblem(i); });
+      picker.appendChild(b);
+    });
+  }
+
+  async function chooseProblem(idx) {
+    if (busy || !session || session.stage !== "curse") return;
+    var c = charById(session.charId);
+    var myKey = session.teamKey || window.Ledger.teamKey(session.team);
+    busy = true;
+    resetIdle();
+    renderPicker();
+    el.sub.textContent = "Consulting The Other Side…";
+    // A claim that timed out on a bad network may still have landed — adopt
+    // it rather than letting this team take a second curse.
+    var entry = window.Ledger.entries().filter(function (e) { return e.teamKey === myKey && e.charId === c.id; })[0];
+    var error = null;
+    if (entry) idx = entry.problem;
+    else {
+      try {
+        entry = await window.Ledger.claim(session.team, myKey, c.id, idx);
+      } catch (err) {
+        error = window.Ledger.friendly(err);
+      }
+    }
+    busy = false;
+
+    if (entry) {
+      session.entryId = entry.id;
+      recordOutcome("curse", idx);
+      window.Sound.whoosh();
+      showCard("curse");
+      return;
+    }
+
+    var used = window.Ledger.usedProblems(c.id);
+    var left = c.problems.filter(function (p, i) { return !used[i]; }).length;
+    if (!error && !left) {
+      // every problem for this character got taken — send them back to the first wheel
+      session.charId = null; session.stage = "soul"; save();
+      render(true);
+      el.sub.textContent = "That soul's curses have all been claimed. Spin for a new soul.";
+      return;
+    }
+    render(false);
+    el.sub.textContent = error || "Another team claimed that curse a moment ago. Choose another.";
+    picker.classList.add("shake");
+    setTimeout(function () { picker.classList.remove("shake"); }, 500);
   }
 
   /* ---------- reveal card ---------- */
