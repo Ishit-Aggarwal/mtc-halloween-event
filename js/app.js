@@ -1337,9 +1337,11 @@
     if (e.key === "Escape") Array.prototype.forEach.call(document.querySelectorAll(".modal"), closeModal);
   });
 
-  // the beginner's hosting guide (GitHub and Vercel tabs): from the top bar, and from the submission form
+  // The beginner's hosting guide. Anything with data-guide="<tab>" opens it on that tab
+  // (top-bar "?", the Submit page's help links and hosting pills, the guide's own tabs);
+  // data-guide-section="<id>" also scrolls to that part of the tab.
   var guide = $("githubModal");
-  function showGuideTab(name) {
+  function showGuideTab(name, sectionId) {
     Array.prototype.forEach.call(guide.querySelectorAll(".gh-tab"), function (t) {
       var on = t.getAttribute("data-guide") === name;
       t.classList.toggle("is-active", on);
@@ -1349,16 +1351,15 @@
       p.hidden = p.getAttribute("data-panel") !== name;
     });
     guide.querySelector(".gh-body").scrollTop = 0;
+    var sec = sectionId && $(sectionId);
+    if (sec) setTimeout(function () { sec.scrollIntoView({ block: "start" }); }, 30);
   }
-  Array.prototype.forEach.call(guide.querySelectorAll(".gh-tab"), function (t) {
-    t.addEventListener("click", function () { showGuideTab(t.getAttribute("data-guide")); });
-  });
-  ["githubTopBtn", "githubGuideBtn", "vercelGuideBtn"].forEach(function (id) {
-    var b = $(id);
-    if (b) b.addEventListener("click", function () {
-      showGuideTab(b.getAttribute("data-guide") || "github");
-      openModal(guide);
-    });
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-guide]");
+    if (!b) return;
+    e.preventDefault(); // a help link inside a form label shouldn't focus the input
+    if (guide.hidden) openModal(guide);
+    showGuideTab(b.getAttribute("data-guide"), b.getAttribute("data-guide-section"));
   });
 
   /* ---------- organisers: back to the sign-in page ---------- */

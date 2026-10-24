@@ -1382,7 +1382,16 @@ body.lit .circuit-grid {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
   transition: all .2s ease;
   user-select: none;
+  cursor: pointer; /* each pill opens that host's guide */
 }
+.sub-platforms-hint { margin-left: 4px; font-weight: 400; letter-spacing: .04em; text-transform: none; color: var(--bone-dim); }
+/* small "? How do I get this" link beside a Submit field */
+.sub-help {
+  margin-left: 6px; padding: 2px 8px; cursor: pointer; vertical-align: 1px;
+  font-family: var(--f-type); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: none;
+  color: var(--pumpkin); background: rgba(255, 122, 26, .1); border: 1px solid rgba(255, 122, 26, .5); border-radius: 999px;
+}
+.sub-help:hover, .sub-help:focus-visible { outline: none; background: rgba(255, 122, 26, .22); color: #fff; }
 .host-pill:hover {
   border-color: #ff5533;
   background: rgba(50, 12, 18, 0.98);
@@ -1959,14 +1968,27 @@ body.lit .circuit-grid {
 .gh-body ol, .gh-body ul { margin: 6px 0; padding-left: 22px; }
 .gh-body li { margin: 4px 0; }
 .gh-lead { margin: 14px 0; font-size: 16.5px; }
-.gh-tabs { display: flex; gap: 8px; padding: 12px 22px 0; border-bottom: 1px solid rgba(244, 227, 215, .1); }
+/* guide tabs: pills that wrap, so every guide stays visible on any screen */
+.gh-tabs { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 22px; border-bottom: 1px solid rgba(244, 227, 215, .1); }
 .gh-tab {
-  padding: 9px 18px; cursor: pointer; font-family: var(--f-type); font-size: 15px; letter-spacing: .06em; color: var(--bone-dim);
-  background: none; border: 1px solid transparent; border-bottom: 0; border-radius: 8px 8px 0 0; margin-bottom: -1px;
+  white-space: nowrap; padding: 7px 13px; cursor: pointer;
+  font-family: var(--f-type); font-size: 14px; letter-spacing: .05em; color: var(--bone-dim);
+  background: rgba(244, 227, 215, .03); border: 1px solid rgba(244, 227, 215, .14); border-radius: 999px;
 }
-.gh-tab:hover, .gh-tab:focus-visible { outline: none; color: var(--bone); }
-.gh-tab.is-active { color: var(--bone); background: #120506; border-color: rgba(244, 227, 215, .14); box-shadow: inset 0 2px 0 var(--ember); }
+.gh-tab:hover, .gh-tab:focus-visible { outline: none; color: var(--bone); border-color: rgba(255, 90, 42, .6); }
+.gh-tab.is-active { color: #fff; background: var(--blood); border-color: var(--blood-hot); }
 .gh-panel[hidden] { display: none; }
+.gh-need { margin: 0 0 6px; }
+.gh-hosts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin: 10px 0 4px; }
+.gh-host { display: flex; flex-direction: column; gap: 6px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(244, 227, 215, .12); background: rgba(244, 227, 215, .03); }
+.gh-host p { margin: 0; font-size: 14.5px; }
+.gh-host .gh-host-name { font-weight: 700; font-size: 15.5px; }
+.gh-host-go {
+  margin-top: auto; align-self: flex-start; padding: 6px 12px; cursor: pointer;
+  font-family: var(--f-type); font-size: 13px; letter-spacing: .06em; color: #fff;
+  background: var(--blood); border: 0; border-radius: 6px;
+}
+.gh-host-go:hover, .gh-host-go:focus-visible { outline: none; background: var(--blood-hot); }
 .gh-quick { margin: 0 0 8px; padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255, 122, 26, .45); background: rgba(255, 122, 26, .07); }
 .gh-quick-title { margin: 0 0 4px; font-family: var(--f-type); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--pumpkin); }
 .gh-sec { padding: 16px 0 6px; border-top: 1px solid rgba(244, 227, 215, .08); margin-top: 14px; }
