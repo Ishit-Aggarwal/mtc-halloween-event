@@ -1176,6 +1176,14 @@ body.lit .circuit-grid {
   border-color: rgba(255, 90, 60, .38);
   background: rgba(18, 4, 7, 0.95);
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+/* a filled seal reopens its card on hover / tap */
+.fate.is-filled:hover, .fate.is-filled:focus-visible {
+  outline: none;
+  border-color: var(--c);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.7), 0 0 16px color-mix(in srgb, var(--c) 35%, transparent);
 }
 .fate.is-filled .fate-name { color: var(--c); text-shadow: 0 0 14px color-mix(in srgb, var(--c) 50%, transparent), 0 1px 3px #000; }
 .fate.is-filled .fate-num { font-size: 20px; border-color: var(--c); color: var(--bone); background: rgba(10, 2, 4, 0.95); box-shadow: 0 0 10px color-mix(in srgb, var(--c) 30%, transparent); }
@@ -1780,6 +1788,11 @@ body.lit .circuit-grid {
   70%  { transform: translateY(-6px) scale(1.03) rotateY(10deg) rotateZ(0); }
   100% { transform: none; }
 }
+/* a card reopened from the grimoire: quick, and on hover it lets the mouse through */
+.reveal.replay .card { animation: cardAgain .3s ease-out both; }
+@keyframes cardAgain { from { transform: translateY(14px) scale(.96); opacity: 0; } }
+.reveal.peek { pointer-events: none; }
+.reveal.peek .reveal-backdrop { background: rgba(3, 1, 1, .55); -webkit-backdrop-filter: none; backdrop-filter: none; }
 .card-face {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
@@ -1922,6 +1935,58 @@ body.lit .circuit-grid {
 .host-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid rgba(244, 227, 215, .1); }
 .host-head h2 { margin: 0; font-family: var(--f-title); font-weight: 400; font-size: 24px; color: var(--ember); letter-spacing: .04em; }
 .host-body { padding: 8px 18px 20px; overflow: auto; -webkit-overflow-scrolling: touch; }
+
+/* ---------- GitHub guide: plain, readable type for first-timers ---------- */
+.gh-box {
+  width: min(720px, 100%);
+  max-height: calc(var(--vh) * 100 - 32px);
+  padding: 0;
+  text-align: left;
+  display: flex; flex-direction: column;
+  background: #120506;
+  border: 1px solid rgba(244, 227, 215, .14);
+  border-radius: 12px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .8);
+}
+.gh-body {
+  padding: 6px 22px 24px; overflow: auto; -webkit-overflow-scrolling: touch;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; font-size: 15.5px; line-height: 1.6; color: var(--bone);
+}
+.gh-body a { color: var(--pumpkin); }
+.gh-body code, .gh-body kbd {
+  font-family: ui-monospace, Consolas, "Courier New", monospace; font-size: .9em;
+  padding: 1px 6px; border-radius: 4px; background: rgba(244, 227, 215, .08); border: 1px solid rgba(244, 227, 215, .12);
+  overflow-wrap: anywhere;
+}
+.gh-body pre { margin: 10px 0; padding: 12px 14px; overflow-x: auto; border-radius: 8px; background: #070203; border: 1px solid rgba(244, 227, 215, .12); }
+.gh-body pre code { padding: 0; border: 0; background: none; overflow-wrap: normal; white-space: pre; }
+.gh-body ol, .gh-body ul { margin: 6px 0; padding-left: 22px; }
+.gh-body li { margin: 4px 0; }
+.gh-lead { margin: 14px 0; font-size: 16.5px; }
+.gh-quick { margin: 0 0 8px; padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255, 122, 26, .45); background: rgba(255, 122, 26, .07); }
+.gh-quick-title { margin: 0 0 4px; font-family: var(--f-type); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--pumpkin); }
+.gh-sec { padding: 16px 0 6px; border-top: 1px solid rgba(244, 227, 215, .08); margin-top: 14px; }
+.gh-sec h3 { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font-family: var(--f-sc); font-weight: 400; font-size: 21px; color: var(--bone); }
+.gh-step {
+  flex: 0 0 auto; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  font-family: var(--f-type); font-size: 15px; color: #fff; background: var(--blood);
+}
+.gh-tip { margin: 10px 0 0; padding: 10px 14px; border-left: 3px solid var(--ember); border-radius: 0 8px 8px 0; background: rgba(255, 90, 42, .08); font-size: 14.5px; }
+.gh-words { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; margin: 10px 0 0; }
+.gh-words dt { font-weight: 600; color: var(--gold); }
+.gh-words dd { margin: 0; }
+@media (max-width: 540px) { .gh-words { grid-template-columns: 1fr; } .gh-words dd { margin-bottom: 6px; } }
+.gh-body details { margin: 8px 0; border-radius: 8px; border: 1px solid rgba(244, 227, 215, .12); background: rgba(244, 227, 215, .03); }
+.gh-body summary { cursor: pointer; padding: 10px 14px; font-weight: 600; }
+.gh-body details[open] summary { border-bottom: 1px solid rgba(244, 227, 215, .08); }
+.gh-body details > :not(summary) { margin-left: 14px; margin-right: 14px; }
+.gh-foot { margin: 18px 0 0; text-align: center; color: var(--bone-dim); }
+.gh-open {
+  margin: 4px 0 14px; padding: 10px 14px; width: 100%; cursor: pointer; text-align: left;
+  font-family: var(--f-type); font-size: 14px; letter-spacing: .04em; color: var(--bone);
+  border-radius: 8px; border: 1px dashed rgba(255, 122, 26, .6); background: rgba(255, 122, 26, .08);
+}
+.gh-open:hover, .gh-open:focus-visible { outline: none; background: rgba(255, 122, 26, .16); border-style: solid; }
 .host-body h3 { margin: 18px 0 10px; font-family: var(--f-sc); font-weight: 400; font-size: 18px; color: var(--bone); }
 .host-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; }
 .stat { padding: 8px 10px; border-radius: 8px; background: rgba(255, 255, 255, .03); border: 1px solid rgba(244, 227, 215, .08); }

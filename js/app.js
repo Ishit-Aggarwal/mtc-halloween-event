@@ -65,7 +65,7 @@
 
   var session = window.Store.session();
   var timerId = null, lastBpm = 0;
-  var busy = false;
+  var busy = false, replaying = false;
   var activeView = "mission";
   var baseTitle = document.title;
 
@@ -174,7 +174,10 @@
     var must = li.querySelector(".fate-must-have");
     var roman = ["I", "II", "III", "IV"][slot - 1];
     li.classList.remove("is-filled", "is-current");
-    if (data && data.name) {
+    var filled = !!(data && data.name);
+    li.tabIndex = filled ? 0 : -1;
+    if (filled) li.title = "Hover or tap to see this card again"; else li.removeAttribute("title");
+    if (filled) {
       var wasEmpty = name.textContent === "???";
       li.classList.add("is-filled");
       li.style.setProperty("--c", data.color || "#f4e3d7");
@@ -669,7 +672,13 @@
 
   /* ---------- reveal card ---------- */
 
-  function showCard(stage) {
+  // opts.replay: re-show a card the team already accepted (from the grimoire);
+  // opts.peek: shown on hover only, so it can't be clicked and vanishes on mouse-out.
+  function showCard(stage, opts) {
+    opts = opts || {};
+    replaying = !!opts.replay;
+    el.reveal.classList.toggle("replay", replaying);
+    el.reveal.classList.toggle("peek", !!opts.peek);
     var c = charById(session.charId);
     var kicker, glyph, name, lore = "", desc = "", brief = "", quote = "", archetype = "", portrait = "", mustHave = "", btn, accent = "#c4161c";
     if (stage === "soul") {
@@ -757,18 +766,67 @@
       }
     }
     el.cardScope.textContent = stage === "curse" ? D.scopeNote : "";
-    el.cardBtn.textContent = btn;
+    el.cardBtn.textContent = replaying ? "Close" : btn;
     el.card.querySelector(".card-front").style.setProperty("--accent", accent);
     el.cardGlyph.style.setProperty("--accent", accent);
 
     el.reveal.hidden = false;
     el.card.style.animation = "none"; void el.card.offsetWidth; el.card.style.animation = "";
-    window.Sound.reveal();
+    if (opts.peek) return;
+    if (!replaying) window.Sound.reveal();
     announce(kicker + ": " + name + ". " + (brief || desc || lore) + (mustHave ? " Must have: " + mustHave : ""));
-    setTimeout(function () { el.cardBtn.focus({ preventScroll: true }); }, 900);
+    setTimeout(function () { el.cardBtn.focus({ preventScroll: true }); }, replaying ? 50 : 900);
   }
 
+  function closeReplay() {
+    el.reveal.hidden = true;
+    el.reveal.classList.remove("replay", "peek");
+    replaying = false;
+  }
+
+  /* ---------- the grimoire: hover (or tap) a filled seal to see its card again ---------- */
+
+  var SLOT_STAGE = { 1: "soul", 2: "curse", 3: "hex", 4: "twist" };
+  var peekTimer = null;
+  var canHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  function canReplay(li) {
+    return !!session && li.classList.contains("is-filled") && el.reveal.hidden && !busy;
+  }
+  function replayCard(li, peek) {
+    showCard(SLOT_STAGE[li.getAttribute("data-slot")], { replay: true, peek: peek });
+  }
+  Array.prototype.forEach.call(el.fateList.querySelectorAll(".fate"), function (li) {
+    if (canHover) {
+      li.addEventListener("mouseenter", function () {
+        clearTimeout(peekTimer);
+        peekTimer = setTimeout(function () { if (canReplay(li)) replayCard(li, true); }, 250);
+      });
+      li.addEventListener("mouseleave", function () {
+        clearTimeout(peekTimer);
+        if (replaying && el.reveal.classList.contains("peek")) closeReplay();
+      });
+    }
+    li.addEventListener("click", function (e) {
+      if (e.target.closest("button, a")) return;
+      clearTimeout(peekTimer);
+      // clicking while peeking keeps the card open so it can be read and closed
+      if (replaying && el.reveal.classList.contains("peek")) {
+        el.reveal.classList.remove("peek");
+        el.cardBtn.focus({ preventScroll: true });
+      } else if (canReplay(li)) {
+        replayCard(li, false);
+      }
+    });
+    li.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && canReplay(li)) { e.preventDefault(); replayCard(li, false); }
+    });
+  });
+  el.reveal.querySelector(".reveal-backdrop").addEventListener("click", function () { if (replaying) closeReplay(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape" && replaying) closeReplay(); });
+
   function acceptCard() {
+    if (replaying) { closeReplay(); return; }
     el.reveal.hidden = true;
     var stage = session.pending;
     session.pending = null;
@@ -1321,6 +1379,12 @@
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") Array.prototype.forEach.call(document.querySelectorAll(".modal"), closeModal);
+  });
+
+  // the beginner's GitHub guide: from the top bar, and from the submission form
+  ["githubTopBtn", "githubGuideBtn"].forEach(function (id) {
+    var b = $(id);
+    if (b) b.addEventListener("click", function () { openModal($("githubModal")); });
   });
 
   /* ---------- organisers: back to the sign-in page ---------- */
