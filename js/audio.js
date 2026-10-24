@@ -1084,6 +1084,23 @@
       osc.start(t); osc.stop(t + 0.048);
     },
 
+    cutsceneHeartbeat: function (intensity) {
+      if (!enabled || !ctx) return;
+      var t = ctx.currentTime;
+      var lvl = intensity || 1;
+      var osc = ctx.createOscillator(); osc.type = "sine";
+      osc.frequency.setValueAtTime(62, t);
+      osc.frequency.exponentialRampToValueAtTime(28, t + 0.22);
+
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.12 * lvl, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+
+      osc.connect(g); g.connect(fxBus);
+      osc.start(t); osc.stop(t + 0.28);
+    },
+
     cutsceneAlarm: function () {
       if (!enabled || !ctx) return;
       var t = ctx.currentTime;

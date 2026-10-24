@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var NARRATIVE_LINES = [
+  var NARRATIVE_LINES_ENTRY = [
     "Welcome to the Other Side.",
     "A world that exists between reality and the network.",
     "Here, nightmares have identities. Monsters have memories. Villains have entire worlds of their own.",
@@ -22,6 +22,19 @@
     "And the Phantom is still out there.",
     "Your mission is no longer to destroy the corruption.",
     "It is to rebuild what has been lost."
+  ];
+
+  var NARRATIVE_LINES_HEX = [
+    "Digital Exorcists, your assignments have been revealed.",
+    "You know your characters. You know the ui. Think about their problems. Now it is time to build.",
+    "Your mission is to create a website that belongs in this world — one that is creative, visually compelling, intuitive, and functional.",
+    "You may use your approved tools and technologies. You may use AI assistance according to the event rules. But remember: the final result is yours to explain and demonstrate.",
+    "Judges will evaluate your storyline and creativity, your UI/UX, and how effectively your website solves the assigned problem.",
+    "You have -- minutes.",
+    "The timer begins in three...",
+    "Two...",
+    "One...",
+    "LET THE HAUNT BEGIN!"
   ];
 
   // Canvas Modes
@@ -35,6 +48,7 @@
 
   var Cutscene = {
     isActive: false,
+    cutsceneType: "entry", // "entry" or "hex"
     timerIds: [],
     animFrame: null,
     canvasMode: MODE.PORTAL,
@@ -72,6 +86,10 @@
       this.cinemaWrap = document.getElementById("cutsceneCinemaWrap");
       this.cinemaTextLine = document.getElementById("cinemaTextLine");
       this.endcard = document.getElementById("cutsceneEndcard");
+      this.endcardKicker = document.getElementById("endcardKicker");
+      this.endcardTitle = document.getElementById("endcardTitle");
+      this.endcardDesc = document.getElementById("endcardDesc");
+      this.proceedBtnText = document.getElementById("cutsceneProceedBtnText");
 
       this.skipBtn = document.getElementById("cutsceneSkipBtn");
       this.proceedBtn = document.getElementById("cutsceneProceedBtn");
@@ -271,7 +289,8 @@
       this.targetWarpSpeed = 1;
     },
 
-    play: function () {
+    play: function (type) {
+      this.cutsceneType = type === "hex" ? "hex" : "entry";
       this.isActive = true;
       this.clearTimers();
       if (!this.layer) this.init();
@@ -730,6 +749,8 @@
       var currentTypeTimer = null;
       var isTyping = false;
       var pendingChars = [];
+      var isHex = this.cutsceneType === "hex";
+      var lines = isHex ? NARRATIVE_LINES_HEX : NARRATIVE_LINES_ENTRY;
 
       function escapeHtml(str) {
         return String(str || "")
@@ -759,8 +780,8 @@
       function showLine() {
         if (!self.isActive) return;
 
-        if (lineIdx >= NARRATIVE_LINES.length) {
-          // All lines completed! Linger on final sentence, then dissolve into Mission 02 End Card
+        if (lineIdx >= lines.length) {
+          // All lines completed! Linger on final sentence, then dissolve into End Card
           self.delay(function () {
             if (!self.isActive) return;
             textEl.classList.add("exit");
@@ -772,7 +793,7 @@
           return;
         }
 
-        var text = NARRATIVE_LINES[lineIdx];
+        var text = lines[lineIdx];
         lineIdx++;
 
         // Step 1: Liquefied blood dissolve of previous line
@@ -781,12 +802,75 @@
         self.delay(function () {
           if (!self.isActive) return;
 
+          // Clear any specialized classes from prior line
+          textEl.className = "cinema-text-line";
+
+          var isCountdown = (text === "Two..." || text === "One..." || text === "The timer begins in three...");
+          var isClimax = (text === "LET THE HAUNT BEGIN!");
+
+          if (text === "Two..." || text === "One...") {
+            textEl.classList.add("countdown-num");
+            if (window.Sound && window.Sound.cutsceneHeartbeat) {
+              window.Sound.cutsceneHeartbeat(text === "One..." ? 1.8 : 1.4);
+            }
+          } else if (text === "The timer begins in three...") {
+            if (window.Sound && window.Sound.cutsceneHeartbeat) {
+              window.Sound.cutsceneHeartbeat(1.0);
+            }
+          }
+
+          if (isClimax) {
+            // CLIMAX EXPLOSION!
+            textEl.classList.add("haunt-climax");
+            textEl.innerHTML = buildLineMarkup(text);
+            void textEl.offsetWidth;
+
+            // Instantly burst all characters into bright arterial crimson
+            var chars = textEl.querySelectorAll(".blood-char");
+            chars.forEach(function (c) {
+              c.classList.remove("pending");
+              c.classList.add("bleeding");
+            });
+
+            // Violent camera tremor, lightning flash, and thunderous roar
+            if (self.rig) {
+              self.rig.classList.remove("claw-slam-shake");
+              void self.rig.offsetWidth;
+              self.rig.classList.add("claw-slam-shake");
+            }
+            if (self.flash) {
+              self.flash.classList.add("bang");
+              setTimeout(function () {
+                if (self.flash) {
+                  self.flash.classList.remove("bang");
+                  self.flash.classList.add("fade");
+                }
+              }, 140);
+            }
+
+            var S = window.Sound || {};
+            if (S.cutsceneImpact) S.cutsceneImpact();
+            if (S.cutsceneDragRoar) S.cutsceneDragRoar();
+            if (S.thunder) S.thunder();
+
+            // Hold climax for 3.2 seconds, then transition to End Card
+            self.delay(function () {
+              if (!self.isActive) return;
+              textEl.classList.add("exit");
+              self.delay(function () {
+                if (!self.isActive) return;
+                self.showEndCard();
+              }, 600);
+            }, 3200);
+            return;
+          }
+
           // Render new sentence with all characters in pending (invisible) state
           textEl.classList.remove("exit");
           textEl.innerHTML = buildLineMarkup(text);
           void textEl.offsetWidth;
 
-          if (window.Sound && window.Sound.whisper && lineIdx % 2 === 1) {
+          if (window.Sound && window.Sound.whisper && lineIdx % 2 === 1 && !isCountdown) {
             window.Sound.whisper();
           }
 
@@ -804,7 +888,7 @@
             if (charIdx >= charEls.length) {
               isTyping = false;
               // Finished writing current line! Linger for reading
-              var lingerTime = text.length > 55 ? 2600 : 2100;
+              var lingerTime = (text === "Two..." || text === "One...") ? 1300 : (text.length > 55 ? 2600 : 2100);
               self.delay(showLine, lingerTime);
               return;
             }
@@ -823,7 +907,7 @@
             var ch = el.getAttribute("data-char") || "";
             var delayMs = 38;
             if (ch === "." || ch === "!" || ch === "?") {
-              delayMs = 280; // Dramatic pause on punctuation
+              delayMs = isCountdown ? 180 : 280; // Dramatic pause on punctuation
             } else if (ch === "," || ch === ";") {
               delayMs = 150;
             } else {
@@ -859,6 +943,18 @@
     showEndCard: function () {
       if (this.cinemaWrap) this.cinemaWrap.hidden = true;
       if (this.endcard) {
+        if (this.cutsceneType === "hex") {
+          if (this.endcardKicker) this.endcardKicker.textContent = "Microsoft Tech Community · Round 02";
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'THE HAUNT IS LIVE<br><span class="highlight-glitch">LET THE HAUNT BEGIN</span>';
+          if (this.endcardDesc) this.endcardDesc.innerHTML = 'Your assignments have been sealed in blood. The timer has begun.<br>Build a digital experience worthy of this realm before time expires.';
+          if (this.proceedBtnText) this.proceedBtnText.textContent = "START BUILDING NOW →";
+        } else {
+          if (this.endcardKicker) this.endcardKicker.textContent = "Microsoft Tech Community · Round 02";
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'MISSION 02<br><span class="highlight-glitch">WEBSITE RESURRECTION</span>';
+          if (this.endcardDesc) this.endcardDesc.innerHTML = 'The realms have collapsed. Their digital homes have vanished.<br>Your purpose is no longer destruction. <strong>It is resurrection.</strong>';
+          if (this.proceedBtnText) this.proceedBtnText.textContent = "PROCEED TO THE WHEEL OF EVIL →";
+        }
+
         this.endcard.hidden = false;
         void this.endcard.offsetWidth;
       }
@@ -883,10 +979,13 @@
         this.layer.classList.remove("is-active");
       }
 
+      var wasHex = this.cutsceneType === "hex";
+
       // Persist seen status in preferences
       try {
         if (window.Store && window.Store.setPref) {
-          window.Store.setPref("cutsceneSeen", true);
+          if (wasHex) window.Store.setPref("hexCutsceneSeen", true);
+          else window.Store.setPref("cutsceneSeen", true);
         }
       } catch (e) {}
 
@@ -894,13 +993,33 @@
         if (self.layer) self.layer.hidden = true;
         self.resetVisuals();
 
-        // Handoff to main altar gate dismissal & Creatures.opening()
-        var gate = document.getElementById("gate");
-        if (gate) gate.classList.add("gone");
-        if (window.Creatures && window.Creatures.opening) {
-          window.Creatures.opening();
+        if (wasHex) {
+          // Hex Cutscene completed: smooth handoff to Mission Workspace
+          if (window.App && typeof window.App.onHexCutsceneComplete === "function") {
+            window.App.onHexCutsceneComplete();
+          } else {
+            var tabMission = document.getElementById("tabMission");
+            if (tabMission) tabMission.click();
+            var submissionCard = document.getElementById("submissionCard");
+            if (submissionCard) submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        } else {
+          // Entry Cutscene completed: handoff to main altar gate dismissal & Creatures.opening()
+          var gate = document.getElementById("gate");
+          if (gate) gate.classList.add("gone");
+          if (window.Creatures && window.Creatures.opening) {
+            window.Creatures.opening();
+          }
         }
       }, 450);
+    },
+
+    playEntryCutscene: function () {
+      this.play("entry");
+    },
+
+    playHexCutscene: function () {
+      this.play("hex");
     },
 
     delay: function (fn, ms) {

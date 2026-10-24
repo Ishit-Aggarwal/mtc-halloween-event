@@ -833,7 +833,14 @@
     resetIdle();
     render(stage !== "twist");
     renderGrimoire(true);
-    if (stage === "twist") {
+    if (stage === "hex") {
+      // Hex assignments complete! Trigger the "LET THE HAUNT BEGIN" Cutscene
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playHexCutscene === "function") {
+        setTimeout(function () {
+          window.OtherSideCutscene.playHexCutscene();
+        }, 320);
+      }
+    } else if (stage === "twist") {
       setView("mission");
       setTimeout(function () {
         if (el.viewTabs) el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1559,9 +1566,24 @@
   if (el.prologueCloseBtn) el.prologueCloseBtn.addEventListener("click", closeDecree);
   if (el.prologuePill) el.prologuePill.addEventListener("click", openDecree);
   if (el.decreeTopBtn) el.decreeTopBtn.addEventListener("click", openDecree);
+  window.App = window.App || {};
+  window.App.onHexCutsceneComplete = function () {
+    setView("mission");
+    setTimeout(function () {
+      if (el.viewTabs) el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
+      else el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  };
+
   if (el.cutsceneTopBtn) {
     el.cutsceneTopBtn.addEventListener("click", function () {
-      if (window.OtherSideCutscene) window.OtherSideCutscene.play();
+      if (window.OtherSideCutscene) {
+        if (session && (session.hex != null || session.stage === "wait" || session.stage === "twist" || session.stage === "done")) {
+          window.OtherSideCutscene.playHexCutscene();
+        } else {
+          window.OtherSideCutscene.playEntryCutscene();
+        }
+      }
     });
   }
 
