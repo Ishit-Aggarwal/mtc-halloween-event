@@ -449,7 +449,8 @@
                       <li><strong>Host:</strong> Deploy your website online and ensure it is publicly accessible.</li>
                       <li><strong>Submit:</strong> Paste your live hosted link and provide your source code (GitHub repo, .zip upload, or Drive link) below so judges can evaluate your project.</li>
                     </ol>
-                    <button class="gh-open" type="button" data-guide="github">🐙 Never used GitHub? How to make a repo and upload (push) your code</button>
+                    <button class="gh-open" type="button" data-guide="github">🐙 Never used GitHub? Set up an account and push your code, step by step</button>
+                    <button class="gh-open" type="button" data-guide="git">💻 Already on GitHub? How to update your code (commit &amp; push)</button>
                     <button class="gh-open" type="button" data-guide="start">🌐 How do I put my site online? Open the hosting guide</button>
                     <div class="sub-platforms">
                       <span class="sub-platforms-title">Recommended Free Hosting Platforms: <span class="sub-platforms-hint">tap one for a step-by-step guide</span></span>
@@ -608,6 +609,7 @@
       <div class="gh-tabs" role="tablist" aria-label="Choose a guide">
         <button class="gh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="ghPanelStart" data-guide="start">🧭 Start here</button>
         <button class="gh-tab" type="button" role="tab" aria-selected="false" aria-controls="ghPanelGithub" data-guide="github">🐙 GitHub</button>
+        <button class="gh-tab" type="button" role="tab" aria-selected="false" aria-controls="ghPanelGit" data-guide="git">💻 Commit &amp; Push</button>
         <button class="gh-tab" type="button" role="tab" aria-selected="false" aria-controls="ghPanelVercel" data-guide="vercel">▲ Vercel</button>
         <button class="gh-tab" type="button" role="tab" aria-selected="false" aria-controls="ghPanelNetlify" data-guide="netlify">💎 Netlify</button>
         <button class="gh-tab" type="button" role="tab" aria-selected="false" aria-controls="ghPanelRender" data-guide="render">⚡ Render</button>
@@ -665,16 +667,17 @@
        </div>
 
        <div class="gh-panel" id="ghPanelGithub" role="tabpanel" data-panel="github" hidden>
-        <p class="gh-lead">Never used GitHub? No problem. Follow these steps in order and your site will be online with a link you can submit. No coding commands needed.</p>
+        <p class="gh-lead">Never used GitHub? No problem. Follow these steps in order: you'll send your project to GitHub with a few typed commands, then get a live link you can submit. Copy the commands exactly as shown.</p>
 
         <div class="gh-quick">
           <p class="gh-quick-title">The short version</p>
           <ol>
             <li>Make a free GitHub account</li>
-            <li>Create a new <b>public</b> repository</li>
-            <li>Upload your project files</li>
+            <li>Install Git on your laptop</li>
+            <li>Create a new, empty <b>public</b> repository</li>
+            <li>Open a terminal inside your project folder</li>
+            <li>Push your code with a few commands</li>
             <li>Turn on <b>GitHub Pages</b> to get a live link</li>
-            <li>Paste both links in the Submit form</li>
           </ol>
         </div>
 
@@ -683,9 +686,10 @@
           <p>GitHub is like Google Drive, but for code. It stores your project online so judges can see it, and it can also turn your files into a real website for free.</p>
           <dl class="gh-words">
             <dt>Repository (repo)</dt><dd>A project folder on GitHub. One repo per project.</dd>
-            <dt>Commit</dt><dd>A save point. Every time you upload or change files, GitHub asks you to “commit”, which just means save, with a short note.</dd>
-            <dt>Push</dt><dd>Sending saved changes from your laptop to GitHub. You only need this if you use commands or GitHub Desktop. Uploading in the browser does it for you.</dd>
-            <dt>GitHub Pages</dt><dd>GitHub’s free hosting. It turns your repo into a live website link.</dd>
+            <dt>Terminal</dt><dd>A window where you type commands instead of clicking. Windows calls it Command Prompt; on a Mac it's called Terminal.</dd>
+            <dt>Commit</dt><dd>A save point of your files, with a short note about what changed.</dd>
+            <dt>Push</dt><dd>Sending your commits from your laptop up to GitHub.</dd>
+            <dt>GitHub Pages</dt><dd>GitHub's free hosting. It turns your repo into a live website link.</dd>
           </dl>
         </section>
 
@@ -696,32 +700,85 @@
             <li>Enter your email, a password and a <b>username</b>. Your username appears in your website link, so keep it simple.</li>
             <li>Open the email GitHub sends you and enter the code to verify your account.</li>
           </ol>
-          <p class="gh-tip">One account per team is enough. Whoever uploads the code can use their account.</p>
+          <p class="gh-tip">One account per team is enough. Whoever pushes the code can use their account.</p>
         </section>
 
         <section class="gh-sec">
-          <h3><span class="gh-step">2</span> Create a repository</h3>
+          <h3><span class="gh-step">2</span> Install Git</h3>
+          <ul>
+            <li><b>Windows:</b> download Git from <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com/downloads</a>, run the installer and keep clicking <b>Next</b>. The default options are fine.</li>
+            <li><b>Mac:</b> open Terminal (press <kbd>Cmd</kbd>+<kbd>Space</kbd>, type <code>Terminal</code>, press <kbd>Enter</kbd>), type <code>git --version</code> and press <kbd>Enter</kbd>. If Git isn't installed yet, your Mac offers to install it. Click <b>Install</b>.</li>
+          </ul>
+          <p>To check it worked, open a terminal (step 4) and type <code>git --version</code>. You should see something like <code>git version 2.47.0</code>.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">3</span> Create an empty repository</h3>
           <ol>
-            <li>Sign in, then click the <b>+</b> at the top right and choose <b>New repository</b>.</li>
+            <li>On github.com click the <b>+</b> at the top right → <b>New repository</b>.</li>
             <li>Give it a name with no spaces, for example <code>deadpool-job-board</code>.</li>
             <li>Choose <b>Public</b>. Free hosting only works on public repos, and judges need to see your code.</li>
-            <li>Tick <b>Add a README file</b>, then click <b>Create repository</b>.</li>
+            <li>Leave everything else <b>unticked</b>: no README, no .gitignore, no license. The repo must be empty.</li>
+            <li>Click <b>Create repository</b> and keep that page open. You'll need its link, which looks like <code>https://github.com/your-username/deadpool-job-board.git</code></li>
           </ol>
         </section>
 
-        <section class="gh-sec">
-          <h3><span class="gh-step">3</span> Upload your project</h3>
+        <section class="gh-sec" id="ghTerminalStep">
+          <h3><span class="gh-step">4</span> Open a terminal in your project folder</h3>
+          <p>The terminal has to be “inside” your project folder: the folder that has your <code>index.html</code> in it. Pick whichever way suits you:</p>
+
+          <p><b>Windows, the quick way</b></p>
           <ol>
-            <li>Inside your repo, click <b>Add file</b> → <b>Upload files</b>.</li>
-            <li>Open your project folder on your laptop, select <b>everything inside it</b> (not the folder itself) and drag it onto the page.</li>
-            <li>Wait until every file has finished uploading.</li>
-            <li>Scroll down, type a short note such as <code>first version</code>, and click <b>Commit changes</b>.</li>
+            <li>Open your project folder in File Explorer.</li>
+            <li>Click the address bar at the top (where the folder's path is shown), type <code>cmd</code> and press <kbd>Enter</kbd>. A black window opens, already inside your folder.</li>
           </ol>
-          <p class="gh-tip">Your main page must be called exactly <code>index.html</code> and must sit at the top of the repo, not inside another folder. You can upload up to 100 files at a time.</p>
+          <p class="gh-tip">On Windows 11 you can also right-click an empty space inside the folder and choose <b>Open in Terminal</b>.</p>
+
+          <p><b>Windows, typing the path</b></p>
+          <ol>
+            <li>Right-click your project folder and choose <b>Copy as path</b> (on Windows 10, hold <kbd>Shift</kbd> while you right-click). This copies the folder's path with quote marks around it.</li>
+            <li>Open the Start menu, type <code>cmd</code> and open <b>Command Prompt</b>.</li>
+            <li>Type <code>cd /d </code> (with a space at the end), paste the path with <kbd>Ctrl</kbd>+<kbd>V</kbd>, and press <kbd>Enter</kbd>. It looks like this:
+              <pre><code>cd /d "C:\Users\YourName\Desktop\my project"</code></pre>
+            </li>
+          </ol>
+          <p class="gh-tip"><b>Why the quote marks?</b> If a folder name has a space in it (like <code>my project</code>), the terminal splits it in two without them. The <code>/d</code> lets it jump to another drive, such as <code>D:</code>.</p>
+
+          <p><b>Mac</b></p>
+          <ol>
+            <li>Open Terminal (<kbd>Cmd</kbd>+<kbd>Space</kbd>, type <code>Terminal</code>, press <kbd>Enter</kbd>).</li>
+            <li>Type <code>cd </code> (with a space at the end), then drag your project folder from Finder into the Terminal window. Its path appears. Press <kbd>Enter</kbd>. It looks like this:
+              <pre><code>cd "/Users/yourname/Desktop/my project"</code></pre>
+            </li>
+          </ol>
+
+          <p><b>VS Code</b>: open your project folder, then choose <b>Terminal</b> → <b>New Terminal</b>. It opens in the folder automatically.</p>
+
+          <p class="gh-tip"><b>Check you're in the right place:</b> type <code>dir</code> (Windows) or <code>ls</code> (Mac) and press <kbd>Enter</kbd>. You should see <code>index.html</code> in the list.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">5</span> Push your code (first time)</h3>
+          <p>In that terminal, type these one at a time and press <kbd>Enter</kbd> after each. Put in your own name, email and repo link.</p>
+          <pre><code>git config --global user.name "Your Name"
+git config --global user.email "you@example.com"
+git init
+git add .
+git commit -m "first version"
+git branch -M main
+git remote add origin https://github.com/your-username/your-repo-name.git
+git push -u origin main</code></pre>
+          <ul>
+            <li>The two <code>git config</code> lines tell Git who you are. You only need them once per laptop.</li>
+            <li><code>git add .</code> picks up every file in the folder. The dot means “everything here”.</li>
+            <li>For <code>git remote add origin</code>, use your own repo link from step 3. Your empty repo's page on GitHub shows these exact commands with your link already filled in, under <b>“…or push an existing repository from the command line”</b>. You can copy them from there.</li>
+            <li>On the first push a window asks you to sign in to GitHub. Choose <b>Sign in with your browser</b> and approve it.</li>
+          </ul>
+          <p>Now refresh your repo page on GitHub. All your files should be there. 🎉</p>
         </section>
 
         <section class="gh-sec" id="ghPagesStep">
-          <h3><span class="gh-step">4</span> Put it online with GitHub Pages</h3>
+          <h3><span class="gh-step">6</span> Put it online with GitHub Pages</h3>
           <ol>
             <li>In your repo, click <b>Settings</b> (top menu), then <b>Pages</b> (left menu).</li>
             <li>Under <b>Build and deployment</b>, set <b>Source</b> to <b>Deploy from a branch</b>.</li>
@@ -731,17 +788,22 @@
           </ol>
         </section>
 
-        <section class="gh-sec">
-          <h3><span class="gh-step">5</span> Changed something? Update it</h3>
+        <section class="gh-sec" id="ghUpdateStep">
+          <h3><span class="gh-step">7</span> Changed something? Update it</h3>
           <ol>
-            <li>Click <b>Add file</b> → <b>Upload files</b> again and drop in the files you changed. Files with the same name replace the old ones.</li>
-            <li>Click <b>Commit changes</b>.</li>
-            <li>Your live site updates in a minute or two. If you still see the old version, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on a Mac).</li>
+            <li>Save your files.</li>
+            <li>Open a terminal in your project folder again (step 4).</li>
+            <li>Run these three commands:
+              <pre><code>git add .
+git commit -m "describe what you changed"
+git push</code></pre>
+            </li>
           </ol>
+          <p>That's it. GitHub updates straight away, and your live site within a minute or two. If you still see the old version, press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on a Mac).</p>
         </section>
 
         <section class="gh-sec">
-          <h3><span class="gh-step">6</span> Submit your links</h3>
+          <h3><span class="gh-step">8</span> Submit your links</h3>
           <ul>
             <li><b>Live Hosted Website URL:</b> your GitHub Pages link, <code>https://your-username.github.io/your-repo-name/</code></li>
             <li><b>GitHub Repository URL:</b> the address of your repo page, <code>https://github.com/your-username/your-repo-name</code></li>
@@ -751,44 +813,158 @@
         <section class="gh-sec">
           <h3>Common problems</h3>
           <details>
-            <summary>My link says “404: There isn’t a GitHub Pages site here”</summary>
-            <p>Wait 2–3 minutes and refresh. Then check that your main file is named exactly <code>index.html</code> (all lowercase) and is at the top of the repo, that Pages is set to <code>main</code> and <code>/ (root)</code>, and that the repo is Public.</p>
+            <summary>“git is not recognized” / “command not found: git”</summary>
+            <p>Git isn't installed yet, or the terminal was open while you installed it. Install Git (step 2), close the terminal, and open a new one.</p>
           </details>
           <details>
-            <summary>My site loads but the design or images are missing</summary>
-            <p>GitHub cares about capital letters: <code>Logo.png</code> and <code>logo.png</code> are different files, so the name in your code must match exactly. Use paths like <code>images/logo.png</code>, never <code>C:\Users\...</code>. Also check in your repo that the CSS and image files were actually uploaded.</p>
+            <summary>“The system cannot find the path specified” / “no such file or directory”</summary>
+            <p>The <code>cd</code> path has a typo or is missing its quote marks. Use <b>Copy as path</b> (Windows) or drag the folder into Terminal (Mac) so the path is exactly right, and keep the quotes.</p>
+          </details>
+          <details>
+            <summary>“not a git repository”</summary>
+            <p>The terminal isn't inside your project folder. Go back to step 4, then check with <code>dir</code> / <code>ls</code> that you can see <code>index.html</code>.</p>
+          </details>
+          <details>
+            <summary>“Please tell me who you are” / “Author identity unknown”</summary>
+            <p>Run the two <code>git config --global</code> lines from step 5, then run the <code>git commit</code> line again.</p>
+          </details>
+          <details>
+            <summary>“src refspec main does not match any”</summary>
+            <p>Nothing has been committed yet. Run <code>git add .</code> and <code>git commit -m "first version"</code>, then <code>git push -u origin main</code> again.</p>
+          </details>
+          <details>
+            <summary>“remote origin already exists”</summary>
+            <p>You've already added a link. To replace it, run <code>git remote set-url origin https://github.com/your-username/your-repo-name.git</code> and push again.</p>
+          </details>
+          <details>
+            <summary>Push “rejected” / “fetch first”</summary>
+            <p>GitHub has something your laptop doesn't. This usually means a README was ticked when the repo was created, or a teammate pushed. Run this, then push again:</p>
+            <pre><code>git pull --no-rebase --no-edit --allow-unrelated-histories origin main
+git push</code></pre>
+          </details>
+          <details>
+            <summary>On a Mac, it asks for a password and won't accept mine</summary>
+            <p>GitHub doesn't accept your normal password in the terminal. On github.com go to <b>Settings</b> → <b>Developer settings</b> → <b>Personal access tokens</b> → <b>Tokens (classic)</b> → <b>Generate new token (classic)</b>, tick <b>repo</b>, generate it and copy it. Paste that token when the terminal asks for the password. Nothing shows on screen while you paste or type the password. That's normal.</p>
+          </details>
+          <details>
+            <summary>My link says “404: There isn't a GitHub Pages site here”</summary>
+            <p>Wait 2–3 minutes and refresh. Check that your main file is named exactly <code>index.html</code> (all lowercase) and is at the top of the repo, that Pages is set to <code>main</code> and <code>/ (root)</code>, and that the repo is Public.</p>
           </details>
           <details>
             <summary>All my files are inside one folder in the repo</summary>
-            <p>You dragged the folder instead of what's inside it. The easiest fix is to make a new repo and upload again, this time selecting the files inside your project folder.</p>
+            <p>The terminal was opened one folder too high. Open it in the folder that directly contains <code>index.html</code>, and push from there.</p>
           </details>
           <details>
-            <summary>How do my teammates add their work?</summary>
-            <p>The simplest way: send your files to one person and they upload everything. Or the owner can go to <b>Settings</b> → <b>Collaborators</b> → <b>Add people</b> and invite teammates by their GitHub username.</p>
+            <summary>My site loads but the design or images are missing</summary>
+            <p>GitHub cares about capital letters: <code>Logo.png</code> and <code>logo.png</code> are different files, so the name in your code must match exactly. Use paths like <code>images/logo.png</code>, never <code>C:\Users\...</code>.</p>
           </details>
           <details>
-            <summary>Do we have to pay for anything?</summary>
-            <p>No. A GitHub account, public repos and GitHub Pages are all free.</p>
+            <summary>I pushed a huge <code>node_modules</code> folder</summary>
+            <p>Create a file called <code>.gitignore</code> in your project folder containing the line <code>node_modules/</code>, then run <code>git rm -r --cached node_modules</code>, commit and push again.</p>
           </details>
           <details>
-            <summary>Can we use Vercel or Netlify instead?</summary>
-            <p>Yes. Any working public link is fine. Open the <b>Vercel</b> tab at the top of this guide for step-by-step instructions.</p>
+            <summary>I really can't get the terminal working</summary>
+            <p>As a last resort, on your repo's page click <b>uploading an existing file</b> (or <b>Add file</b> → <b>Upload files</b>), drag in the files <b>inside</b> your project folder, not the folder itself, and click <b>Commit changes</b>. Or ask an organiser to help you with the terminal.</p>
           </details>
           <details>
             <summary>How do I make a .zip of my project?</summary>
             <p><b>Windows:</b> right-click your project folder → <b>Compress to ZIP file</b> (or <b>Send to</b> → <b>Compressed (zipped) folder</b>). <b>Mac:</b> right-click the folder → <b>Compress</b>.</p>
           </details>
           <details>
-            <summary>I know the command line. Can I push from the terminal?</summary>
-            <p>Yes. From inside your project folder:</p>
-            <pre><code>git init
-git add .
-git commit -m "first version"
-git branch -M main
-git remote add origin https://github.com/your-username/your-repo-name.git
-git push -u origin main</code></pre>
-            <p>After that, every update is <code>git add .</code>, then <code>git commit -m "what changed"</code>, then <code>git push</code>. If you'd rather click than type, the free <a href="https://desktop.github.com" target="_blank" rel="noopener">GitHub Desktop</a> app does the same thing.</p>
+            <summary>Do we have to pay for anything?</summary>
+            <p>No. A GitHub account, public repos and GitHub Pages are all free.</p>
           </details>
+        </section>
+       </div>
+
+       <div class="gh-panel" id="ghPanelGit" role="tabpanel" data-panel="git" hidden>
+        <p class="gh-lead">Your code is on GitHub (the <button class="gh-inline" type="button" data-guide="github">🐙 GitHub</button> tab, steps 1–5). This is how you keep it up to date while you build, and how to work on it as a team.</p>
+
+        <div class="gh-quick">
+          <p class="gh-quick-title">Three words you'll see</p>
+          <ul>
+            <li><b>Commit</b>: save a snapshot of your files, with a short note like “added the map”.</li>
+            <li><b>Push</b>: send your commits from your laptop up to GitHub.</li>
+            <li><b>Pull</b>: bring down changes a teammate pushed, so you have their work too.</li>
+          </ul>
+          <p>The routine is always: <b>save your files → commit → push</b>.</p>
+        </div>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">1</span> Open a terminal in your project folder</h3>
+          <p>Same as before: on Windows, type <code>cmd</code> in the File Explorer address bar of your project folder; on a Mac, type <code>cd </code> and drag the folder into Terminal; in VS Code, use <b>Terminal</b> → <b>New Terminal</b>. If you get stuck, see <button class="gh-inline" type="button" data-guide="github" data-guide-section="ghTerminalStep">step 4 of the GitHub tab</button>.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">2</span> Commit and push</h3>
+          <pre><code>git add .
+git commit -m "describe what you changed"
+git push</code></pre>
+          <ul>
+            <li>Do this every time you finish a piece of work. Little and often is safer than one giant push at the end.</li>
+            <li>Good notes are short and say what changed: <code>added the incident map</code>, <code>fixed the mobile menu</code>, <code>new colours</code>.</li>
+            <li>“nothing to commit, working tree clean” means nothing has changed since your last commit. Did you save your files?</li>
+          </ul>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">3</span> Working as a team</h3>
+          <ol>
+            <li>The repo owner adds teammates: on github.com open the repo → <b>Settings</b> → <b>Collaborators</b> → <b>Add people</b>. Each teammate accepts the email invite.</li>
+            <li>A teammate gets the code once, in a terminal:
+              <pre><code>git clone https://github.com/owner-username/your-repo-name.git
+cd your-repo-name</code></pre>
+            </li>
+            <li><b>Always pull before you start working</b>, so you have everyone's latest changes:
+              <pre><code>git pull</code></pre>
+            </li>
+            <li>When you're done, commit and push as in step 2.</li>
+          </ol>
+          <p class="gh-tip">Try not to edit the same file at the same time as a teammate. It saves a lot of headaches.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3>Prefer buttons to typing?</h3>
+          <details>
+            <summary>GitHub Desktop (an app, no commands)</summary>
+            <ol>
+              <li>Install <a href="https://desktop.github.com" target="_blank" rel="noopener">GitHub Desktop</a> and sign in to GitHub.</li>
+              <li><b>File</b> → <b>Add local repository…</b> → choose your project folder. If it says it isn't a repository yet, click <b>create a repository</b>.</li>
+              <li>Click <b>Publish repository</b> and untick <b>Keep this code private</b>.</li>
+              <li>After each change: write a <b>Summary</b> → <b>Commit to main</b> → <b>Push origin</b>.</li>
+            </ol>
+          </details>
+          <details>
+            <summary>VS Code's Source Control buttons</summary>
+            <ol>
+              <li>With Git installed, open your folder and click the <b>Source Control</b> icon in the left bar (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>).</li>
+              <li>First time: <b>Initialize Repository</b> → type a message → <b>Commit</b> → <b>Publish Branch</b> → <b>Publish to GitHub public repository</b>.</li>
+              <li>After each change: type a message → <b>Commit</b> → <b>Sync Changes</b>.</li>
+            </ol>
+          </details>
+        </section>
+
+        <section class="gh-sec">
+          <h3>Common problems</h3>
+          <details>
+            <summary>Push “rejected” / “Updates were rejected”</summary>
+            <p>A teammate pushed something you don't have yet. Pull first, then push:</p>
+            <pre><code>git pull --no-rebase --no-edit
+git push</code></pre>
+          </details>
+          <details>
+            <summary>“CONFLICT” after pulling</summary>
+            <p>You and a teammate changed the same lines. Open the file it names, find the part between <code>&lt;&lt;&lt;&lt;&lt;&lt;&lt;</code> and <code>&gt;&gt;&gt;&gt;&gt;&gt;&gt;</code>, keep the version you want, delete the marker lines, save, then run <code>git add .</code>, <code>git commit -m "fixed conflict"</code> and <code>git push</code>. VS Code shows buttons to pick a version, which makes this easier.</p>
+          </details>
+          <details>
+            <summary>“Permission denied” or error 403 when pushing</summary>
+            <p>You're signed in with a GitHub account that doesn't own the repo. Ask the owner to add you as a collaborator (step 3), and accept the invite email.</p>
+          </details>
+          <details>
+            <summary>My push worked but the live site didn't change</summary>
+            <p>Hosts take a minute or two to update. Check your host's deployments page, then refresh your site with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on a Mac).</p>
+          </details>
+          <p>For setup errors (Git not found, wrong folder, signing in), see <b>Common problems</b> in the <button class="gh-inline" type="button" data-guide="github">🐙 GitHub</button> tab.</p>
         </section>
        </div>
 
@@ -798,7 +974,7 @@ git push -u origin main</code></pre>
         <div class="gh-quick">
           <p class="gh-quick-title">The short version</p>
           <ol>
-            <li>Put your code on GitHub (steps 1–3 in the <b>GitHub</b> tab)</li>
+            <li>Push your code to GitHub (steps 1–5 in the <b>GitHub</b> tab)</li>
             <li>Sign up to Vercel with your GitHub account</li>
             <li>Import your repo</li>
             <li>Click <b>Deploy</b></li>
@@ -808,7 +984,7 @@ git push -u origin main</code></pre>
 
         <section class="gh-sec">
           <h3><span class="gh-step">1</span> Put your code on GitHub first</h3>
-          <p>Vercel takes your code from a GitHub repository. If you haven't yet, follow steps 1–3 in the <b>GitHub</b> tab: make an account, create a repo and upload your files. You can skip GitHub Pages.</p>
+          <p>Vercel takes your code from a GitHub repository. If you haven't yet, follow steps 1–5 in the <b>GitHub</b> tab: make an account, create a repo and push your code from the terminal. You can skip GitHub Pages.</p>
         </section>
 
         <section class="gh-sec">
@@ -906,7 +1082,7 @@ git push -u origin main</code></pre>
         <section class="gh-sec">
           <h3><span class="gh-step">3</span> Or: connect your GitHub repo</h3>
           <ol>
-            <li>Put your code on GitHub first (steps 1–3 in the <b>GitHub</b> tab).</li>
+            <li>Push your code to GitHub first (steps 1–5 in the <b>GitHub</b> tab).</li>
             <li>Click <b>Add new site</b> → <b>Import an existing project</b> → <b>GitHub</b>, allow Netlify to access GitHub, and pick your repo.</li>
             <li>For a plain HTML/CSS/JavaScript site, leave <b>Build command</b> and <b>Publish directory</b> empty. For React/Vite, use <code>npm run build</code> and <code>dist</code> (Netlify usually fills these in).</li>
             <li>Click <b>Deploy</b>. From now on, every change you commit on GitHub goes live by itself.</li>
@@ -935,7 +1111,7 @@ git push -u origin main</code></pre>
 
         <section class="gh-sec">
           <h3><span class="gh-step">1</span> Put your code on GitHub first</h3>
-          <p>Follow steps 1–3 in the <b>GitHub</b> tab: make an account, create a repo and upload your files.</p>
+          <p>Follow steps 1–5 in the <b>GitHub</b> tab: make an account, create a repo and push your code from the terminal.</p>
         </section>
 
         <section class="gh-sec">
@@ -1011,7 +1187,7 @@ git push -u origin main</code></pre>
         <section class="gh-sec">
           <h3><span class="gh-step">4</span> Or: connect your GitHub repo</h3>
           <ol>
-            <li>Put your code on GitHub first (steps 1–3 in the <b>GitHub</b> tab).</li>
+            <li>Push your code to GitHub first (steps 1–5 in the <b>GitHub</b> tab).</li>
             <li>Choose <b>Connect to Git</b> (or <b>Import an existing Git repository</b>), connect your GitHub account, pick your repo and click <b>Begin setup</b>.</li>
             <li><b>Framework preset:</b> <b>None</b> for plain HTML. Leave <b>Build command</b> and <b>Build output directory</b> empty. For React/Vite use <code>npm run build</code> and <code>dist</code>.</li>
             <li>Click <b>Save and Deploy</b>. Every change you commit on GitHub goes live by itself.</li>

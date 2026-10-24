@@ -166,6 +166,25 @@
     }
   }
 
+  // puts a character's face photo in a glyph box; the emoji shows until (and unless) the photo loads
+  function showFace(box, c, glyph) {
+    var src = c ? (c.face || ("assets/characters/" + c.id + "-face.jpg")) : "";
+    if (src && box.dataset.face === src && box.classList.contains("has-photo")) return;
+    box.dataset.face = src;
+    box.classList.remove("has-photo");
+    box.textContent = glyph;
+    if (!src) return;
+    var img = new Image();
+    img.className = "face-photo";
+    img.alt = "";
+    img.draggable = false;
+    img.onload = function () {
+      if (box.dataset.face !== src) return; // something else has been shown since
+      box.textContent = ""; box.appendChild(img); box.classList.add("has-photo");
+    };
+    img.src = src;
+  }
+
   function setFate(slot, data) {
     var li = el.fateList.querySelector('[data-slot="' + slot + '"]');
     var num = li.querySelector(".fate-num"), name = li.querySelector(".fate-name"), desc = li.querySelector(".fate-desc");
@@ -179,7 +198,7 @@
       var wasEmpty = name.textContent === "???";
       li.classList.add("is-filled");
       li.style.setProperty("--c", data.color || "#f4e3d7");
-      num.textContent = data.glyph || roman;
+      showFace(num, data.char, data.glyph || roman);
       name.textContent = data.name;
       desc.textContent = data.desc || "";
       if (must) {
@@ -193,7 +212,7 @@
       }
       if (wasEmpty && data.fresh) { li.classList.remove("is-new"); void li.offsetWidth; li.classList.add("is-new"); }
     } else {
-      num.textContent = roman;
+      showFace(num, null, roman);
       name.textContent = data && data.pendingName ? data.pendingName : "???";
       desc.textContent = data && data.pendingDesc ? data.pendingDesc : "";
       if (must) must.hidden = true;
@@ -223,7 +242,7 @@
       }
     }
 
-    setFate(1, c ? { name: c.name, desc: c.lore, glyph: c.glyph, color: c.color, fresh: fresh } : { current: stage === "soul" });
+    setFate(1, c ? { name: c.name, desc: c.lore, glyph: c.glyph, char: c, color: c.color, fresh: fresh } : { current: stage === "soul" });
 
     var p = c && typeof s.problem === "number" ? c.problems[s.problem] : null;
     setFate(2, p ? { name: p.t, desc: p.d, glyph: "📜", color: c.color, fresh: fresh } : { current: stage === "curse" });
@@ -355,7 +374,7 @@
       var k = D.keeper;
       return { id: "keeper", name: k.name, short: k.name, glyph: k.glyph, color: k.color, spin: k.spin, idle: k.idle };
     }
-    return { id: c.id, name: c.name, short: c.short, glyph: c.glyph, color: c.color, spin: c.spin, idle: c.idle };
+    return { id: c.id, name: c.name, short: c.short, glyph: c.glyph, char: c, color: c.color, spin: c.spin, idle: c.idle };
   }
 
   var WHEEL_NAMES = { soul: "soul", curse: "curse", hex: "hex", twist: "twist" };
@@ -363,7 +382,7 @@
   function updateSpinner(stage, line) {
     var who = spinnerFor(stage);
     el.spinner.style.setProperty("--c", who.color);
-    el.spinnerFace.textContent = who.glyph;
+    showFace(el.spinnerFace, who.char, who.glyph);
     el.spinnerName.textContent = who.name;
     el.spinner.classList.remove("impatient");
     if (line) { el.spinnerLine.textContent = line; return; }
