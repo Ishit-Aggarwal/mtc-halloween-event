@@ -189,6 +189,13 @@
     </div>
   </header>
 
+  <!-- Persistent 5-Minute Shutdown Banner -->
+  <div class="system-shutdown-banner" id="systemShutdownBanner" hidden>
+    <span class="shutdown-pulse">⚠️</span>
+    <span class="shutdown-text" id="shutdownBannerText">SYSTEM SHUTDOWN IN <span id="shutdownCountdown">05:00</span> · SUBMIT YOUR PROJECT</span>
+    <span class="shutdown-pulse">⚠️</span>
+  </div>
+
   <main class="altar" id="app">
 
     <section class="hero">
@@ -1260,6 +1267,9 @@ git push</code></pre>
               <input id="hostImport" type="file" accept="application/json,.json">
             </label>
             <button class="btn btn-ghost btn-sm" id="hostFree" type="button">Free this phone for a new team</button>
+            <button class="btn btn-blood btn-sm" id="hostTriggerCorruption" type="button">⚡ Trigger 15-Min Corruption Alert</button>
+            <button class="btn btn-blood btn-sm" id="hostTriggerFiveMin" type="button">⏳ Trigger Final 5 Min Warning</button>
+            <button class="btn btn-blood btn-sm" id="hostTriggerZeroHour" type="button">🔒 Trigger Zero Hour (Lockdown)</button>
             <button class="btn btn-blood btn-sm" id="hostReset" type="button">Wipe entire ledger</button>
           </div>
           <p class="host-note" id="hostNote"></p>
@@ -1392,6 +1402,7 @@ git push</code></pre>
         <!-- Big Cinematic Narrative Transmission (Centrally Staged, Red Ambient Glow) -->
         <div class="cutscene-cinema-wrap" id="cutsceneCinemaWrap" hidden>
           <div class="cinema-text-stage" id="cinemaTextStage">
+            <p class="cinema-text-kicker" id="cinemaTextKicker" hidden></p>
             <h2 class="cinema-text-line" id="cinemaTextLine"></h2>
           </div>
         </div>

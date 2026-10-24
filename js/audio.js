@@ -1157,6 +1157,35 @@
       if (Sound.thunder) Sound.thunder();
     },
 
+    startClockTick: function () {
+      if (!enabled || !ctx || Sound._clockInterval) return;
+      function tick() {
+        if (!enabled || !ctx) return;
+        var t = ctx.currentTime;
+        var osc = ctx.createOscillator(); osc.type = "triangle";
+        osc.frequency.setValueAtTime(1400, t);
+        osc.frequency.exponentialRampToValueAtTime(320, t + 0.018);
+
+        var g = ctx.createGain();
+        g.gain.setValueAtTime(0.0001, t);
+        // Low volume so teams can easily talk
+        g.gain.linearRampToValueAtTime(0.02, t + 0.002);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.02);
+
+        osc.connect(g); g.connect(fxBus);
+        osc.start(t); osc.stop(t + 0.025);
+      }
+      tick();
+      Sound._clockInterval = setInterval(tick, 1000);
+    },
+
+    stopClockTick: function () {
+      if (Sound._clockInterval) {
+        clearInterval(Sound._clockInterval);
+        Sound._clockInterval = null;
+      }
+    },
+
     // browsers suspend audio in background tabs; resume on return
     wake: function () { if (ctx && enabled && ctx.state === "suspended") ctx.resume(); }
   };

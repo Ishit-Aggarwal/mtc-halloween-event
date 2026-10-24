@@ -51,7 +51,13 @@
     subLiveLink: $("subLiveLink"), subRepoLink: $("subRepoLink"),
     subZipDownload: $("subZipDownload"), subZipCloudLink: $("subZipCloudLink"),
     subEditBtn: $("subEditBtn"),
-    viewTabs: $("viewTabs"), tabMission: $("tabMission"), tabWheel: $("tabWheel")
+    viewTabs: $("viewTabs"), tabMission: $("tabMission"), tabWheel: $("tabWheel"),
+    systemShutdownBanner: $("systemShutdownBanner"),
+    shutdownCountdown: $("shutdownCountdown"),
+    shutdownBannerText: $("shutdownBannerText"),
+    hostTriggerCorruption: $("hostTriggerCorruption"),
+    hostTriggerFiveMin: $("hostTriggerFiveMin"),
+    hostTriggerZeroHour: $("hostTriggerZeroHour")
   };
 
   var wheel = new window.Wheel(el.canvas, el.rotor, el.pointer);
@@ -489,7 +495,11 @@
     if (left <= 0) {
       window.Sound.heartbeat(0); lastBpm = 0;
       stopTimer();
-      unlockTwist();
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playCorruptionCutscene === "function") {
+        window.OtherSideCutscene.playCorruptionCutscene();
+      } else {
+        unlockTwist();
+      }
     }
   }
   function startTimer() {
@@ -1428,7 +1438,116 @@
     if (window.Sound.bell) window.Sound.bell();
     return "ok";
   }
-  window.App = { claimEgg: claimEgg, hasEgg: function (id) { return !!(session && session.eggs && session.eggs.indexOf(id) >= 0); } };
+
+  var shutdownTimerId = null;
+  var shutdownSecondsLeft = 300; // 5 minutes
+
+  function startShutdownCountdown(durationSeconds) {
+    if (durationSeconds != null) shutdownSecondsLeft = durationSeconds;
+    else if (shutdownSecondsLeft <= 0 || shutdownSecondsLeft > 300) shutdownSecondsLeft = 300;
+
+    if (el.systemShutdownBanner) {
+      el.systemShutdownBanner.hidden = false;
+    }
+    setView("mission", true);
+    if (el.submissionCard) {
+      el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    if (window.Sound && window.Sound.startClockTick) {
+      window.Sound.startClockTick();
+    }
+
+    if (shutdownTimerId) clearInterval(shutdownTimerId);
+
+    function tickShutdown() {
+      if (el.shutdownCountdown) {
+        var m = Math.floor(shutdownSecondsLeft / 60);
+        var s = shutdownSecondsLeft % 60;
+        el.shutdownCountdown.textContent = (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+      }
+
+      if (shutdownSecondsLeft <= 0) {
+        clearInterval(shutdownTimerId);
+        shutdownTimerId = null;
+        if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playZeroHourCutscene === "function") {
+          window.OtherSideCutscene.playZeroHourCutscene();
+        } else {
+          lockSubmissions();
+        }
+        return;
+      }
+      shutdownSecondsLeft--;
+    }
+
+    tickShutdown();
+    shutdownTimerId = setInterval(tickShutdown, 1000);
+  }
+
+  function stopShutdownCountdown() {
+    if (shutdownTimerId) {
+      clearInterval(shutdownTimerId);
+      shutdownTimerId = null;
+    }
+  }
+
+  function lockSubmissions() {
+    stopShutdownCountdown();
+    if (window.Sound && window.Sound.stopClockTick) {
+      window.Sound.stopClockTick();
+    }
+    if (window.Sound && window.Sound.cutsceneAlarm) {
+      window.Sound.cutsceneAlarm();
+    }
+
+    if (el.systemShutdownBanner) {
+      el.systemShutdownBanner.hidden = false;
+    }
+    if (el.shutdownBannerText) {
+      el.shutdownBannerText.innerHTML = "🔒 <strong>BUILD WINDOW CLOSED · SUBMISSIONS LOCKED</strong> 🔒";
+    }
+
+    // Lock all submission controls
+    if (el.subUrl) el.subUrl.disabled = true;
+    if (el.subRepo) el.subRepo.disabled = true;
+    if (el.subZipFile) el.subZipFile.disabled = true;
+    if (el.subZipLink) el.subZipLink.disabled = true;
+    if (el.subSubmitBtn) {
+      el.subSubmitBtn.disabled = true;
+      if (el.subSubmitLabel) el.subSubmitLabel.textContent = "Submissions Locked";
+    }
+
+    // Add prominent locked banner if not already present
+    var existingBadge = document.getElementById("subClosedLockedNotice");
+    if (!existingBadge && el.subForm) {
+      var badge = document.createElement("div");
+      badge.id = "subClosedLockedNotice";
+      badge.className = "sub-locked-badge bad";
+      badge.innerHTML = "<strong>BUILD WINDOW CLOSED!</strong><br>Submissions are permanently locked. The judges are reviewing entries.";
+      el.subForm.parentNode.insertBefore(badge, el.subForm);
+    }
+
+    announce("Build window closed! Submissions locked!");
+  }
+
+  window.App = {
+    claimEgg: claimEgg,
+    hasEgg: function (id) { return !!(session && session.eggs && session.eggs.indexOf(id) >= 0); },
+    onCorruptionCutsceneComplete: function () {
+      unlockTwist();
+      setView("wheel", true);
+    },
+    onFiveMinCutsceneComplete: function () {
+      startShutdownCountdown(300);
+    },
+    onZeroHourComplete: function () {
+      lockSubmissions();
+    },
+    startShutdownCountdown: startShutdownCountdown,
+    stopShutdownCountdown: stopShutdownCountdown,
+    lockSubmissions: lockSubmissions,
+    unlockTwist: unlockTwist
+  };
 
   function openModal(m) { m.hidden = false; var f = m.querySelector("button, input"); if (f) setTimeout(function () { f.focus(); }, 30); }
   function closeModal(m) { m.hidden = true; }
@@ -1783,6 +1902,33 @@
   $("hostJudges").addEventListener("click", function () {
     if (window.Ledger.isHost) window.Store.setJudgePass(D.judgeKey);
   });
+
+  if ($("hostTriggerCorruption")) {
+    $("hostTriggerCorruption").addEventListener("click", function () {
+      closeModal(el.host);
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playCorruptionCutscene === "function") {
+        window.OtherSideCutscene.playCorruptionCutscene();
+      }
+    });
+  }
+
+  if ($("hostTriggerFiveMin")) {
+    $("hostTriggerFiveMin").addEventListener("click", function () {
+      closeModal(el.host);
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playFiveMinCutscene === "function") {
+        window.OtherSideCutscene.playFiveMinCutscene();
+      }
+    });
+  }
+
+  if ($("hostTriggerZeroHour")) {
+    $("hostTriggerZeroHour").addEventListener("click", function () {
+      closeModal(el.host);
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playZeroHourCutscene === "function") {
+        window.OtherSideCutscene.playZeroHourCutscene();
+      }
+    });
+  }
 
   /* ---------- live updates ---------- */
 

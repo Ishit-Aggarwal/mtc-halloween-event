@@ -37,6 +37,22 @@
     "LET THE HAUNT BEGIN!"
   ];
 
+  var NARRATIVE_LINES_CORRUPTION = [
+    "You are rebuilding my world.",
+    "How... inconvenient.",
+    "Let's see what happens when your perfect little systems stop behaving.",
+    "Emergency protocol initiated.",
+    "Few minutes remain.",
+    "Don't disappoint me."
+  ];
+
+  var NARRATIVE_LINES_FIVE_MIN = [
+    "Five minutes, exorcists. Five minutes until the system shuts down.",
+    "Check your links. Check your interactions. Make sure your website actually works.",
+    "A terrifying design is great. A terrifying design that crashes is less great.",
+    "Five minutes. Finish strong."
+  ];
+
   // Canvas Modes
   var MODE = {
     PORTAL: 1,
@@ -84,6 +100,7 @@
       // Spooky Void & Cinema Typography Elements
       this.voidFigures = document.getElementById("voidFigures");
       this.cinemaWrap = document.getElementById("cutsceneCinemaWrap");
+      this.cinemaTextKicker = document.getElementById("cinemaTextKicker");
       this.cinemaTextLine = document.getElementById("cinemaTextLine");
       this.endcard = document.getElementById("cutsceneEndcard");
       this.endcardKicker = document.getElementById("endcardKicker");
@@ -252,6 +269,9 @@
     },
 
     resetVisuals: function () {
+      if (this.layer) {
+        this.layer.classList.remove("corruption-mode", "shutdown-mode");
+      }
       if (this.rig) {
         this.rig.className = "cutscene-rig";
       }
@@ -278,6 +298,10 @@
       if (this.cinemaWrap) {
         this.cinemaWrap.hidden = true;
       }
+      if (this.cinemaTextKicker) {
+        this.cinemaTextKicker.textContent = "";
+        this.cinemaTextKicker.hidden = true;
+      }
       if (this.cinemaTextLine) {
         this.cinemaTextLine.textContent = "";
         this.cinemaTextLine.className = "cinema-text-line";
@@ -290,7 +314,7 @@
     },
 
     play: function (type) {
-      this.cutsceneType = type === "hex" ? "hex" : "entry";
+      this.cutsceneType = (type === "hex" || type === "corruption" || type === "fiveMin" || type === "zeroHour") ? type : "entry";
       this.isActive = true;
       this.clearTimers();
       if (!this.layer) this.init();
@@ -331,6 +355,97 @@
           self.playCinematicNarrative();
         }, 650);
 
+        return;
+      }
+
+      if (this.cutsceneType === "corruption") {
+        // ========================================================
+        // CORRUPTION CUTSCENE: 15-MIN TIMEOUT EMERGENCY RED ALERT
+        // (Freezes timer, red strobe ambience, emergency sirens, Phantom dialogue)
+        // ========================================================
+        this.canvasMode = MODE.DARK_VOID;
+        if (this.layer) this.layer.classList.add("corruption-mode");
+        this.startRenderLoop();
+
+        if (this.voidFigures) {
+          this.voidFigures.hidden = false;
+          void this.voidFigures.offsetWidth;
+          this.voidFigures.classList.add("revealed");
+        }
+
+        if (this.cinemaTextKicker) {
+          this.cinemaTextKicker.hidden = false;
+          this.cinemaTextKicker.textContent = "🚨 EMERGENCY PROTOCOL INITIATED // SYSTEM COMPROMISED 🚨";
+        }
+
+        if (S.cutsceneStaticBurst) S.cutsceneStaticBurst();
+        if (S.cutsceneAlarm) S.cutsceneAlarm();
+        if (S.whisper) S.whisper();
+
+        this.delay(function () {
+          if (!self.isActive) return;
+          if (self.cinemaWrap) self.cinemaWrap.hidden = false;
+          self.playCinematicNarrative();
+        }, 600);
+
+        return;
+      }
+
+      if (this.cutsceneType === "fiveMin") {
+        // ========================================================
+        // FIVE-MINUTE CUTSCENE: SYSTEM SHUTDOWN WARNING IN 05:00
+        // (Ambient ticking begins, urgent siren alert, final sprint warning)
+        // ========================================================
+        this.canvasMode = MODE.DARK_VOID;
+        if (this.layer) this.layer.classList.add("shutdown-mode");
+        this.startRenderLoop();
+
+        if (this.voidFigures) {
+          this.voidFigures.hidden = false;
+          void this.voidFigures.offsetWidth;
+          this.voidFigures.classList.add("revealed");
+        }
+
+        if (this.cinemaTextKicker) {
+          this.cinemaTextKicker.hidden = false;
+          this.cinemaTextKicker.textContent = "⚠️ CRITICAL WARNING · 05:00 REMAINING ⚠️";
+        }
+
+        if (S.cutsceneAlarm) S.cutsceneAlarm();
+        if (S.startClockTick) S.startClockTick();
+
+        this.delay(function () {
+          if (!self.isActive) return;
+          if (self.cinemaWrap) self.cinemaWrap.hidden = false;
+          self.playCinematicNarrative();
+        }, 600);
+
+        return;
+      }
+
+      if (this.cutsceneType === "zeroHour") {
+        // ========================================================
+        // ZERO HOUR: BUILD WINDOW CLOSED! SUBMISSIONS LOCKED!
+        // ========================================================
+        this.canvasMode = MODE.DARK_VOID;
+        if (this.layer) this.layer.classList.add("shutdown-mode");
+        this.startRenderLoop();
+
+        if (S.stopClockTick) S.stopClockTick();
+        if (S.cutsceneFlashBang) S.cutsceneFlashBang();
+        if (S.cutsceneImpact) S.cutsceneImpact();
+
+        if (this.flash) {
+          this.flash.classList.add("bang");
+          setTimeout(function () {
+            if (self.flash) {
+              self.flash.classList.remove("bang");
+              self.flash.classList.add("fade");
+            }
+          }, 120);
+        }
+
+        this.showEndCard();
         return;
       }
 
@@ -780,8 +895,10 @@
       var currentTypeTimer = null;
       var isTyping = false;
       var pendingChars = [];
-      var isHex = this.cutsceneType === "hex";
-      var lines = isHex ? NARRATIVE_LINES_HEX : NARRATIVE_LINES_ENTRY;
+      var lines = NARRATIVE_LINES_ENTRY;
+      if (this.cutsceneType === "hex") lines = NARRATIVE_LINES_HEX;
+      else if (this.cutsceneType === "corruption") lines = NARRATIVE_LINES_CORRUPTION;
+      else if (this.cutsceneType === "fiveMin") lines = NARRATIVE_LINES_FIVE_MIN;
 
       function escapeHtml(str) {
         return String(str || "")
@@ -837,7 +954,13 @@
           textEl.className = "cinema-text-line";
 
           var isCountdown = (text === "Two..." || text === "One..." || text === "The timer begins in three...");
-          var isClimax = (text === "LET THE HAUNT BEGIN!");
+          var isClimax = (text === "LET THE HAUNT BEGIN!" || text === "Don't disappoint me." || text === "Five minutes. Finish strong.");
+
+          if (text === "Emergency protocol initiated.") {
+            if (window.Sound && window.Sound.cutsceneAlarm) {
+              window.Sound.cutsceneAlarm();
+            }
+          }
 
           if (text === "Two..." || text === "One...") {
             textEl.classList.add("countdown-num");
@@ -979,6 +1102,21 @@
           if (this.endcardTitle) this.endcardTitle.innerHTML = 'THE HAUNT IS LIVE<br><span class="highlight-glitch">LET THE HAUNT BEGIN</span>';
           if (this.endcardDesc) this.endcardDesc.innerHTML = 'Your assignments have been sealed in blood. The timer has begun.<br>Build a digital experience worthy of this realm before time expires.';
           if (this.proceedBtnText) this.proceedBtnText.textContent = "START BUILDING NOW →";
+        } else if (this.cutsceneType === "corruption") {
+          if (this.endcardKicker) this.endcardKicker.textContent = "CRITICAL ALERT · 15 MINUTES ELAPSED";
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'SYSTEM CORRUPTION ACTIVE<br><span class="highlight-glitch">THE TWIST AWAKENS</span>';
+          if (this.endcardDesc) this.endcardDesc.innerHTML = 'The Phantom has breached your build environment. An unexpected corruption has surfaced.<br>Face the Twist Wheel and accept your team\'s new handicap.';
+          if (this.proceedBtnText) this.proceedBtnText.textContent = "FACE THE TWIST →";
+        } else if (this.cutsceneType === "fiveMin") {
+          if (this.endcardKicker) this.endcardKicker.textContent = "FINAL COUNTDOWN · 05:00 REMAINING";
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'SYSTEM SHUTDOWN IN 05:00<br><span class="highlight-glitch">SUBMISSION WINDOW CLOSING</span>';
+          if (this.endcardDesc) this.endcardDesc.innerHTML = 'Check your links. Check your interactions. Make sure your website actually works.<br>Five minutes remaining. Finish strong.';
+          if (this.proceedBtnText) this.proceedBtnText.textContent = "RETURN TO SUBMISSIONS →";
+        } else if (this.cutsceneType === "zeroHour") {
+          if (this.endcardKicker) this.endcardKicker.textContent = "DEADLINE REACHED · WINDOW CLOSED";
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'BUILD WINDOW CLOSED!<br><span class="highlight-glitch">SUBMISSIONS LOCKED!</span>';
+          if (this.endcardDesc) this.endcardDesc.innerHTML = 'The digital veil has permanently sealed. No further submissions will be accepted.<br>The judges are now reviewing your creations.';
+          if (this.proceedBtnText) this.proceedBtnText.textContent = "VIEW LOCKED RECORD →";
         } else {
           if (this.endcardKicker) this.endcardKicker.textContent = "Microsoft Tech Community · Round 02";
           if (this.endcardTitle) this.endcardTitle.innerHTML = 'MISSION 02<br><span class="highlight-glitch">WEBSITE RESURRECTION</span>';
@@ -1010,13 +1148,13 @@
         this.layer.classList.remove("is-active");
       }
 
-      var wasHex = this.cutsceneType === "hex";
+      var completedType = this.cutsceneType;
 
       // Persist seen status in preferences
       try {
         if (window.Store && window.Store.setPref) {
-          if (wasHex) window.Store.setPref("hexCutsceneSeen", true);
-          else window.Store.setPref("cutsceneSeen", true);
+          if (completedType === "hex") window.Store.setPref("hexCutsceneSeen", true);
+          else if (completedType === "entry") window.Store.setPref("cutsceneSeen", true);
         }
       } catch (e) {}
 
@@ -1024,7 +1162,7 @@
         if (self.layer) self.layer.hidden = true;
         self.resetVisuals();
 
-        if (wasHex) {
+        if (completedType === "hex") {
           // Hex Cutscene completed: smooth handoff to Mission Workspace
           if (window.App && typeof window.App.onHexCutsceneComplete === "function") {
             window.App.onHexCutsceneComplete();
@@ -1033,6 +1171,29 @@
             if (tabMission) tabMission.click();
             var submissionCard = document.getElementById("submissionCard");
             if (submissionCard) submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        } else if (completedType === "corruption") {
+          // Corruption Cutscene completed: awaken the Twist Wheel!
+          if (window.App && typeof window.App.onCorruptionCutsceneComplete === "function") {
+            window.App.onCorruptionCutsceneComplete();
+          } else {
+            var tabWheel = document.getElementById("tabWheel");
+            if (tabWheel) tabWheel.click();
+          }
+        } else if (completedType === "fiveMin") {
+          // 5-Min Cutscene completed: handoff to persistent banner & submission focus
+          if (window.App && typeof window.App.onFiveMinCutsceneComplete === "function") {
+            window.App.onFiveMinCutsceneComplete();
+          } else {
+            var banner = document.getElementById("systemShutdownBanner");
+            if (banner) banner.hidden = false;
+            var tabMission2 = document.getElementById("tabMission");
+            if (tabMission2) tabMission2.click();
+          }
+        } else if (completedType === "zeroHour") {
+          // Zero Hour completed: lock down submissions permanently
+          if (window.App && typeof window.App.onZeroHourComplete === "function") {
+            window.App.onZeroHourComplete();
           }
         } else {
           // Entry Cutscene completed: handoff to main altar gate dismissal & Creatures.opening()
@@ -1051,6 +1212,18 @@
 
     playHexCutscene: function () {
       this.play("hex");
+    },
+
+    playCorruptionCutscene: function () {
+      this.play("corruption");
+    },
+
+    playFiveMinCutscene: function () {
+      this.play("fiveMin");
+    },
+
+    playZeroHourCutscene: function () {
+      this.play("zeroHour");
     },
 
     delay: function (fn, ms) {

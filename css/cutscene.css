@@ -23,6 +23,29 @@
   pointer-events: auto;
 }
 
+/* ---------- Cutscene Modes ---------- */
+.cutscene-layer.corruption-mode {
+  background: #0d0103;
+}
+
+.cutscene-layer.corruption-mode .cutscene-vignette {
+  background: radial-gradient(ellipse at center, rgba(180, 0, 0, 0.3) 0%, rgba(90, 0, 0, 0.68) 55%, rgba(12, 0, 3, 0.96) 100%);
+  animation: corruptionRedStrobe 1.6s ease-in-out infinite alternate;
+}
+
+@keyframes corruptionRedStrobe {
+  0% { opacity: 0.7; }
+  100% { opacity: 1; filter: brightness(1.2); }
+}
+
+.cutscene-layer.shutdown-mode {
+  background: #080102;
+}
+
+.cutscene-layer.shutdown-mode .cutscene-vignette {
+  background: radial-gradient(ellipse at center, rgba(140, 10, 0, 0.25) 0%, rgba(50, 2, 4, 0.75) 60%, rgba(5, 0, 1, 0.98) 100%);
+}
+
 /* ---------- 3D Camera Rig (Trauma Shakes & Dimensional Plunge) ---------- */
 .cutscene-rig {
   position: absolute;
@@ -490,6 +513,23 @@
 @keyframes bloodAuraBreathe {
   0% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.95); }
   100% { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+/* Cinematic Narrative Header / Emergency Kicker */
+.cinema-text-kicker {
+  margin: 0 0 16px;
+  font-family: var(--f-pixel), monospace;
+  font-size: clamp(12px, 1.8vw, 16px);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #ff3326;
+  text-shadow: 0 0 12px rgba(255, 51, 38, 0.9);
+  animation: kickerGlitchBlink 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes kickerGlitchBlink {
+  0%, 100% { opacity: 0.85; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.02); text-shadow: 0 0 18px #ff2216; }
 }
 
 /* ---------- Cinematic Spooky Blood Inscription Typography ---------- */
@@ -1012,4 +1052,53 @@
   background: var(--blood-hot, #ff3326);
   color: #fff;
   box-shadow: 0 0 10px rgba(255, 51, 38, 0.6);
+}
+
+/* ---------- Prominent System Shutdown Banner & Locked State ---------- */
+.system-shutdown-banner {
+  background: linear-gradient(90deg, rgba(150, 0, 0, 0.95), rgba(220, 20, 20, 0.98), rgba(150, 0, 0, 0.95));
+  border-bottom: 2px solid #ff3326;
+  box-shadow: 0 0 30px rgba(255, 34, 22, 0.75);
+  color: #fff;
+  font-family: var(--f-pixel), monospace;
+  font-size: clamp(12px, 2vw, 16px);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 95;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  animation: shutdownBannerPulse 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes shutdownBannerPulse {
+  0% { filter: brightness(0.95); }
+  100% { filter: brightness(1.25); box-shadow: 0 0 45px rgba(255, 34, 22, 0.9); }
+}
+
+.sub-locked-badge {
+  background: rgba(30, 2, 4, 0.9);
+  border: 1px solid #ff3326;
+  color: #ff3326;
+  font-family: var(--f-pixel), monospace;
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  border-radius: 4px;
+  text-align: center;
+  margin-top: 14px;
+  box-shadow: 0 0 18px rgba(255, 34, 22, 0.4);
+}
+
+.sub-locked-badge.bad {
+  border-color: #ff2216;
+  background: rgba(45, 2, 5, 0.95);
+  color: #ff6655;
 }
