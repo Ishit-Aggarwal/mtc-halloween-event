@@ -131,18 +131,15 @@
 
   /* ---------- wheel configs per stage ---------- */
 
+  // Any number of teams may share a character and a problem, so nothing is ever struck out.
   function soulSegments() {
     return D.characters.map(function (c) {
-      var used = window.Ledger.usedProblems(c.id);
-      var left = c.problems.length - Object.keys(used).length;
-      return { label: c.short, glyph: c.glyph, color: c.color, disabled: left <= 0 };
+      return { label: c.short, glyph: c.glyph, color: c.color, disabled: false };
     });
   }
   function curseSegments(c) {
-    var used = window.Ledger.usedProblems(c.id);
-    return c.problems.map(function (p, i) {
-      var mine = session && session.problem === i;
-      return { label: p.t, glyph: "", color: c.color, disabled: !!used[i] && !mine };
+    return c.problems.map(function (p) {
+      return { label: p.t, glyph: "", color: c.color, disabled: false };
     });
   }
   function hexSegments() {
@@ -306,7 +303,7 @@
       case "curse":
         segs = curseSegments(c); theme = { a: THEMES.curse.a, b: THEMES.curse.b, accent: c.color };
         kicker = "Step II · The Curse"; title = c.short + "'s Curse";
-        sub = "Choose the problem your team will build. Once you claim it, no other team can.";
+        sub = "Choose the problem your team will build.";
         break;
       case "hex":
         segs = hexSegments(); theme = THEMES.hex;
@@ -503,13 +500,7 @@
   /* ---------- spinning ---------- */
 
   async function chooseOutcome(stage) {
-    var i, options = [];
-    if (stage === "soul") {
-      var segs = soulSegments();
-      for (i = 0; i < segs.length; i++) if (!segs[i].disabled) options.push(i);
-      if (!options.length) return { error: "Every soul has been claimed. Ask the host to open a new ledger." };
-      return { index: pick(options) };
-    }
+    if (stage === "soul") return { index: rand(D.characters.length) };
     if (stage === "hex") return { index: rand(D.uiCurses.length) };
     if (stage === "twist") return { index: rand(D.twists.length) };
     return { error: "This wheel can't be spun right now." };
@@ -524,14 +515,15 @@
       session.hex = idx;
       session.hexAt = Date.now();
       session.unlockAt = session.hexAt + delayMinutes() * 60000;
-      window.Ledger.update(session.entryId, { hex: idx, hexAt: session.hexAt });
+      // older sessions still have a claim record; new ones keep everything on the team record
+      if (session.entryId) window.Ledger.update(session.entryId, { hex: idx, hexAt: session.hexAt });
     } else if (stage === "twist") {
       var me = session.charId, myHex = session.hex;
       var others = D.characters.filter(function (c) { return c.id !== me; });
       var curses = D.uiCurses.filter(function (h, i) { return i !== myHex; });
       session.twistExtra = { randomChar: pick(others).short, randomCurse: pick(curses).t };
       session.twist = idx;
-      window.Ledger.update(session.entryId, { twist: idx, twistText: fillTwist(D.twists[idx].d), doneAt: Date.now() });
+      if (session.entryId) window.Ledger.update(session.entryId, { twist: idx, twistText: fillTwist(D.twists[idx].d), doneAt: Date.now() });
     }
     // the result is locked in *before* the wheel stops — refreshing can't re-roll it
     session.pending = stage;
@@ -606,68 +598,32 @@
   function renderPicker() {
     var c = charById(session.charId);
     if (!c) return;
-    var used = window.Ledger.usedProblems(c.id);
     picker.style.setProperty("--accent", c.color);
     picker.innerHTML = "";
     c.problems.forEach(function (p, i) {
-      var taken = !!used[i] && session.problem !== i;
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "ps-option" + (taken ? " taken" : "");
-      b.disabled = taken || busy;
+      b.className = "ps-option";
+      b.disabled = busy;
       b.innerHTML = '<span class="ps-num"></span><span class="ps-title"></span><span class="ps-desc"></span><span class="ps-state"></span>';
       b.querySelector(".ps-num").textContent = "PS " + (i + 1);
       b.querySelector(".ps-title").textContent = p.t;
       b.querySelector(".ps-desc").textContent = p.d;
-      b.querySelector(".ps-state").textContent = taken ? "Claimed by another team" : "Choose this curse →";
+      b.querySelector(".ps-state").textContent = "Choose this curse →";
       b.addEventListener("click", function () { chooseProblem(i); });
       picker.appendChild(b);
     });
   }
 
-  async function chooseProblem(idx) {
+  // The choice is saved on the team's own record (saveProgress), which the
+  // judges' board and the host ledger read. Other teams may choose it too.
+  function chooseProblem(idx) {
     if (busy || !session || session.stage !== "curse") return;
-    var c = charById(session.charId);
-    var myKey = session.teamKey || window.Ledger.teamKey(session.team);
-    busy = true;
     resetIdle();
-    renderPicker();
-    el.sub.textContent = "Consulting The Other Side…";
-    // A claim that timed out on a bad network may still have landed — adopt
-    // it rather than letting this team take a second curse.
-    var entry = window.Ledger.entries().filter(function (e) { return e.teamKey === myKey && e.charId === c.id; })[0];
-    var error = null;
-    if (entry) idx = entry.problem;
-    else {
-      try {
-        entry = await window.Ledger.claim(session.team, myKey, c.id, idx);
-      } catch (err) {
-        error = window.Ledger.friendly(err);
-      }
-    }
-    busy = false;
-
-    if (entry) {
-      session.entryId = entry.id;
-      recordOutcome("curse", idx);
-      window.Sound.whoosh();
-      showCard("curse");
-      return;
-    }
-
-    var used = window.Ledger.usedProblems(c.id);
-    var left = c.problems.filter(function (p, i) { return !used[i]; }).length;
-    if (!error && !left) {
-      // every problem for this character got taken — send them back to the first wheel
-      session.charId = null; session.stage = "soul"; save();
-      render(true);
-      el.sub.textContent = "That soul's curses have all been claimed. Spin for a new soul.";
-      return;
-    }
-    render(false);
-    el.sub.textContent = error || "Another team claimed that curse a moment ago. Choose another.";
-    picker.classList.add("shake");
-    setTimeout(function () { picker.classList.remove("shake"); }, 500);
+    session.entryId = null;
+    recordOutcome("curse", idx);
+    window.Sound.whoosh();
+    showCard("curse");
   }
 
   /* ---------- reveal card ---------- */
@@ -1381,10 +1337,28 @@
     if (e.key === "Escape") Array.prototype.forEach.call(document.querySelectorAll(".modal"), closeModal);
   });
 
-  // the beginner's GitHub guide: from the top bar, and from the submission form
-  ["githubTopBtn", "githubGuideBtn"].forEach(function (id) {
+  // the beginner's hosting guide (GitHub and Vercel tabs): from the top bar, and from the submission form
+  var guide = $("githubModal");
+  function showGuideTab(name) {
+    Array.prototype.forEach.call(guide.querySelectorAll(".gh-tab"), function (t) {
+      var on = t.getAttribute("data-guide") === name;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    Array.prototype.forEach.call(guide.querySelectorAll(".gh-panel"), function (p) {
+      p.hidden = p.getAttribute("data-panel") !== name;
+    });
+    guide.querySelector(".gh-body").scrollTop = 0;
+  }
+  Array.prototype.forEach.call(guide.querySelectorAll(".gh-tab"), function (t) {
+    t.addEventListener("click", function () { showGuideTab(t.getAttribute("data-guide")); });
+  });
+  ["githubTopBtn", "githubGuideBtn", "vercelGuideBtn"].forEach(function (id) {
     var b = $(id);
-    if (b) b.addEventListener("click", function () { openModal($("githubModal")); });
+    if (b) b.addEventListener("click", function () {
+      showGuideTab(b.getAttribute("data-guide") || "github");
+      openModal(guide);
+    });
   });
 
   /* ---------- organisers: back to the sign-in page ---------- */
@@ -1499,14 +1473,28 @@
 
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
 
+  /** One row per team: its own saved record, filled in from any older claim records. */
+  function teamRecords() {
+    var L = window.Ledger, byKey = {};
+    L.teams().forEach(function (t) { byKey[t.key] = Object.assign({}, t); });
+    L.entries().forEach(function (e) {
+      var key = e.teamKey || L.teamKey(e.team || "");
+      var t = byKey[key] || (byKey[key] = { key: key, name: e.team, at: e.at });
+      ["charId", "problem", "hex", "hexAt", "twist", "twistText", "submissionUrl", "repoUrl", "submittedAt", "zipUrl", "zipName", "zipCloudUrl"]
+        .forEach(function (k) { if (t[k] == null && e[k] != null) t[k] = e[k]; });
+    });
+    return Object.keys(byKey).map(function (k) { return byKey[k]; })
+      .sort(function (a, b) { return (a.at || 0) - (b.at || 0); });
+  }
+
   function renderHost() {
     var L = window.Ledger;
-    var ledger = L.entries();
+    var ledger = teamRecords();
     var cloud = L.mode === "cloud";
     var canAct = L.isHost;
 
     $("hostMode").innerHTML = cloud
-      ? "Shared ledger · <b>" + esc(statusText(L.status)) + "</b> — every phone sees the same claims."
+      ? "Shared ledger · <b>" + esc(statusText(L.status)) + "</b> — every phone sees the same teams."
       : "Single-device mode — the ledger lives only in this browser. Add a Firebase config to share it across phones.";
     $("hostAuth").hidden = !cloud;
     $("hostSignedOut").hidden = canAct;
@@ -1521,23 +1509,26 @@
     $("hostCount").textContent = "(" + ledger.length + ")";
     if (document.activeElement !== $("hostDelay")) $("hostDelay").value = delayMinutes();
 
+    // how many teams each character has (characters can be shared, so this is just a tally)
+    var perChar = {}, most = 1;
+    ledger.forEach(function (t) { if (t.charId) { perChar[t.charId] = (perChar[t.charId] || 0) + 1; most = Math.max(most, perChar[t.charId]); } });
     $("hostStats").innerHTML = D.characters.map(function (c) {
-      var used = Object.keys(window.Ledger.usedProblems(c.id)).length, total = c.problems.length;
-      return '<div class="stat"><div class="stat-top"><span>' + c.glyph + " " + esc(c.short) + "</span><span>" + (total - used) + "/" + total + '</span></div><div class="stat-bar"><i style="width:' + (used / total * 100) + '%"></i></div></div>';
+      var n = perChar[c.id] || 0;
+      return '<div class="stat"><div class="stat-top"><span>' + c.glyph + " " + esc(c.short) + "</span><span>" + n + (n === 1 ? " team" : " teams") + '</span></div><div class="stat-bar"><i style="width:' + (n / most * 100) + '%"></i></div></div>';
     }).join("");
 
     var rows = ledger.slice().reverse().map(function (e, i) {
       var c = charById(e.charId);
-      var p = c && c.problems[e.problem];
+      var p = c && typeof e.problem === "number" ? c.problems[e.problem] : null;
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null;
       var t = typeof e.twist === "number" ? D.twists[e.twist] : null;
-      return "<tr><td class='muted'>" + (ledger.length - i) + "</td><td>" + esc(e.team) + "</td><td>" + (c ? c.glyph + " " + esc(c.short) : "?") +
-        "</td><td>" + (p ? esc(p.t) : "?") + "</td><td>" + (h ? esc(h.t) : "<span class='muted'>—</span>") +
-        "</td><td>" + (t ? esc(t.t) : "<span class='muted'>—</span>") + "</td><td class='muted'>" + new Date(e.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) +
-        "</td><td>" + (canAct ? "<button type='button' data-release='" + esc(e.id) + "'>Release</button>" : "") + "</td></tr>";
+      var dash = "<span class='muted'>—</span>";
+      return "<tr><td class='muted'>" + (ledger.length - i) + "</td><td>" + esc(e.name) + "</td><td>" + (c ? c.glyph + " " + esc(c.short) : dash) +
+        "</td><td>" + (p ? esc(p.t) : dash) + "</td><td>" + (h ? esc(h.t) : dash) +
+        "</td><td>" + (t ? esc(t.t) : dash) + "</td><td class='muted'>" + (e.at ? new Date(e.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—") + "</td></tr>";
     }).join("");
-    $("hostTable").innerHTML = "<thead><tr><th>#</th><th>Team</th><th>Soul</th><th>Curse</th><th>Hex</th><th>Twist</th><th>Time</th><th></th></tr></thead><tbody>" +
-      (rows || "<tr><td colspan='8' class='muted'>No souls claimed yet.</td></tr>") + "</tbody>";
+    $("hostTable").innerHTML = "<thead><tr><th>#</th><th>Team</th><th>Soul</th><th>Curse</th><th>Hex</th><th>Twist</th><th>Joined</th></tr></thead><tbody>" +
+      (rows || "<tr><td colspan='7' class='muted'>No teams yet.</td></tr>") + "</tbody>";
   }
 
   function openHost() { renderHost(); $("hostNote").textContent = ""; openModal(el.host); }
@@ -1548,16 +1539,6 @@
     n.classList.toggle("bad", !!bad);
   }
 
-  $("hostTable").addEventListener("click", async function (e) {
-    var b = e.target.closest("[data-release]");
-    if (!b) return;
-    if (!window.confirm("Release this claim? Its curse becomes available to other teams again.")) return;
-    try {
-      await window.Ledger.release(b.getAttribute("data-release"));
-      hostNote("Claim released.");
-    } catch (err) { hostNote(window.Ledger.friendly(err), true); }
-    renderHost();
-  });
 
   $("hostDelay").addEventListener("change", async function () {
     var v = parseFloat(this.value);
@@ -1596,24 +1577,21 @@
   function stamp() { return new Date().toISOString().slice(0, 16).replace(/[:T]/g, "-"); }
 
   $("hostExport").addEventListener("click", function () {
-    download("wheel-of-curses-ledger-" + stamp() + ".json", JSON.stringify(window.Ledger.entries(), null, 2), "application/json");
+    download("wheel-of-curses-ledger-" + stamp() + ".json", JSON.stringify(teamRecords(), null, 2), "application/json");
   });
   $("hostCsv").addEventListener("click", function () {
     var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
-    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Members", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Claimed at"].map(q).join(",")];
-    var teamsByKey = {};
-    window.Ledger.teams().forEach(function (t) { teamsByKey[t.key] = t; });
-    window.Ledger.entries().forEach(function (e) {
-      var tDoc = teamsByKey[e.teamKey || window.Ledger.teamKey(e.team || "")] || {};
-      var ldr = tDoc.leader || {};
-      var memList = (tDoc.members || []).map(function (m) {
+    var lines = [["Team", "Leader Name", "Leader Year", "Leader Branch", "Members", "Character", "Problem", "Problem brief", "UI hex", "Twist", "Twist brief", "Live Hosted URL", "GitHub Repo", "Source Code ZIP", "Cloud ZIP Link", "Submitted at", "Joined at"].map(q).join(",")];
+    teamRecords().forEach(function (e) {
+      var ldr = e.leader || {};
+      var memList = (e.members || []).map(function (m) {
         return m.name + (m.year || m.branch ? " (" + [m.year, m.branch].filter(Boolean).join(" - ") + ")" : "");
       }).join("; ");
       var c = charById(e.charId), p = c && c.problems[e.problem];
       var h = typeof e.hex === "number" ? D.uiCurses[e.hex] : null, t = typeof e.twist === "number" ? D.twists[e.twist] : null;
       var subTime = e.submittedAt ? new Date(e.submittedAt).toLocaleString() : "";
       lines.push([
-        e.team,
+        e.name,
         ldr.name || "",
         ldr.year || "",
         ldr.branch || "",
@@ -1694,7 +1672,7 @@
     requestAnimationFrame(function () {
       liveQueued = false;
       $("rulesDelay").textContent = delayMinutes();
-      // other phones' claims strike out segments on this wheel as they happen
+      // keep this phone's wheel in step with the shared ledger
       if (session && !busy && el.reveal.hidden && (session.stage === "soul" || session.stage === "curse")) render(false);
       if (!el.host.hidden) renderHost();
     });
@@ -1771,7 +1749,6 @@
         eggs: (t.eggs || []).slice()
       };
       ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "zipUrl", "zipName", "zipSize", "zipCloudUrl", "submittedAt", "leader", "members"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
-      if (restored.charId && typeof restored.problem === "number") restored.entryId = restored.charId + "__" + restored.problem;
       // "<stage>-spun" = the wheel had stopped but the card wasn't accepted yet
       var m = /^(soul|curse|hex|twist)-spun$/.exec(restored.stage);
       if (m) { restored.stage = m[1]; restored.pending = m[1]; }

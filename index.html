@@ -171,7 +171,7 @@
       <span class="brand-text">Microsoft Tech Community<small>Amity Noida</small></span>
     </div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="githubTopBtn" type="button" aria-label="GitHub help: how to put your site online" title="GitHub help: how to put your site online">
+      <button class="icon-btn" id="githubTopBtn" type="button" aria-label="Help: put your site online with GitHub or Vercel" title="Help: put your site online with GitHub or Vercel">
         <span class="help-mark">?</span>
       </button>
       <button class="icon-btn" id="decreeTopBtn" type="button" aria-label="The Decree of the Other Side" title="The Decree of the Other Side">
@@ -438,7 +438,8 @@
                       <li><strong>Host:</strong> Deploy your website online and ensure it is publicly accessible.</li>
                       <li><strong>Submit:</strong> Paste your live hosted link and provide your source code (GitHub repo, .zip upload, or Drive link) below so judges can evaluate your project.</li>
                     </ol>
-                    <button class="gh-open" id="githubGuideBtn" type="button">🐙 Never used GitHub? Open the step-by-step guide</button>
+                    <button class="gh-open" id="githubGuideBtn" type="button" data-guide="github">🐙 Never used GitHub? Open the step-by-step guide</button>
+                    <button class="gh-open" id="vercelGuideBtn" type="button" data-guide="vercel">▲ Want a .vercel.app link? Deploy with Vercel, step by step</button>
                     <div class="sub-platforms">
                       <span class="sub-platforms-title">Recommended Free Hosting Platforms:</span>
                       <div class="host-badges">
@@ -590,10 +591,15 @@
     <div class="modal-backdrop" data-close></div>
     <div class="modal-box gh-box" role="dialog" aria-modal="true" aria-labelledby="ghTitle">
       <header class="host-head">
-        <h2 id="ghTitle">GitHub Guide</h2>
-        <button class="icon-btn" type="button" data-close aria-label="Close the GitHub guide">✕</button>
+        <h2 id="ghTitle">Hosting Guide</h2>
+        <button class="icon-btn" type="button" data-close aria-label="Close the hosting guide">✕</button>
       </header>
+      <div class="gh-tabs" role="tablist" aria-label="Choose a guide">
+        <button class="gh-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="ghPanelGithub" data-guide="github">🐙 GitHub</button>
+        <button class="gh-tab" type="button" role="tab" aria-selected="false" aria-controls="ghPanelVercel" data-guide="vercel">▲ Vercel</button>
+      </div>
       <div class="gh-body">
+       <div class="gh-panel" id="ghPanelGithub" role="tabpanel" data-panel="github">
         <p class="gh-lead">Never used GitHub? No problem. Follow these steps in order and your site will be online with a link you can submit. No coding commands needed.</p>
 
         <div class="gh-quick">
@@ -700,8 +706,8 @@
             <p>No. A GitHub account, public repos and GitHub Pages are all free.</p>
           </details>
           <details>
-            <summary>Can we use Netlify or Vercel instead?</summary>
-            <p>Yes. Any working public link is fine. Both can connect to your GitHub repo and give you a link in a few clicks.</p>
+            <summary>Can we use Vercel or Netlify instead?</summary>
+            <p>Yes. Any working public link is fine. Open the <b>Vercel</b> tab at the top of this guide for step-by-step instructions.</p>
           </details>
           <details>
             <summary>How do I make a .zip of my project?</summary>
@@ -719,6 +725,95 @@ git push -u origin main</code></pre>
             <p>After that, every update is <code>git add .</code>, then <code>git commit -m "what changed"</code>, then <code>git push</code>. If you'd rather click than type, the free <a href="https://desktop.github.com" target="_blank" rel="noopener">GitHub Desktop</a> app does the same thing.</p>
           </details>
         </section>
+       </div>
+
+       <div class="gh-panel" id="ghPanelVercel" role="tabpanel" data-panel="vercel" hidden>
+        <p class="gh-lead">Vercel puts your site online for free and gives you a clean link like <code>your-project.vercel.app</code>. It reads your code from GitHub, so every time you update GitHub, your live site updates by itself.</p>
+
+        <div class="gh-quick">
+          <p class="gh-quick-title">The short version</p>
+          <ol>
+            <li>Put your code on GitHub (steps 1–3 in the <b>GitHub</b> tab)</li>
+            <li>Sign up to Vercel with your GitHub account</li>
+            <li>Import your repo</li>
+            <li>Click <b>Deploy</b></li>
+            <li>Paste your <code>.vercel.app</code> link in the Submit form</li>
+          </ol>
+        </div>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">1</span> Put your code on GitHub first</h3>
+          <p>Vercel takes your code from a GitHub repository. If you haven't yet, follow steps 1–3 in the <b>GitHub</b> tab: make an account, create a repo and upload your files. You can skip GitHub Pages.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">2</span> Create your Vercel account</h3>
+          <ol>
+            <li>Go to <a href="https://vercel.com/signup" target="_blank" rel="noopener">vercel.com/signup</a>.</li>
+            <li>Choose the <b>Hobby</b> plan (it's free) and type your name.</li>
+            <li>Click <b>Continue with GitHub</b> and sign in with the same GitHub account that has your repo.</li>
+            <li>When GitHub asks, click <b>Authorize Vercel</b>.</li>
+          </ol>
+          <p class="gh-tip">Signing up with GitHub links the two accounts, so Vercel can see your repos. You don't need a separate password.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">3</span> Import your repo</h3>
+          <ol>
+            <li>On your Vercel dashboard, click <b>Add New…</b> → <b>Project</b>.</li>
+            <li>Under <b>Import Git Repository</b>, find your repo and click <b>Import</b>.</li>
+            <li>Don't see it? Click <b>Adjust GitHub App Permissions</b> (or <b>Install</b>), choose your account, give Vercel access to that repo and save. Then it appears in the list.</li>
+          </ol>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">4</span> Deploy</h3>
+          <ol>
+            <li><b>Project Name:</b> this becomes your link, so keep it short, for example <code>deadpool-job-board</code>.</li>
+            <li><b>Framework Preset:</b> for a plain HTML/CSS/JavaScript site choose <b>Other</b>. If you used React or Vite, Vercel picks the right one for you.</li>
+            <li>Leave <b>Root Directory</b> and the build settings as they are.</li>
+            <li>Click <b>Deploy</b> and wait about a minute.</li>
+            <li>When you see the congratulations screen, click <b>Continue to Dashboard</b>. Your link is under <b>Domains</b>, for example <code>https://deadpool-job-board.vercel.app</code>. Open it and check your site works.</li>
+          </ol>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">5</span> Changed something? Update it</h3>
+          <p>Just update your files on GitHub (<b>Add file</b> → <b>Upload files</b> → <b>Commit changes</b>). Vercel notices and puts the new version online within a minute or two. You don't need to touch Vercel again.</p>
+        </section>
+
+        <section class="gh-sec">
+          <h3><span class="gh-step">6</span> Submit your links</h3>
+          <ul>
+            <li><b>Live Hosted Website URL:</b> your Vercel link, <code>https://your-project.vercel.app</code></li>
+            <li><b>GitHub Repository URL:</b> <code>https://github.com/your-username/your-repo-name</code></li>
+          </ul>
+        </section>
+
+        <section class="gh-sec">
+          <h3>Common problems</h3>
+          <details>
+            <summary>My link shows “404: NOT_FOUND”</summary>
+            <p>Vercel can't find your main page. It must be named exactly <code>index.html</code> (all lowercase) and sit at the top of your repo. If it's inside a folder, open your project in Vercel → <b>Settings</b> → <b>Build and Deployment</b> → set <b>Root Directory</b> to that folder, then redeploy (or move the files to the top of the repo on GitHub).</p>
+          </details>
+          <details>
+            <summary>My repo isn't in the import list</summary>
+            <p>Vercel only sees repos you've given it access to. On the import page click <b>Adjust GitHub App Permissions</b>, pick your account, allow the repo and save. Also check you signed in to Vercel with the same GitHub account that owns the repo.</p>
+          </details>
+          <details>
+            <summary>The deployment says “Build failed”</summary>
+            <p>For a plain HTML/CSS/JavaScript site, open the project's <b>Settings</b> → <b>Build and Deployment</b>, set <b>Framework Preset</b> to <b>Other</b>, turn off any custom <b>Build Command</b>, save and redeploy. For React/Vite, open the failed deployment and read the red error lines. It's usually a missing file or a typo, and fixing it on GitHub redeploys automatically.</p>
+          </details>
+          <details>
+            <summary>My changes aren't showing on the live site</summary>
+            <p>Check that you clicked <b>Commit changes</b> on GitHub, then look at the <b>Deployments</b> tab in Vercel: the newest one should say <b>Ready</b>. Then press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> on a Mac) on your site.</p>
+          </details>
+          <details>
+            <summary>Is it really free? Does everyone in the team need an account?</summary>
+            <p>Yes, the Hobby plan is free. Only the person who owns the GitHub repo needs a Vercel account. Everyone else just uses the link.</p>
+          </details>
+        </section>
+       </div>
 
         <p class="gh-foot">Still stuck? Ask any organiser. We're happy to help.</p>
       </div>
@@ -738,7 +833,7 @@ git push -u origin main</code></pre>
         <section class="host-auth" id="hostAuth" hidden>
           <form id="hostLogin" class="host-login" autocomplete="on">
             <div id="hostSignedOut">
-              <p class="host-hint">Anyone can view the ledger. Sign in as the host to release claims, change the timer or wipe the event.</p>
+              <p class="host-hint">Anyone can view the ledger. Sign in as the host to change the timer or wipe the event.</p>
               <div class="host-login-row">
                 <input id="hostEmail" type="email" placeholder="Host email" autocomplete="username" required>
                 <input id="hostPass" type="password" placeholder="Password" autocomplete="current-password" required>
@@ -752,7 +847,7 @@ git push -u origin main</code></pre>
           </form>
         </section>
         <section>
-          <h3>Souls remaining</h3>
+          <h3>Teams per soul</h3>
           <div class="host-stats" id="hostStats"></div>
         </section>
         <section>

@@ -1085,14 +1085,10 @@ body.lit .circuit-grid {
   box-shadow: 0 10px 30px rgba(0, 0, 0, .55), 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
 }
 .ps-option:disabled { cursor: default; }
-.ps-option.taken { opacity: .45; filter: grayscale(.7); }
-.ps-option.taken .ps-title { text-decoration: line-through; }
 .ps-num { font-family: var(--f-pixel); font-size: 12px; letter-spacing: .14em; color: var(--gold); }
 .ps-title { font-family: var(--f-title); font-size: clamp(19px, 2.6vw, 23px); line-height: 1.2; }
 .ps-desc { font-size: 15.5px; line-height: 1.45; color: var(--bone-dim); }
-.ps-state { margin-top: 4px; font-family: var(--f-type); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ember); }
-.ps-option.taken .ps-state { color: var(--bone-dim); }
-@keyframes shake {
+.ps-state { margin-top: 4px; font-family: var(--f-type); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--ember); }@keyframes shake {
   10%, 90% { transform: translate(-1px, 0); } 20%, 80% { transform: translate(3px, 1px); }
   30%, 50%, 70% { transform: translate(-5px, -1px); } 40%, 60% { transform: translate(5px, 1px); }
 }
@@ -1963,6 +1959,14 @@ body.lit .circuit-grid {
 .gh-body ol, .gh-body ul { margin: 6px 0; padding-left: 22px; }
 .gh-body li { margin: 4px 0; }
 .gh-lead { margin: 14px 0; font-size: 16.5px; }
+.gh-tabs { display: flex; gap: 8px; padding: 12px 22px 0; border-bottom: 1px solid rgba(244, 227, 215, .1); }
+.gh-tab {
+  padding: 9px 18px; cursor: pointer; font-family: var(--f-type); font-size: 15px; letter-spacing: .06em; color: var(--bone-dim);
+  background: none; border: 1px solid transparent; border-bottom: 0; border-radius: 8px 8px 0 0; margin-bottom: -1px;
+}
+.gh-tab:hover, .gh-tab:focus-visible { outline: none; color: var(--bone); }
+.gh-tab.is-active { color: var(--bone); background: #120506; border-color: rgba(244, 227, 215, .14); box-shadow: inset 0 2px 0 var(--ember); }
+.gh-panel[hidden] { display: none; }
 .gh-quick { margin: 0 0 8px; padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255, 122, 26, .45); background: rgba(255, 122, 26, .07); }
 .gh-quick-title { margin: 0 0 4px; font-family: var(--f-type); font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--pumpkin); }
 .gh-sec { padding: 16px 0 6px; border-top: 1px solid rgba(244, 227, 215, .08); margin-top: 14px; }
