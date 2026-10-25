@@ -19,9 +19,7 @@ pnpm-debug.log*
 credentials.json
 client_secret*.json
 
-# Firebase & local caches
-.firebase/
-.firebaserc
+# local caches
 *.log
 
 # OS clutter & IDEs

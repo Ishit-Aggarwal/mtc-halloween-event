@@ -1851,7 +1851,7 @@
 
     $("hostMode").innerHTML = cloud
       ? "Shared ledger · <b>" + esc(statusText(L.status)) + "</b> — every phone sees the same teams."
-      : "Single-device mode — the ledger lives only in this browser. Add a Firebase config to share it across phones.";
+      : "Single-device mode — the ledger lives only in this browser. Add a Supabase config to share it across phones.";
     $("hostAuth").hidden = !cloud;
     $("hostSignedOut").hidden = canAct;
     $("hostSignedIn").hidden = !canAct;

@@ -94,14 +94,14 @@ Open the host ledger by typing the **host word** into the team-name box and pres
 From the ledger you can:
 - See how many teams each character has, and every team's results
 - Change the twist delay (useful for a dry run: set it to 0.5)
-- **Free this phone** so a new team can register on it (e.g. after a test run). In shared mode, sign out of the host account afterwards so the phone gets a fresh identity.
+- **Free this phone** so a new team can register on it (e.g. after a test run). In shared mode, sign out of the host account before handing the phone to a team.
 - Export the ledger as JSON or CSV (CSV opens in Excel / Sheets)
 - Wipe everything (you must type `WIPE` to confirm)
 
 With the shared ledger on, anyone can *view* this panel. Changing the timer and wiping need the host sign-in.
 
 ## Teams on their own phones: the shared ledger
-To let every phone share one ledger, follow **[SETUP-FIREBASE.md](SETUP-FIREBASE.md)** (about 15 minutes, free plan).
+To let every phone share one ledger, follow **[SETUP-SUPABASE.md](SETUP-SUPABASE.md)** (about 10 minutes, free plan).
 
 Once it's set up:
 - **Shared, not exclusive.** Any number of teams can have the same character and problem. Each team's choices live on its own team record.
@@ -109,7 +109,7 @@ Once it's set up:
 - **Host sign-in.** The host signs in inside the host ledger. Twist-delay changes then apply to every phone.
 - **Saved progress.** Each team's full progress is saved to the shared ledger, which is what the judges' board reads. If a phone loses its local data mid-event, reopening the site on that phone picks up where the team left off.
 
-Without a Firebase config (`js/firebase-config.js` left as `null`), the site runs in **single-device mode**: the ledger lives in that one browser. That's fine for a single shared spinning station. In that mode the host panel can also merge ledgers exported from other devices.
+Without a Supabase config (`window.SUPABASE_CONFIG` in `js/supabase-config.js` set to `null`), the site runs in **single-device mode**: the ledger lives in that one browser. That's fine for a single shared spinning station. In that mode the host panel can also merge ledgers exported from other devices.
 
 ## Editing content
 All characters, problems, hexes, and twists live in `js/data.js`.
