@@ -134,50 +134,21 @@
     },
 
     // ----------------------------------------------------
-    // PREPARE TRANSPARENT ZOMBIE HAND TEXTURES
-    // Converts black isolation backgrounds into clean alpha cutouts
+    // ZOMBIE HAND TEXTURES
+    // The black backgrounds are already cut out (the old in-browser pass,
+    // baked into assets/figures/zombie-hand-*.webp so phones don't freeze
+    // doing it on load). Browsers without WebP get the PNG copy.
     // ----------------------------------------------------
     prepareZombieHands: function () {
-      var handImgs = [
-        document.getElementById("handLeftImg"),
-        document.getElementById("handRightImg"),
-        document.getElementById("handCenterImg")
-      ];
-      handImgs.forEach(function (img) {
+      ["handLeftImg", "handRightImg", "handCenterImg"].forEach(function (id) {
+        var img = document.getElementById(id);
         if (!img) return;
-        function makeTransparent() {
-          if (img.dataset.processed === "true") return;
-          try {
-            var canvas = document.createElement("canvas");
-            var nw = img.naturalWidth || 1376;
-            var nh = img.naturalHeight || 768;
-            canvas.width = nw;
-            canvas.height = nh;
-            var ctx = canvas.getContext("2d");
-            ctx.drawImage(img, 0, 0, nw, nh);
-            var imgData = ctx.getImageData(0, 0, nw, nh);
-            var d = imgData.data;
-            for (var i = 0; i < d.length; i += 4) {
-              var r = d[i], g = d[i + 1], b = d[i + 2];
-              var maxVal = Math.max(r, g, b);
-              if (maxVal < 14) {
-                d[i + 3] = 0;
-              } else if (maxVal < 36) {
-                d[i + 3] = Math.round(255 * ((maxVal - 14) / 22));
-              }
-            }
-            ctx.putImageData(imgData, 0, 0);
-            img.src = canvas.toDataURL("image/png");
-            img.dataset.processed = "true";
-          } catch (e) {
-            // CSS mix-blend-mode: screen handles it if canvas access is blocked
-          }
+        function fallback() {
+          img.removeEventListener("error", fallback);
+          img.src = img.getAttribute("src").replace(/\.webp$/, ".png");
         }
-        if (img.complete && img.naturalWidth > 0) {
-          makeTransparent();
-        } else {
-          img.addEventListener("load", makeTransparent);
-        }
+        if (img.complete && !img.naturalWidth) fallback();
+        else img.addEventListener("error", fallback);
       });
     },
 
@@ -675,7 +646,11 @@
 
       function render(now) {
         if (!self.isActive) return;
-        var elapsed = (now - self.startTime) * 0.001;
+        // the first frame can be stamped a hair before startTime; a negative
+        // time made the portal's radius negative, threw, and froze the canvas
+        var elapsed = Math.max(0, (now - self.startTime) * 0.001);
+        // ask for the next frame first, so one bad frame can't stop the loop
+        self.animFrame = requestAnimationFrame(render);
 
         if (self.canvasMode === MODE.PORTAL) {
           self.drawBloodyPortalFrame(elapsed);
@@ -684,8 +659,6 @@
         } else if (self.canvasMode === MODE.DARK_VOID) {
           self.drawDarkVoidAtmosphereFrame(elapsed);
         }
-
-        self.animFrame = requestAnimationFrame(render);
       }
 
       if (this.animFrame) cancelAnimationFrame(this.animFrame);

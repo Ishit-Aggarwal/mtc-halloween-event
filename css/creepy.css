@@ -49,25 +49,49 @@
   transition: opacity 1.1s ease, visibility 1.1s;
 }
 .gate.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+/* faded out for good: stop drawing it (its flickers otherwise kept running unseen) */
+html.gate-closed .gate.gone { display: none; }
+/* Whatever sits behind a full-screen cover (the gate, or the cutscene once it has
+   faded in) can't be seen, so it isn't painted or animated until the cover lifts.
+   Phones need that time for what IS on screen. The classes come from js/fx.js. */
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot),
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate) { visibility: hidden; }
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot),
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot) *,
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot) *::before,
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot) *::after,
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot)::before,
+html.behind-gate :is(.atmo, .creatures, .topbar, .altar, .site-foot)::after,
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate),
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate) *,
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate) *::before,
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate) *::after,
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate)::before,
+html.behind-cutscene :is(.atmo, .creatures, .topbar, .altar, .site-foot, .gate)::after { animation-play-state: paused !important; }
 /* the gate covers the whole page, so nothing behind it scrolls and no scrollbar shows */
 html:has(.gate:not(.gone)) { overflow: hidden; }
 .gate { scrollbar-width: none; }
 .gate::-webkit-scrollbar { display: none; }
-/* the dark breathes in and out, the light keeps failing, and something blinks in the corner */
-@property --gate-dim { syntax: "<number>"; inherits: false; initial-value: 0; }
-.gate::before, .gate::after { content: ""; position: fixed; pointer-events: none; }
+/* the dark breathes in and out, the light keeps failing, and something blinks in the corner.
+   Only transform and opacity move here, so phones animate it all on the GPU. */
+.gate::before, .gate::after, .gate-dim { content: ""; position: fixed; pointer-events: none; }
 .gate::before {
   inset: -12%;
-  background:
-    radial-gradient(ellipse at 50% 45%, transparent 34%, rgba(0, 0, 0, .7) 78%),
-    linear-gradient(rgba(0, 0, 0, var(--gate-dim)), rgba(0, 0, 0, var(--gate-dim)));
-  animation: gateBreathe 9s ease-in-out infinite alternate, gateFalter 11s linear infinite;
+  background: radial-gradient(ellipse at 50% 45%, transparent 34%, rgba(0, 0, 0, .7) 78%);
+  animation: gateBreathe 9s ease-in-out infinite alternate;
 }
 @keyframes gateBreathe { from { transform: scale(1.12); } to { transform: scale(.94); } }
+/* the failing light: a black veil that flickers in now and then */
+.gate-dim {
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  animation: gateFalter 11s linear infinite;
+}
 @keyframes gateFalter {
-  0%, 31%, 35%, 37%, 72%, 100% { --gate-dim: 0; }
-  32% { --gate-dim: .55; } 33% { --gate-dim: .15; } 34% { --gate-dim: .7; } 36% { --gate-dim: .3; }
-  73% { --gate-dim: .45; } 74% { --gate-dim: 0; }
+  0%, 31%, 35%, 37%, 72%, 100% { opacity: 0; }
+  32% { opacity: .55; } 33% { opacity: .15; } 34% { opacity: .7; } 36% { opacity: .3; }
+  73% { opacity: .45; } 74% { opacity: 0; }
 }
 .gate::after {
   top: 9%; left: 6%;
@@ -79,13 +103,16 @@ html:has(.gate:not(.gone)) { overflow: hidden; }
   opacity: 0;
   animation: gateEyes 19s ease-in-out 3s infinite;
 }
+/* top-left corner, then (unseen) over to the top-right: 6vw → calc(94vw - 34px) */
 @keyframes gateEyes {
-  0%, 40% { opacity: 0; left: 6%; transform: scaleY(1); }
-  45% { opacity: .8; } 52% { transform: scaleY(1); } 53% { transform: scaleY(.1); } 54% { transform: scaleY(1); }
-  58% { opacity: .8; } 62% { opacity: 0; left: 6%; }
-  63%, 80% { opacity: 0; left: calc(94% - 34px); }
-  84% { opacity: .7; } 88% { transform: scaleY(1); } 89% { transform: scaleY(.1); } 90% { transform: scaleY(1); }
-  92% { opacity: .7; } 96%, 100% { opacity: 0; left: calc(94% - 34px); }
+  0%, 40% { opacity: 0; transform: translateX(0) scaleY(1); }
+  45% { opacity: .8; }
+  52% { transform: translateX(0) scaleY(1); } 53% { transform: translateX(0) scaleY(.1); } 54% { transform: translateX(0) scaleY(1); }
+  58% { opacity: .8; } 62% { opacity: 0; transform: translateX(0) scaleY(1); }
+  63%, 80% { opacity: 0; transform: translateX(calc(88vw - 34px)) scaleY(1); }
+  84% { opacity: .7; }
+  88% { transform: translateX(calc(88vw - 34px)) scaleY(1); } 89% { transform: translateX(calc(88vw - 34px)) scaleY(.1); } 90% { transform: translateX(calc(88vw - 34px)) scaleY(1); }
+  92% { opacity: .7; } 96%, 100% { opacity: 0; transform: translateX(calc(88vw - 34px)) scaleY(1); }
 }
 .gate-inner { position: relative; z-index: 1; max-width: 560px; margin: auto; }
 .gate-inner > * { animation: rise .9s cubic-bezier(.2, .8, .2, 1) both; }

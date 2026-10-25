@@ -534,8 +534,7 @@ body.lit .circuit-grid {
   border: 1px solid rgba(255, 60, 30, 0.38);
   border-radius: 40px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 60, 30, 0.16);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  /* no backdrop blur: the bar is 95% opaque, so it never showed, and phones paid for it every frame */
   position: relative;
   z-index: 5;
 }
@@ -608,8 +607,7 @@ body.lit .circuit-grid {
     inset 0 0 0 6px rgba(10, 2, 3, .85),
     inset 0 0 0 7px rgba(255, 90, 60, .22),
     inset 0 0 60px rgba(0, 0, 0, .85);
-  -webkit-backdrop-filter: blur(14px);
-  backdrop-filter: blur(14px);
+  /* no backdrop blur: this plate is 98-99% opaque, so it never showed, and phones paid for it every frame */
 }
 
 .ledger-panel .parchment {
@@ -1127,8 +1125,7 @@ body.lit .circuit-grid {
   border: 1px solid rgba(240, 90, 70, .25);
   background: rgba(14, 3, 5, 0.9);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(0, 0, 0, 0.4);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  /* no backdrop blur: the fates sit on the near-solid grimoire plate, so it never showed, and phones paid for it every frame */
   transition: border-color .4s, background .4s, box-shadow .4s;
 }
 .fate-num {
@@ -1206,8 +1203,7 @@ body.lit .circuit-grid {
     0 0 0 1px rgba(10, 2, 3, .9),
     0 12px 36px rgba(0, 0, 0, .85),
     inset 0 0 20px rgba(0, 0, 0, .7);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
+  /* no backdrop blur: this panel is 98-99% opaque, so it never showed, and phones paid for it every frame */
 }
 
 .sub-header {

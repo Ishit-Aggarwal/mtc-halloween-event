@@ -58,11 +58,17 @@
   Wheel.prototype.setSegments = function (segments, theme) {
     this.segments = segments;
     this.theme = theme || {};
+    // the app re-sends the same wheel whenever the shared ledger changes;
+    // a full redraw is costly on phones, so only draw when something differs
+    var sig = JSON.stringify([segments, this.theme]);
+    if (sig === this._drawnSig && this.rotor.clientWidth === this._drawnAt) return;
+    this._drawnSig = sig;
     this.draw();
   };
 
   Wheel.prototype.draw = function () {
     var n = this.segments.length;
+    if (!n) return; // nothing to draw yet (the fonts arriving before any wheel is set up)
     var cssSize = this.rotor.clientWidth || 400;
     this._drawnAt = this.rotor.clientWidth;
     var dpr = Math.min(window.devicePixelRatio || 1, 2);

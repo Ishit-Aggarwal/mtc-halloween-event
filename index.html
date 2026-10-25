@@ -10,6 +10,11 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- the shared ledger (Firebase): open these connections early so phones don't wait on them -->
+  <link rel="preconnect" href="https://www.gstatic.com">
+  <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin>
+  <link rel="dns-prefetch" href="https://identitytoolkit.googleapis.com">
+  <link rel="dns-prefetch" href="https://securetoken.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rye&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Oswald:wght@400;500;600;700&family=Pixelify+Sans:wght@500;700&family=Special+Elite&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/creepy.css">
@@ -146,6 +151,7 @@
 
   <!-- ============ ENTRY GATE (also unlocks audio & starts cutscene) ============ -->
   <div class="gate" id="gate">
+    <div class="gate-dim" aria-hidden="true"></div>
     <div class="gate-inner">
       <svg class="pixel-pumpkin" data-pixel-pumpkin viewBox="0 0 15 13" aria-hidden="true"></svg>
       <p class="gate-kicker">Microsoft Tech Community</p>
@@ -1424,17 +1430,17 @@ git push</code></pre>
       <div class="cutscene-claws-layer" id="cutsceneClawsLayer">
         <!-- Left Realistic Zombie Hand Gripping Bezel -->
         <div class="claw-wrap claw-left" id="clawLeft">
-          <img src="assets/figures/zombie-hand-left.jpg" id="handLeftImg" class="hand-img hand-img-left" alt="" draggable="false">
+          <img src="assets/figures/zombie-hand-left.webp" id="handLeftImg" fetchpriority="low" decoding="async" class="hand-img hand-img-left" alt="" draggable="false">
         </div>
 
         <!-- Right Realistic Zombie Hand Gripping Bezel -->
         <div class="claw-wrap claw-right" id="clawRight">
-          <img src="assets/figures/zombie-hand-right.jpg" id="handRightImg" class="hand-img hand-img-right" alt="" draggable="false">
+          <img src="assets/figures/zombie-hand-right.webp" id="handRightImg" fetchpriority="low" decoding="async" class="hand-img hand-img-right" alt="" draggable="false">
         </div>
 
         <!-- Center Realistic Zombie Hand Thrusting Forward in 3D Perspective -->
         <div class="claw-wrap claw-center" id="clawCenter">
-          <img src="assets/figures/zombie-hand-center.jpg" id="handCenterImg" class="hand-img hand-img-center" alt="" draggable="false">
+          <img src="assets/figures/zombie-hand-center.webp" id="handCenterImg" fetchpriority="low" decoding="async" class="hand-img hand-img-center" alt="" draggable="false">
         </div>
       </div>
 

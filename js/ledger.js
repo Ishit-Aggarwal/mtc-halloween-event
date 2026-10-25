@@ -97,12 +97,19 @@
   function loadSdk() {
     if (window.firebase && window.firebase.firestore) return Promise.resolve();
     if (mock) return loadScript("tests/mock-firebase.js");
+    // file storage is only needed to upload a ZIP, so it loads then (loadStorage)
     return Promise.all([
       loadScript(SDK + "firebase-app-compat.js"),
       loadScript(SDK + "firebase-auth-compat.js"),
-      loadScript(SDK + "firebase-firestore-compat.js"),
-      loadScript(SDK + "firebase-storage-compat.js").catch(function () { return null; })
+      loadScript(SDK + "firebase-firestore-compat.js")
     ]);
+  }
+  var storageLoad = null;
+  function loadStorage() {
+    if (window.firebase && window.firebase.storage) return Promise.resolve();
+    if (mock) return Promise.resolve();
+    if (!storageLoad) storageLoad = loadScript(SDK + "firebase-storage-compat.js").catch(function () { storageLoad = null; });
+    return storageLoad;
   }
 
   var subscribed = false, gotClaims = false;
@@ -242,6 +249,7 @@
     },
 
     uploadZip: async function (key, file, onProgress) {
+      if (window.firebase && cfg && cfg.storageBucket) await loadStorage();
       if (!window.firebase || !window.firebase.storage || !cfg || !cfg.storageBucket) {
         return null;
       }

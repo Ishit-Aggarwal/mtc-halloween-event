@@ -14,6 +14,38 @@
   if (lowPower) document.documentElement.classList.add("low-power");
   var SVGNS = "http://www.w3.org/2000/svg";
 
+  /* ---------- full-screen covers ---------- */
+  // While the entry gate is up, or the cutscene has faded in over everything,
+  // the page behind can't be seen: <html> gets behind-gate / behind-cutscene and
+  // css/creepy.css stops painting and animating it. Our own loops check covered().
+  var root = document.documentElement;
+  function covered() { return root.classList.contains("behind-gate") || root.classList.contains("behind-cutscene"); }
+  function watchCovers() {
+    var gate = document.getElementById("gate"), cut = document.getElementById("cutsceneLayer"), cutTimer = null, gateTimer = null;
+    function sync() {
+      var gateUp = !!gate && !gate.classList.contains("gone");
+      root.classList.toggle("behind-gate", gateUp);
+      // once the gate has faded out (1.1s), it leaves the page for good (gate-closed)
+      if (gateUp) { clearTimeout(gateTimer); gateTimer = null; root.classList.remove("gate-closed"); }
+      else if (gate && !gateTimer && !root.classList.contains("gate-closed")) {
+        gateTimer = setTimeout(function () { gateTimer = null; root.classList.add("gate-closed"); }, 1300);
+      }
+      var cutOn = !!cut && !cut.hidden && cut.classList.contains("is-active");
+      if (!cutOn) {
+        clearTimeout(cutTimer); cutTimer = null;
+        root.classList.remove("behind-cutscene");
+      } else if (!cutTimer && !root.classList.contains("behind-cutscene")) {
+        // only once its 0.6s fade-in is over, so nothing vanishes while it's see-through
+        cutTimer = setTimeout(function () { cutTimer = null; root.classList.add("behind-cutscene"); }, 700);
+      }
+    }
+    sync();
+    if (!window.MutationObserver) return;
+    var mo = new MutationObserver(sync);
+    if (gate) mo.observe(gate, { attributes: true, attributeFilter: ["class"] });
+    if (cut) mo.observe(cut, { attributes: true, attributeFilter: ["class", "hidden"] });
+  }
+
   // seeded RNG so the graveyard looks the same on every load
   function rng(seed) {
     return function () {
@@ -59,14 +91,51 @@
     }
   }
 
+  // The hill path (absolute M/L/C/Z only) as a fine polyline: [x, y, lengthSoFar, ...].
+  function flattenPath(d) {
+    var tok = d.match(/[MLCZ]|-?\d*\.?\d+(?:e-?\d+)?/gi), i = 0, cmd = "", out = [], x = 0, y = 0, sx = 0, sy = 0, len = 0;
+    if (!tok) return null;
+    function num() { return parseFloat(tok[i++]); }
+    function to(nx, ny) { len += Math.sqrt((nx - x) * (nx - x) + (ny - y) * (ny - y)); x = nx; y = ny; out.push(x, y, len); }
+    while (i < tok.length) {
+      if (/[a-z]/i.test(tok[i])) cmd = tok[i++];
+      if (cmd === "M") { x = sx = num(); y = sy = num(); out.push(x, y, len); cmd = "L"; }
+      else if (cmd === "L") to(num(), num());
+      else if (cmd === "C") {
+        var x0 = x, y0 = y, x1 = num(), y1 = num(), x2 = num(), y2 = num(), x3 = num(), y3 = num();
+        for (var s = 1; s <= 64; s++) {
+          var t = s / 64, u = 1 - t;
+          to(u * u * u * x0 + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3,
+             u * u * u * y0 + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y3);
+        }
+      }
+      else if (cmd === "Z" || cmd === "z") { to(sx, sy); cmd = ""; }
+      else return null; // anything else: let the browser measure it
+    }
+    return out;
+  }
+
   function topEdge(path, width) {
-    // sample the hill path to know where its top edge sits
+    // sample the hill path every 4 units along its length to know where its top edge sits
     var ys = new Array(Math.ceil(width / 10) + 1);
+    function sample(px, py) {
+      var b = Math.round(px / 10);
+      if (b >= 0 && b < ys.length && (ys[b] === undefined || py < ys[b])) ys[b] = py;
+    }
     try {
-      var L = path.getTotalLength();
-      for (var d = 0; d < L; d += 4) {
-        var p = path.getPointAtLength(d), b = Math.round(p.x / 10);
-        if (b >= 0 && b < ys.length && (ys[b] === undefined || p.y < ys[b])) ys[b] = p.y;
+      // worked out here rather than with getPointAtLength(), which phones
+      // took a second or two to answer hundreds of times on load
+      var pts = flattenPath(path.getAttribute("d") || "");
+      if (pts && pts.length > 3) {
+        var L = pts[pts.length - 1], k = 0;
+        for (var d = 0; d < L; d += 4) {
+          while (k + 5 < pts.length && pts[k + 5] < d) k += 3;
+          var seg = pts[k + 5] - pts[k + 2], f = seg > 0 ? (d - pts[k + 2]) / seg : 0;
+          sample(pts[k] + (pts[k + 3] - pts[k]) * f, pts[k + 1] + (pts[k + 4] - pts[k + 1]) * f);
+        }
+      } else {
+        var Lb = path.getTotalLength();
+        for (var db = 0; db < Lb; db += 4) { var p = path.getPointAtLength(db); sample(p.x, p.y); }
       }
     } catch (e) {}
     return function (x) { var v = ys[Math.round(x / 10)]; return v === undefined ? 300 : v; };
@@ -155,7 +224,7 @@
     var last = 0;
     function frame(t) {
       requestAnimationFrame(frame);
-      if (document.hidden) return;
+      if (document.hidden || covered()) { last = 0; return; } // nothing to see behind the gate
 
       // Yield 100% GPU/CPU during cutscenes or jumpscares
       var cutsceneActive = window.OtherSideCutscene && window.OtherSideCutscene.isActive;
@@ -212,7 +281,7 @@
     var host = document.getElementById("bats");
     if (!host || reduceMotion) return;
     function loop() {
-      if (!document.hidden) {
+      if (!document.hidden && !covered()) {
         var flock = Math.random() < 0.3 ? 3 : 1;
         for (var i = 0; i < flock; i++) setTimeout(function () { spawnBat(host); }, i * 260);
       }
@@ -263,24 +332,34 @@
   }
 
   // noReveal: the caller shows its own figures in this flash
+  // Everything that reads --lit lives inside .atmo, so it's set there: set on
+  // <html> it made phones restyle the whole page on every flicker. The page
+  // on top dims a little in the flash (the same calc as body.lit .altar in
+  // css/creepy.css), written straight onto those three elements for the same reason.
+  function setLit(atmo, dimmed, v) {
+    atmo.style.setProperty("--lit", v);
+    dimmed.forEach(function (d) { d.style.opacity = v === null ? "" : String(1 - v * 0.55); d.style.transition = v === null ? "" : "none"; });
+  }
   function strike(noReveal) {
     if (reduceMotion || striking || !document.getElementById("lightning")) return;
     striking = true;
-    var root = document.documentElement;
+    var atmo = document.querySelector(".atmo");
+    var dimmed = Array.prototype.slice.call(document.querySelectorAll(".altar, .site-foot, .topbar"));
     var steps = FLICKERS[Math.floor(Math.random() * FLICKERS.length)];
     var bolt = Math.random() < 0.8 ? makeBolt() : null;
     document.body.classList.add("lit");
     var i = 0;
     (function next() {
       if (i >= steps.length) {
-        root.style.setProperty("--lit", "0");
+        setLit(atmo, dimmed, null);
+        atmo.style.setProperty("--lit", "0");
         document.body.classList.remove("lit");
         if (bolt) bolt.remove();
         striking = false;
         return;
       }
       var s = steps[i++];
-      root.style.setProperty("--lit", s[0]);
+      setLit(atmo, dimmed, s[0]);
       if (bolt && i > 3) bolt.style.opacity = "0"; // the bolt is only in the first flickers
       setTimeout(next, s[1]);
     })();
@@ -533,6 +612,7 @@
   window.FX = { strike: strike };
 
   function start() {
+    watchCovers();
     vhFix();
     makePixelPumpkins();
     makeRansom();

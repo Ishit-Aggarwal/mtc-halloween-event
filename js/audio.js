@@ -15,6 +15,9 @@
   var Ctx = window.AudioContext || window.webkitAudioContext;
   var ctx = null, master = null, fxBus = null, musicBus = null, reverb = null, noiseBuf = null;
   var enabled = false;
+  // On the dev machine (localhost) everything still runs, but nothing reaches the speakers.
+  // The deployed site and phones on the network keep their sound.
+  var SILENT = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
   var droneNodes = null, musicTimer = null, heartTimer = null;
 
   /* ---------- setup ---------- */
@@ -29,15 +32,26 @@
     return buf;
   }
 
-  function init() {
+  // Just the AudioContext: enough to ask whether sound may start yet.
+  function makeCtx() {
     if (ctx || !Ctx) return !!ctx;
     try {
       // iPhones: play even with the ring/silent switch on
       try { if (navigator.audioSession) navigator.audioSession.type = "playback"; } catch (e) {}
       ctx = new Ctx();
+    } catch (e) { ctx = null; }
+    return !!ctx;
+  }
+
+  // The whole sound engine. Built only when sound is switched on, so a phone
+  // isn't busy making reverb while the page is still loading.
+  function init() {
+    if (master) return true;
+    if (!makeCtx()) return false;
+    try {
       var comp = ctx.createDynamicsCompressor();
       comp.threshold.value = -14; comp.ratio.value = 4;
-      master = ctx.createGain(); master.gain.value = 0.9;
+      master = ctx.createGain(); master.gain.value = SILENT ? 0 : 0.9;
       master.connect(comp); comp.connect(ctx.destination);
 
       reverb = ctx.createConvolver();
@@ -58,8 +72,8 @@
       noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
       var nd = noiseBuf.getChannelData(0);
       for (var i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
-    } catch (e) { ctx = null; }
-    return !!ctx;
+    } catch (e) { master = null; return false; }
+    return true;
   }
 
   function noise(loop) {
@@ -221,16 +235,24 @@
                 [27.55, 32.7], [34.5, 38.6], [41.15, 44.45], [48.15, 52.85], [55.45, 59.95]];
   var laughBuf = null, laughEl = null, lastLaugh = -1, laughLoading = false, laughQueued = false;
 
-  // Start downloading the laugh the moment the page opens, so the very first
-  // laugh (right as you enter the crypt) isn't lost waiting for the network.
-  var laughBytes = null;
-  try {
-    fetch(LAUGH_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
-      .then(function (ab) { laughBytes = ab; if (ctx) loadLaugh(); })
-      .catch(function () { laughBytes = false; if (ctx) loadLaugh(); });
-  } catch (e) { laughBytes = false; }
+  // Start downloading the laugh as soon as the page itself has loaded, so the
+  // very first laugh (right as you enter the crypt) isn't lost waiting for the
+  // network, without the 650 KB file slowing the page down on a phone.
+  var laughBytes = null, laughFetched = false;
+  function fetchLaugh() {
+    if (laughFetched) return;
+    laughFetched = true;
+    try {
+      fetch(LAUGH_URL).then(function (r) { if (!r.ok) throw new Error(r.status); return r.arrayBuffer(); })
+        .then(function (ab) { laughBytes = ab; if (ctx) loadLaugh(); })
+        .catch(function () { laughBytes = false; if (ctx) loadLaugh(); });
+    } catch (e) { laughBytes = false; }
+  }
+  if (document.readyState === "complete") fetchLaugh();
+  else window.addEventListener("load", fetchLaugh, { once: true });
 
   function loadLaugh() {
+    fetchLaugh(); // sound switched on before the page finished loading
     if (laughBuf || laughLoading || laughBytes === null) return;
     laughLoading = true;
     if (laughBytes) {
@@ -246,6 +268,7 @@
   function useElement() {
     laughEl = new Audio(LAUGH_URL);
     laughEl.preload = "auto";
+    laughEl.muted = SILENT;
     if (laughQueued) { laughQueued = false; setTimeout(function () { Sound.laugh(true); }, 300); }
   }
 
@@ -540,7 +563,7 @@
       if (navigator.getAutoplayPolicy) {
         try { return navigator.getAutoplayPolicy("audiocontext") === "allowed"; } catch (e) {}
       }
-      return init() && ctx.state === "running";
+      return makeCtx() && ctx.state === "running";
     },
 
     setEnabled: function (on) {
@@ -551,7 +574,7 @@
         startDrone();
         startMusic();
         loadLaugh();
-        if (laughEl) { laughEl.muted = true; laughEl.play().then(function () { laughEl.pause(); laughEl.muted = false; }).catch(function () {}); }
+        if (laughEl) { laughEl.muted = true; laughEl.play().then(function () { laughEl.pause(); laughEl.muted = SILENT; }).catch(function () {}); }
         haunt();
         laughLoop();
       } else if (ctx) {
