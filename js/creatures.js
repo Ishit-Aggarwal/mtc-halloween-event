@@ -239,6 +239,257 @@
     node.style.setProperty("--blur", (blur || 0) + "px");
   }
 
+  /* ---------- SOUL JUMPSCARE VIDEOS & HELPERS ---------- */
+
+  /**
+   * Map of character IDs to their jumpscare video assets in 'soul jumpscares/'
+   */
+  var CHARACTER_SCARE_VIDEOS = {
+    "annabelle": "soul jumpscares/ANNABELLE.mp4",
+    "deadpool": "soul jumpscares/DEADPOOL.mp4",
+    "kirmada": "soul jumpscares/KIRMADA.mp4",
+    "manjulika": "soul jumpscares/MONJULIKA.mp4",
+    "monjulika": "soul jumpscares/MONJULIKA.mp4",
+    "pennywise": "soul jumpscares/PENNYWISE.mp4",
+    "spiderman": "soul jumpscares/SPIDERMAN.mp4",
+    "stree": "soul jumpscares/STREE.mp4",
+    "thanos": "soul jumpscares/VALAK.mp4",
+    "valak": "soul jumpscares/VALAK.mp4",
+    "voldemort": "soul jumpscares/VOLDEMORT.mp4",
+    "wednesday": "soul jumpscares/WEDNESDAY.mp4"
+  };
+
+  function getScareVideo(ch) {
+    if (!ch) return null;
+    if (ch.video) return ch.video;
+    var cfg = ((window.CURSE_DATA && window.CURSE_DATA.characterScares) || {})[ch.id] || {};
+    if (cfg.video) return cfg.video;
+    var normId = String(ch.id || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+    return CHARACTER_SCARE_VIDEOS[normId] || CHARACTER_SCARE_VIDEOS[ch.id] || null;
+  }
+
+  var preloadedCharId = null;
+  function preloadScare(ch) {
+    if (!ch || !scaresOn || reduceMotion) return;
+    var videoSrc = getScareVideo(ch);
+    if (!videoSrc) return;
+    try {
+      var video = document.getElementById("scareVideoPlayer");
+      if (video && preloadedCharId !== ch.id) {
+        preloadedCharId = ch.id;
+        video.src = encodeURI(videoSrc);
+        video.preload = "auto";
+        video.load();
+      }
+    } catch (e) {
+      console.warn("Preload scare video error:", e);
+    }
+  }
+
+  function legacyCharacterScare(ch, done) {
+    done = done || function () {};
+    var cfg = ((window.CURSE_DATA && window.CURSE_DATA.characterScares) || {})[ch.id] || {};
+    var st = stage(ch.color);
+
+    var eyes = document.createElement("div");
+    eyes.className = "char-eyes";
+    eyes.innerHTML = "<i></i><i></i>";
+
+    var face = document.createElement("div");
+    face.className = "char-face";
+    if (cfg.image) {
+      var im = document.createElement("img");
+      im.src = cfg.image; im.alt = ""; im.draggable = false;
+      face.appendChild(im);
+    } else {
+      var g = document.createElement("span");
+      g.textContent = ch.glyph;
+      face.appendChild(g);
+    }
+    function size(s, blur) { face.style.setProperty("--s", s); face.style.setProperty("--blur", (blur || 0) + "px"); }
+    size(0.16, 3);
+
+    var cap = document.createElement("div");
+    cap.className = "char-line";
+    var nm = document.createElement("b"); nm.textContent = ch.name;
+    var ln = document.createElement("span"); ln.textContent = cfg.line || "";
+    cap.appendChild(nm); cap.appendChild(ln);
+
+    st.appendChild(eyes); st.appendChild(face); st.appendChild(cap);
+    st.classList.add("on", "cut");
+    if (S().breath) S().breath();
+
+    var t = 0;
+    function at(ms, fn) { t += ms; setTimeout(fn, t); }
+    at(500, function () { eyes.classList.add("show"); });
+    at(900, function () { eyes.classList.remove("show"); face.classList.add("show"); st.classList.remove("cut"); });
+    at(700, function () { st.classList.add("cut"); });
+    at(90, function () { size(0.5, 1); st.classList.remove("cut"); });
+    at(650, function () { st.classList.add("cut"); });
+    at(100, function () {
+      st.classList.remove("cut");
+      face.classList.add("lunge");
+      st.classList.add("hit");
+      var snd = S()[cfg.sound] || S().scream;
+      if (snd) snd.call(window.Sound);
+      if (cfg.sound && cfg.sound !== "scream" && S().scream) setTimeout(function () { S().scream(); }, 120);
+      flash(); shake();
+    });
+    at(300, function () { cap.classList.add("show"); });
+    at(1500, function () { st.classList.add("out"); });
+    at(420, function () { st.remove(); done(); });
+  }
+
+  function playVideoScare(ch, done) {
+    done = done || function () {};
+    if (typeof ch === "string") {
+      var cList = (window.CURSE_DATA && window.CURSE_DATA.characters) || [];
+      var found = null;
+      for (var i = 0; i < cList.length; i++) {
+        if (cList[i].id === ch) { found = cList[i]; break; }
+      }
+      ch = found || { id: ch, name: ch, color: "#c1121f" };
+    }
+    if (!ch) { done(); return; }
+
+    var videoSrc = getScareVideo(ch);
+    if (!videoSrc) {
+      legacyCharacterScare(ch, done);
+      return;
+    }
+
+    var layer = document.getElementById("scareVideoLayer");
+    var video = document.getElementById("scareVideoPlayer");
+    var skipBtn = document.getElementById("scareVideoSkip");
+
+    if (!layer || !video) {
+      legacyCharacterScare(ch, done);
+      return;
+    }
+
+    layer.style.setProperty("--scare-accent", ch.color || "#c1121f");
+
+    var isFinished = false;
+    var safetyTimer = null;
+    var keyListener = null;
+
+    function cleanup() {
+      if (keyListener) {
+        document.removeEventListener("keydown", keyListener);
+        keyListener = null;
+      }
+      if (skipBtn) skipBtn.onclick = null;
+      if (layer) layer.onclick = null;
+      if (safetyTimer) {
+        clearTimeout(safetyTimer);
+        safetyTimer = null;
+      }
+      video.onended = null;
+      video.onerror = null;
+    }
+
+    function finish() {
+      if (isFinished) return;
+      isFinished = true;
+      cleanup();
+
+      shake();
+      if (window.FX && window.FX.strike) window.FX.strike();
+
+      layer.classList.remove("impact");
+      layer.classList.add("fade-out");
+
+      setTimeout(function () {
+        try {
+          video.pause();
+          video.currentTime = 0;
+          video.removeAttribute("src");
+          video.load();
+        } catch (e) {}
+
+        layer.hidden = true;
+        layer.classList.remove("is-active", "fade-out");
+        preloadedCharId = null;
+
+        done();
+      }, 300);
+    }
+
+    if (skipBtn) {
+      skipBtn.onclick = function (e) {
+        e.stopPropagation();
+        finish();
+      };
+    }
+
+    keyListener = function (e) {
+      if (e.key === "Escape" || e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        finish();
+      }
+    };
+    document.addEventListener("keydown", keyListener);
+
+    layer.onclick = function (e) {
+      if (e.target !== skipBtn && !skipBtn.contains(e.target)) {
+        finish();
+      }
+    };
+
+    var encodedSrc = encodeURI(videoSrc);
+    if (!video.src || !video.src.includes(encodedSrc)) {
+      video.src = encodedSrc;
+      video.preload = "auto";
+      video.load();
+    }
+
+    var soundEnabled = (!window.Sound || window.Sound.enabled !== false);
+    video.muted = !soundEnabled;
+    video.volume = 1.0;
+
+    video.onended = function () {
+      finish();
+    };
+
+    video.onerror = function (err) {
+      console.warn("Jumpscare video error, falling back to legacy DOM scare:", err);
+      cleanup();
+      layer.hidden = true;
+      layer.classList.remove("is-active");
+      legacyCharacterScare(ch, done);
+    };
+
+    layer.hidden = false;
+    layer.classList.remove("fade-out");
+    void layer.offsetWidth;
+    layer.classList.add("is-active", "impact");
+
+    shake();
+    if (window.Sound && window.Sound.cutsceneImpact) {
+      window.Sound.cutsceneImpact();
+    }
+
+    var playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise.catch(function (err) {
+        console.warn("Autoplay with audio blocked, fallback to muted video + WebAudio scream:", err);
+        video.muted = true;
+        video.play().catch(function (err2) {
+          console.error("Playback failed entirely:", err2);
+          finish();
+        });
+        if (window.Sound && window.Sound.scream) {
+          window.Sound.scream();
+        }
+      });
+    }
+
+    // Safety timeout: all videos are 8-10s
+    safetyTimer = setTimeout(function () {
+      finish();
+    }, 11500);
+  }
+
   /* ---------- the big moments ---------- */
 
   var Creatures = {
@@ -391,66 +642,25 @@
     },
 
     /**
-     * A jump scare themed on the character a team just got.
-     * Lights out, two glowing eyes open in the dark, the character's face
-     * creeps closer in the flickering dark, then lunges with a sound and a
-     * creepy line in their voice. Calls done() when it is over.
-     * ch = a character from CURSE_DATA.characters.
+     * A jump scare themed on the character a team just got (Wheel I).
+     * Plays high-impact seamless cinematic jumpscare video from 'soul jumpscares/'.
+     * Falls back to legacy DOM character lunge if video is unavailable.
      */
     characterScare: function (ch, done) {
       done = done || function () {};
       if (!ch || !scaresOn || reduceMotion) { done(); return; }
-      var cfg = ((window.CURSE_DATA && window.CURSE_DATA.characterScares) || {})[ch.id] || {};
-      var st = stage(ch.color);
 
-      var eyes = document.createElement("div");
-      eyes.className = "char-eyes";
-      eyes.innerHTML = "<i></i><i></i>";
-
-      var face = document.createElement("div");
-      face.className = "char-face";
-      if (cfg.image) {
-        var im = document.createElement("img");
-        im.src = cfg.image; im.alt = ""; im.draggable = false;
-        face.appendChild(im);
-      } else {
-        var g = document.createElement("span");
-        g.textContent = ch.glyph;
-        face.appendChild(g);
+      var videoSrc = getScareVideo(ch);
+      if (videoSrc) {
+        playVideoScare(ch, done);
+        return;
       }
-      function size(s, blur) { face.style.setProperty("--s", s); face.style.setProperty("--blur", (blur || 0) + "px"); }
-      size(0.16, 3);
 
-      var cap = document.createElement("div");
-      cap.className = "char-line";
-      var nm = document.createElement("b"); nm.textContent = ch.name;
-      var ln = document.createElement("span"); ln.textContent = cfg.line || "";
-      cap.appendChild(nm); cap.appendChild(ln);
-
-      st.appendChild(eyes); st.appendChild(face); st.appendChild(cap);
-      st.classList.add("on", "cut");
-      if (S().breath) S().breath();
-
-      var t = 0;
-      function at(ms, fn) { t += ms; setTimeout(fn, t); }
-      at(500, function () { eyes.classList.add("show"); });                        // two eyes open
-      at(900, function () { eyes.classList.remove("show"); face.classList.add("show"); st.classList.remove("cut"); });  // a face, far away
-      at(700, function () { st.classList.add("cut"); });
-      at(90, function () { size(0.5, 1); st.classList.remove("cut"); });          // closer
-      at(650, function () { st.classList.add("cut"); });
-      at(100, function () {                                                        // HERE
-        st.classList.remove("cut");
-        face.classList.add("lunge");
-        st.classList.add("hit");
-        var snd = S()[cfg.sound] || S().scream;
-        if (snd) snd.call(window.Sound);
-        if (cfg.sound && cfg.sound !== "scream" && S().scream) setTimeout(function () { S().scream(); }, 120);
-        flash(); shake();
-      });
-      at(300, function () { cap.classList.add("show"); });
-      at(1500, function () { st.classList.add("out"); });
-      at(420, function () { st.remove(); done(); });
+      legacyCharacterScare(ch, done);
     },
+
+    preloadScare: preloadScare,
+    playVideoScare: playVideoScare,
 
     /** The twist wakes: the lights stutter, lightning, and a zombie crosses the moon. */
     awaken: function () {

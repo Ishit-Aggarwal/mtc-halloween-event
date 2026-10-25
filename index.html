@@ -1270,6 +1270,7 @@ git push</code></pre>
             <button class="btn btn-blood btn-sm" id="hostTriggerCorruption" type="button">⚡ Trigger 15-Min Corruption Alert</button>
             <button class="btn btn-blood btn-sm" id="hostTriggerFiveMin" type="button">⏳ Trigger Final 5 Min Warning</button>
             <button class="btn btn-blood btn-sm" id="hostTriggerZeroHour" type="button">🔒 Trigger Zero Hour (Lockdown)</button>
+            <button class="btn btn-ghost btn-sm" id="hostTestScare" type="button">👻 Preview Current Soul Jumpscare</button>
             <button class="btn btn-blood btn-sm" id="hostReset" type="button">Wipe entire ledger</button>
           </div>
           <p class="host-note" id="hostNote"></p>
@@ -1324,6 +1325,19 @@ git push</code></pre>
         </button>
       </footer>
     </div>
+  </div>
+
+  <!-- ============ SOUL JUMPSCARE VIDEO STAGE ============ -->
+  <div class="scare-video-layer" id="scareVideoLayer" hidden aria-hidden="true">
+    <div class="scare-video-backdrop" id="scareVideoBackdrop"></div>
+    <video class="scare-video-media" id="scareVideoPlayer" playsinline webkit-playsinline preload="auto"></video>
+    <div class="scare-video-overlay">
+      <div class="scare-video-scanlines"></div>
+      <div class="scare-video-vignette"></div>
+    </div>
+    <button class="scare-video-skip" id="scareVideoSkip" type="button" aria-label="Skip Jump Scare">
+      <span>SKIP</span> <kbd>ESC</kbd>
+    </button>
   </div>
 
   <!-- ============ THE OTHER SIDE: HORROR CUTSCENE ============ -->

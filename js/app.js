@@ -106,6 +106,7 @@
   function pick(list) { return list[rand(list.length)]; }
 
   function charById(id) {
+    if (id === "thanos") id = "valak";
     for (var i = 0; i < D.characters.length; i++) if (D.characters[i].id === id) return D.characters[i];
     return null;
   }
@@ -608,6 +609,9 @@
     }
 
     recordOutcome(stage, out.index);
+    if (stage === "soul" && window.Creatures && typeof window.Creatures.preloadScare === "function") {
+      window.Creatures.preloadScare(charById(session.charId));
+    }
 
     setSpinState(stage);
     el.stage.classList.add("spinning");
@@ -1926,6 +1930,16 @@
       closeModal(el.host);
       if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playZeroHourCutscene === "function") {
         window.OtherSideCutscene.playZeroHourCutscene();
+      }
+    });
+  }
+
+  if ($("hostTestScare")) {
+    $("hostTestScare").addEventListener("click", function () {
+      closeModal(el.host);
+      var targetChar = (session && session.charId && charById(session.charId)) || pick(D.characters);
+      if (window.Creatures && typeof window.Creatures.playVideoScare === "function") {
+        window.Creatures.playVideoScare(targetChar);
       }
     });
   }

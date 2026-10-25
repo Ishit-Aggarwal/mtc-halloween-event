@@ -277,6 +277,7 @@
       }
       if (this.vortex) {
         this.vortex.classList.remove("pull");
+        this.vortex.style.opacity = "";
       }
       if (this.chroma) {
         this.chroma.classList.remove("glitching");
@@ -556,6 +557,21 @@
         if (self.glassLeft) self.glassLeft.hidden = true;
         if (self.glassRight) self.glassRight.hidden = true;
 
+        // Dispel portal vortex & chromatic aberration overlay so wormhole has 100% clear view
+        if (self.vortex) {
+          self.vortex.classList.remove("pull");
+          self.vortex.style.opacity = "0";
+        }
+        if (self.chroma) {
+          self.chroma.classList.remove("glitching");
+        }
+
+        // Clean slate clear for wormhole tunnel
+        if (self.ctx) {
+          self.ctx.fillStyle = "#020002";
+          self.ctx.fillRect(0, 0, self.width, self.height);
+        }
+
         self.canvasMode = MODE.WARP_TUNNEL;
         self.warpSpeed = 1.0;
         self.targetWarpSpeed = 2.0;
@@ -722,91 +738,78 @@
     // ----------------------------------------------------
     drawWarpTunnelFrame: function (time) {
       var ctx = this.ctx, w = this.width, h = this.height;
-      var cx = w * 0.5 + Math.sin(time * 2.5) * 24;
-      var cy = h * 0.5 + Math.cos(time * 2.8) * 16;
+      if (!ctx || !w || !h) return;
+
+      var cx = w * 0.5 + Math.sin(time * 2.5) * 20;
+      var cy = h * 0.5 + Math.cos(time * 2.8) * 14;
 
       // Smooth speed interpolation (eliminates discrete stutter jumps)
       this.warpSpeed += (this.targetWarpSpeed - this.warpSpeed) * 0.08;
       var speedMult = this.warpSpeed;
 
-      // Single trailing clear
-      ctx.fillStyle = "rgba(2, 0, 2, 0.25)";
+      // Trailing clear (gives smooth motion blur without heavy composite filters)
+      ctx.fillStyle = "rgba(4, 0, 4, 0.28)";
       ctx.fillRect(0, 0, w, h);
 
-      // --- BATCH 1: CRIMSON VELOCITY STREAKS (ONE SINGLE STROKE) ---
-      ctx.strokeStyle = "rgba(255, 34, 22, 0.95)";
-      ctx.lineWidth = 2.4;
+      // Central Singularity Glow
+      var coreGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 140);
+      coreGrad.addColorStop(0, "rgba(255, 235, 220, 0.95)");
+      coreGrad.addColorStop(0.2, "rgba(255, 60, 30, 0.65)");
+      coreGrad.addColorStop(0.5, "rgba(180, 10, 15, 0.25)");
+      coreGrad.addColorStop(1, "transparent");
+      ctx.fillStyle = coreGrad;
       ctx.beginPath();
-      for (var c = 0; c < this.warpCrimson.length; c++) {
-        var sc = this.warpCrimson[c];
-        var prevZ_c = sc.z;
-        sc.z -= 32 * speedMult;
-        if (sc.z <= 15) {
-          sc.z = 1200;
-          var ac = Math.random() * Math.PI * 2;
-          var dc = 40 + Math.random() * 800;
-          sc.x = Math.cos(ac) * dc;
-          sc.y = Math.sin(ac) * dc;
-        }
-        var s0_c = FOCAL_LENGTH / prevZ_c;
-        var s1_c = FOCAL_LENGTH / sc.z;
-        ctx.moveTo(cx + sc.x * s0_c, cy + sc.y * s0_c);
-        ctx.lineTo(cx + sc.x * s1_c * sc.len, cy + sc.y * s1_c * sc.len);
-      }
-      ctx.stroke();
+      ctx.arc(cx, cy, 140, 0, Math.PI * 2);
+      ctx.fill();
 
-      // --- BATCH 2: AMBER / EMBER STREAKS (ONE SINGLE STROKE) ---
-      ctx.strokeStyle = "rgba(255, 122, 34, 0.92)";
-      ctx.lineWidth = 1.8;
-      ctx.beginPath();
-      for (var a = 0; a < this.warpAmber.length; a++) {
-        var sa = this.warpAmber[a];
-        var prevZ_a = sa.z;
-        sa.z -= 32 * speedMult;
-        if (sa.z <= 15) {
-          sa.z = 1200;
-          var aa = Math.random() * Math.PI * 2;
-          var da = 30 + Math.random() * 700;
-          sa.x = Math.cos(aa) * da;
-          sa.y = Math.sin(aa) * da;
+      // Batch streak renderer (eliminates erratic lines and prevents cross-screen jumps)
+      function drawStreakBatch(streaks, color, lineWidth, speedFactor, distMin, distMax) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = lineWidth;
+        ctx.beginPath();
+        var step = 34 * speedMult * speedFactor;
+        for (var i = 0; i < streaks.length; i++) {
+          var p = streaks[i];
+          p.z -= step;
+          if (p.z <= 16) {
+            p.z = 1000 + Math.random() * 200;
+            var angle = Math.random() * Math.PI * 2;
+            var dist = distMin + Math.random() * (distMax - distMin);
+            p.x = Math.cos(angle) * dist;
+            p.y = Math.sin(angle) * dist;
+            continue; // Skip drawing on the teleport frame so no crazy lines appear!
+          }
+          var tailZ = p.z + step * 1.5;
+          var s0 = FOCAL_LENGTH / tailZ;
+          var s1 = FOCAL_LENGTH / p.z;
+          var x0 = cx + p.x * s0;
+          var y0 = cy + p.y * s0;
+          var x1 = cx + p.x * s1;
+          var y1 = cy + p.y * s1;
+          ctx.moveTo(x0, y0);
+          ctx.lineTo(x1, y1);
         }
-        var s0_a = FOCAL_LENGTH / prevZ_a;
-        var s1_a = FOCAL_LENGTH / sa.z;
-        ctx.moveTo(cx + sa.x * s0_a, cy + sa.y * s0_a);
-        ctx.lineTo(cx + sa.x * s1_a * sa.len, cy + sa.y * s1_a * sa.len);
+        ctx.stroke();
       }
-      ctx.stroke();
 
-      // --- BATCH 3: CORE WHITE STREAKS (ONE SINGLE STROKE) ---
-      ctx.strokeStyle = "rgba(255, 240, 235, 0.96)";
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      for (var k = 0; k < this.warpWhite.length; k++) {
-        var sw = this.warpWhite[k];
-        var prevZ_w = sw.z;
-        sw.z -= 32 * speedMult;
-        if (sw.z <= 15) {
-          sw.z = 1200;
-          var ak = Math.random() * Math.PI * 2;
-          var dk = 20 + Math.random() * 600;
-          sw.x = Math.cos(ak) * dk;
-          sw.y = Math.sin(ak) * dk;
-        }
-        var s0_w = FOCAL_LENGTH / prevZ_w;
-        var s1_w = FOCAL_LENGTH / sw.z;
-        ctx.moveTo(cx + sw.x * s0_w, cy + sw.y * s0_w);
-        ctx.lineTo(cx + sw.x * s1_w * sw.len, cy + sw.y * s1_w * sw.len);
-      }
-      ctx.stroke();
+      // --- BATCH 1: CRIMSON VELOCITY STREAKS ---
+      drawStreakBatch(this.warpCrimson, "rgba(255, 34, 22, 0.95)", 2.4, 1.0, 40, 800);
 
-      // Concentric Occult Warp Rings (Zero shadowBlur, fast segmented arcs)
+      // --- BATCH 2: AMBER / EMBER STREAKS ---
+      drawStreakBatch(this.warpAmber, "rgba(255, 130, 35, 0.92)", 1.8, 1.1, 30, 700);
+
+      // --- BATCH 3: CORE WHITE STREAKS ---
+      drawStreakBatch(this.warpWhite, "rgba(255, 245, 240, 0.98)", 1.4, 1.25, 20, 550);
+
+      // --- Concentric Occult Warp Rings ---
       for (var r = 0; r < this.warpRings.length; r++) {
         var ring = this.warpRings[r];
         ring.z -= 16 * speedMult;
         ring.rot += ring.rotSpeed;
-        if (ring.z <= 15) {
+        if (ring.z <= 16) {
           ring.z = 1200;
           ring.rot = Math.random() * Math.PI * 2;
+          continue;
         }
 
         var scale = FOCAL_LENGTH / ring.z;

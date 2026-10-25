@@ -66,16 +66,21 @@ window.CURSE_DATA = {
   welcomeScare: "assets/scares/face.jpg",
 
   // The jump scare each character gives when a team lands on them (Wheel I).
+  //   video: path to the character's cinematic jumpscare MP4
   //   line:  the creepy line shown as it lunges
   //   sound: scream | groan | laugh | hiss | theremin
-  //   image: OPTIONAL path to your own scary picture (transparent PNG works best).
-  //          Leave it out to use the character's emoji as the face. Example:
-  //          image: "assets/scares/thanos.png"
   characterScares: {
-    "thanos":       { sound: "groan",    line: "I am inevitable. So is what's standing behind you." },
-    "kirmada":      { sound: "laugh",    line: "The spell is already cast. You just haven't felt it yet." },
-    "spiderman":    { sound: "hiss",     line: "Your spider-sense is screaming. Don't look up." },
-    "deadpool":     { sound: "laugh",    line: "Hey, you. Yeah, you reading this. Don't turn around." }
+    "voldemort":   { video: "soul jumpscares/VOLDEMORT.mp4", sound: "scream", line: "There is only power… and those too weak to seek it." },
+    "stree":       { video: "soul jumpscares/STREE.mp4", sound: "hiss", line: "O Stree, kal aana… par aaj raat yahan sirf mera raaj hai." },
+    "wednesday":   { video: "soul jumpscares/WEDNESDAY.mp4", sound: "whisper", line: "I find social interaction exhausting. Don't look behind you." },
+    "pennywise":   { video: "soul jumpscares/PENNYWISE.mp4", sound: "laugh", line: "You will float down here… we all float down here!" },
+    "annabelle":   { video: "soul jumpscares/ANNABELLE.mp4", sound: "groan", line: "Did you miss me? The glass is breaking…" },
+    "manjulika":   { video: "soul jumpscares/MONJULIKA.mp4", sound: "scream", line: "Ami je tomar… shudho je tomar… Mukti chai!" },
+    "valak":       { video: "soul jumpscares/VALAK.mp4", sound: "scream", line: "Forgive me father, for I have possessed your darkest prayers." },
+    "thanos":      { video: "soul jumpscares/VALAK.mp4", sound: "scream", line: "Forgive me father, for I have possessed your darkest prayers." },
+    "kirmada":     { video: "soul jumpscares/KIRMADA.mp4", sound: "laugh", line: "The spell is already cast. You just haven't felt it yet." },
+    "spiderman":   { video: "soul jumpscares/SPIDERMAN.mp4", sound: "hiss", line: "Your spider-sense is screaming. Don't look up." },
+    "deadpool":    { video: "soul jumpscares/DEADPOOL.mp4", sound: "laugh", line: "Hey, you. Yeah, you reading this. Don't turn around." }
   },
 
   characters: [
@@ -194,22 +199,23 @@ window.CURSE_DATA = {
       ]
     },
     {
-      id: "thanos",
-      name: "Thanos",
-      short: "Thanos",
-      glyph: "💎",
-      color: "#6a4c93",
-      avatar: "assets/characters/thanos.jpg",
-      archetype: "The Mad Titan & Infinity Seeker",
-      quote: "I am inevitable. And so is this wheel.",
-      brief: "Cosmic warlord hunting the six Infinity Stones. Build a galaxy-map tracker for the stones, a resource-balancing platform for struggling planets, or a threat-intel database on Earth's heroes.",
-      lore: "The Mad Titan of Titan. A cosmic conqueror who believes the universe must be balanced, whatever the cost.",
-      spin: "Fun isn't something one considers when balancing the universe… but this does put a smile on my face. SPIN!",
-      idle: "I am inevitable. Your hesitation is not. Spin, or I snap my fingers.",
+      id: "valak",
+      name: "Valak (The Nun)",
+      short: "Valak",
+      glyph: "✝️",
+      color: "#2a0845",
+      avatar: "assets/characters/valak.jpg",
+      face: "assets/characters/valak-face.jpg",
+      archetype: "The Defiler Demon & Unholy Abbess",
+      quote: "Forgive me father, for I have possessed your darkest prayers.",
+      brief: "Blasphemous demon haunting consecrated cloisters. Build an interactive haunted monastery floor map, a searchable forbidden archive of cursed artefacts, or an exorcism emergency response network.",
+      lore: "The Marquis of Snakes. A demonic entity masquerading in sacred vestments, haunting Romanian abbeys.",
+      spin: "The shadow of the cloister falls upon your fate. Spin into darkness.",
+      idle: "Pray as you will, mortal… your hesitation only feeds the defiler.",
       problems: [
-        { t: "The Infinity Stone Tracker", d: "The Infinity Stones are scattered across the universe, and the team cannot monitor their locations and status. Build a cosmic tracking dashboard with a galaxy map, stone profiles, and mission updates." },
-        { t: "The Universe Resource Crisis", d: "Planets face shortages of food, energy, and other essential resources. Build a fictional resource-allocation platform that displays planetary needs and helps distribute supplies fairly." },
-        { t: "The Avengers Threat Monitor", d: "Thanos cannot organise intelligence about Earth's superheroes and their activities. Build a fictional superhero database with profiles, abilities, mission histories, and threat-level filters." }
+        { t: "The Haunted Monastery", d: "Visitors keep getting lost inside Valak’s cursed monastery. Build an interactive website with a floor map, hidden clues, and danger alerts." },
+        { t: "The Forbidden Archives", d: "Ancient records about demons and cursed artefacts are scattered across forgotten libraries. Build a searchable supernatural archive with case files, artefact profiles, and clues." },
+        { t: "The Exorcism Emergency Network", d: "Paranormal investigators struggle to coordinate investigations and track supernatural incidents. Build a dashboard with incident reports, investigator profiles, and case status tracking." }
       ]
     },
     {

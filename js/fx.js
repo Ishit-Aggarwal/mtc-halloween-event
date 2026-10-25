@@ -115,6 +115,23 @@
     var W, H, parts = [];
     var palette = ["255,140,60", "255,90,60", "255,55,35", "255,190,130"];
 
+    // Pre-rendered offscreen stamps (eliminates ~2,700 dynamic gradient allocations/sec)
+    var stamps = palette.map(function (cStr) {
+      var sc = document.createElement("canvas");
+      sc.width = 32;
+      sc.height = 32;
+      var sctx = sc.getContext("2d");
+      var sg = sctx.createRadialGradient(16, 16, 0, 16, 16, 16);
+      sg.addColorStop(0, "rgba(" + cStr + ",1)");
+      sg.addColorStop(0.35, "rgba(" + cStr + ",0.7)");
+      sg.addColorStop(1, "rgba(" + cStr + ",0)");
+      sctx.fillStyle = sg;
+      sctx.beginPath();
+      sctx.arc(16, 16, 16, 0, Math.PI * 2);
+      sctx.fill();
+      return sc;
+    });
+
     function size() {
       W = window.innerWidth; H = window.innerHeight;
       c.width = Math.round(W * dpr); c.height = Math.round(H * dpr);
@@ -131,7 +148,7 @@
         vy: 0.12 + Math.random() * 0.35,
         sway: Math.random() * Math.PI * 2,
         sw: 0.004 + Math.random() * 0.01,
-        c: palette[(Math.random() * palette.length) | 0],
+        cIdx: (Math.random() * palette.length) | 0,
         life: 0.4 + Math.random() * 0.6
       };
     }
@@ -139,6 +156,15 @@
     function frame(t) {
       requestAnimationFrame(frame);
       if (document.hidden) return;
+
+      // Yield 100% GPU/CPU during cutscenes or jumpscares
+      var cutsceneActive = window.OtherSideCutscene && window.OtherSideCutscene.isActive;
+      var scareActive = document.getElementById("scareVideoLayer") && !document.getElementById("scareVideoLayer").hidden;
+      if (cutsceneActive || scareActive) {
+        ctx.clearRect(0, 0, W, H);
+        return;
+      }
+
       if (lowPower && t - last < 32) return; // ~30fps on phones
       var dt = last ? Math.min((t - last) / 16.7, 3) : 1;
       last = t;
@@ -151,12 +177,11 @@
         if (p.y < -10) parts[i] = p = spawn(false);
         var fade = Math.min(1, (H - p.y) / (H * 0.25)) * Math.min(1, p.y / (H * 0.3));
         var a = Math.max(0, fade * p.life);
-        var g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
-        g.addColorStop(0, "rgba(" + p.c + "," + a + ")");
-        g.addColorStop(1, "rgba(" + p.c + ",0)");
-        ctx.fillStyle = g;
-        ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha = a;
+        var sz = p.r * 8;
+        ctx.drawImage(stamps[p.cIdx], p.x - sz * 0.5, p.y - sz * 0.5, sz, sz);
       }
+      ctx.globalAlpha = 1;
     }
     size();
     window.addEventListener("resize", size);
