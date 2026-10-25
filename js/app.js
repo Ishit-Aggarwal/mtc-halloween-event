@@ -268,9 +268,9 @@
       if (typeof s.twist === "number" || stage === "done") {
         s5.hidden = false;
         setFate(5, {
-          name: "The Alliance Protocol · KAPIDHWAJH",
-          desc: "Creatively integrate official sponsor KAPIDHWAJH's Instagram (@kapidhwajh) into your character's world.",
-          mustHave: "@kapidhwajh on Instagram + themed integration",
+          name: "The Alliance Protocol · KAPIDHWAJ",
+          desc: "Creatively integrate official sponsor KAPIDHWAJ's Instagram (@kapidhwaj.innovations) into your character's world.",
+          mustHave: "@kapidhwaj.innovations on Instagram + themed integration",
           glyph: "🌀",
           color: "#ffaa00",
           fresh: fresh
@@ -708,13 +708,13 @@
     } else if (stage === "sponsor") {
       kicker = "🌀 Compulsory Sponsor Twist";
       glyph = "🌀";
-      name = "The Alliance Protocol · KAPIDHWAJH";
+      name = "The Alliance Protocol · KAPIDHWAJ";
       lore = "Official Partner Integration";
-      brief = "A boring footer logo won't save your website. Creatively integrate the official Kapidhwajh Instagram page into your character's world, problem statement, and UI aesthetic.";
+      brief = "A boring footer logo won't save your website. Creatively integrate the official Kapidhwaj Instagram page into your character's world, problem statement, and UI aesthetic.";
       quote = "“Make the sponsor part of the story. Make the integration part of the experience.”";
-      desc = "RULES OF THE ALLIANCE:\n1. The official Kapidhwajh Instagram account must be clearly featured.\n2. Include a clickable link to @kapidhwajh on Instagram.\n3. The integration must visually match your website's theme.\n4. It must feel intentional and creative — not like an unrelated advertisement.";
-      mustHave = "Clickable link to @kapidhwajh on Instagram + Intentional theme integration";
-      portrait = "assets/sponsor/kapidhwajh.png";
+      desc = "RULES OF THE ALLIANCE:\n1. The official Kapidhwaj Instagram account (@kapidhwaj.innovations) must be clearly featured.\n2. Include a clickable link to https://www.instagram.com/kapidhwaj.innovations/ on Instagram.\n3. The integration must visually match your website's theme.\n4. It must feel intentional and creative — not like an unrelated advertisement.";
+      mustHave = "Clickable link to @kapidhwaj.innovations on Instagram + Intentional theme integration";
+      portrait = "assets/sponsor/kapidhwaj.png";
       btn = "Accept the alliance";
       accent = "#ffaa00";
     } else {
