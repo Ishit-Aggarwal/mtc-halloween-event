@@ -1938,17 +1938,18 @@ body.lit .circuit-grid {
   margin: 0;
 }
 
+/* two columns only when the card itself is wide enough: in the narrow grimoire
+   sidebar beside the wheel (laptops) and on phones it is one column */
 .ap-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 16px;
   margin-bottom: 18px;
 }
 
-@media (max-width: 768px) {
-  .ap-grid {
-    grid-template-columns: 1fr;
-  }
+.ap-rules-col, .ap-ideas-col {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .ap-rules-col, .ap-ideas-col {
