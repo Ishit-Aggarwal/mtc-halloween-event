@@ -1758,6 +1758,13 @@
   if (el.decreeTopBtn) el.decreeTopBtn.addEventListener("click", openDecree);
   window.App = window.App || {};
   window.App.onHexCutsceneComplete = function () {
+    // the twist is already awake (a host delay of 0): the mission view would hide
+    // its wheel with no tab to get back to it, so show the wheel instead
+    if (session && session.stage === "twist") {
+      render(false);
+      el.stage.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     setView("mission");
     setTimeout(function () {
       if (el.viewTabs) el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
