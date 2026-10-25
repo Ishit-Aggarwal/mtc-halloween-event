@@ -196,7 +196,7 @@
     var li = el.fateList.querySelector('[data-slot="' + slot + '"]');
     var num = li.querySelector(".fate-num"), name = li.querySelector(".fate-name"), desc = li.querySelector(".fate-desc");
     var must = li.querySelector(".fate-must-have");
-    var roman = ["I", "II", "III", "IV"][slot - 1];
+    var roman = ["I", "II", "III", "IV", "V"][slot - 1];
     li.classList.remove("is-filled", "is-current");
     var filled = !!(data && data.name);
     li.tabIndex = filled ? 0 : -1;
@@ -262,6 +262,23 @@
     else if (stage === "wait") setFate(4, { current: true, pendingName: "Sleeping…", pendingDesc: "Wakes in " + fmt(s.unlockAt - Date.now()) });
     else if (stage === "twist") setFate(4, { current: true, pendingName: "Awake", pendingDesc: "Spin the final wheel." });
     else setFate(4, {});
+
+    var s5 = el.fateList ? el.fateList.querySelector('[data-slot="5"]') : null;
+    if (s5) {
+      if (typeof s.twist === "number" || stage === "done") {
+        s5.hidden = false;
+        setFate(5, {
+          name: "The Alliance Protocol · KAPIDHWAJH",
+          desc: "Creatively integrate official sponsor KAPIDHWAJH's Instagram (@kapidhwajh) into your character's world.",
+          mustHave: "@kapidhwajh on Instagram + themed integration",
+          glyph: "🌀",
+          color: "#ffaa00",
+          fresh: fresh
+        });
+      } else {
+        s5.hidden = true;
+      }
+    }
 
     el.grimoireFoot.hidden = stage !== "done";
     if (stage === "done") renderSubmissionState();
@@ -688,6 +705,18 @@
     } else if (stage === "hex") {
       var h = D.uiCurses[session.hex];
       kicker = "A hex upon your UI"; glyph = h.glyph; name = h.t; desc = h.d; mustHave = h.mustHave || ""; btn = "Accept the hex"; accent = "#ff7a1a";
+    } else if (stage === "sponsor") {
+      kicker = "🌀 Compulsory Sponsor Twist";
+      glyph = "🌀";
+      name = "The Alliance Protocol · KAPIDHWAJH";
+      lore = "Official Partner Integration";
+      brief = "A boring footer logo won't save your website. Creatively integrate the official Kapidhwajh Instagram page into your character's world, problem statement, and UI aesthetic.";
+      quote = "“Make the sponsor part of the story. Make the integration part of the experience.”";
+      desc = "RULES OF THE ALLIANCE:\n1. The official Kapidhwajh Instagram account must be clearly featured.\n2. Include a clickable link to @kapidhwajh on Instagram.\n3. The integration must visually match your website's theme.\n4. It must feel intentional and creative — not like an unrelated advertisement.";
+      mustHave = "Clickable link to @kapidhwajh on Instagram + Intentional theme integration";
+      portrait = "assets/sponsor/kapidhwajh.png";
+      btn = "Accept the alliance";
+      accent = "#ffaa00";
     } else {
       var t = D.twists[session.twist];
       kicker = "The twist"; glyph = t.glyph; name = t.t; desc = fillTwist(t.d); btn = "Seal my fate"; accent = "#ff3326";
@@ -715,7 +744,7 @@
 
     // Visual Portrait & Graceful Fallback
     if (el.cardPortraitFrame && el.cardPortraitImg) {
-      if (stage === "soul" && portrait) {
+      if ((stage === "soul" || stage === "sponsor") && portrait) {
         el.cardPortraitImg.src = portrait;
         el.cardPortraitImg.alt = name;
         if (el.cardPortraitBadge) el.cardPortraitBadge.textContent = glyph;
@@ -790,7 +819,7 @@
 
   /* ---------- the grimoire: hover (or tap) a filled seal to see its card again ---------- */
 
-  var SLOT_STAGE = { 1: "soul", 2: "curse", 3: "hex", 4: "twist" };
+  var SLOT_STAGE = { 1: "soul", 2: "curse", 3: "hex", 4: "twist", 5: "sponsor" };
   var peekTimer = null;
   var canHover = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 
@@ -840,6 +869,27 @@
     else if (stage === "twist") {
       session.stage = "done";
       activeView = "mission";
+      save();
+      saveProgress();
+      busy = false;
+      resetIdle();
+      render(false);
+      renderGrimoire(true);
+      // Twist assignments complete! Trigger the compulsory Sponsor Twist: ALLIANCE PROTOCOL
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playAllianceCutscene === "function") {
+        setTimeout(function () {
+          window.OtherSideCutscene.playAllianceCutscene();
+        }, 320);
+      } else {
+        setView("mission");
+        setTimeout(function () {
+          var apCard = document.getElementById("allianceProtocolCard");
+          if (apCard) apCard.scrollIntoView({ behavior: "smooth", block: "start" });
+          else if (el.viewTabs) el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
+          else el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+      return;
     }
     save();
     saveProgress();
@@ -1415,6 +1465,15 @@
     el.subUrl.focus();
   });
 
+  var replayAllianceBtn = document.getElementById("replayAllianceCutsceneBtn");
+  if (replayAllianceBtn) {
+    replayAllianceBtn.addEventListener("click", function () {
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playAllianceCutscene === "function") {
+        window.OtherSideCutscene.playAllianceCutscene();
+      }
+    });
+  }
+
   /* ---------- hidden bonus points ---------- */
 
   var EGG_IDS = D.eggsEnabled ? Object.keys(D.eggs || {}) : [];
@@ -1543,6 +1602,14 @@
     },
     onFiveMinCutsceneComplete: function () {
       startShutdownCountdown(300);
+    },
+    onAllianceCutsceneComplete: function () {
+      setView("mission", true);
+      setTimeout(function () {
+        var apCard = document.getElementById("allianceProtocolCard");
+        if (apCard) apCard.scrollIntoView({ behavior: "smooth", block: "start" });
+        else if (el.submissionCard) el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 150);
     },
     onZeroHourComplete: function () {
       lockSubmissions();
@@ -1912,6 +1979,15 @@
       closeModal(el.host);
       if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playCorruptionCutscene === "function") {
         window.OtherSideCutscene.playCorruptionCutscene();
+      }
+    });
+  }
+
+  if ($("hostTriggerAlliance")) {
+    $("hostTriggerAlliance").addEventListener("click", function () {
+      closeModal(el.host);
+      if (window.OtherSideCutscene && typeof window.OtherSideCutscene.playAllianceCutscene === "function") {
+        window.OtherSideCutscene.playAllianceCutscene();
       }
     });
   }

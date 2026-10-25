@@ -53,6 +53,18 @@
     "Five minutes. Finish strong."
   ];
 
+  var NARRATIVE_LINES_ALLIANCE = [
+    "Digital Exorcists… the Phantom has intercepted our system again.",
+    "A new transmission has appeared. Your mission isn't just to rebuild the Other Side anymore. You must now establish an alliance.",
+    "Introducing the ALLIANCE PROTOCOL.",
+    "Your website must now include a creative integration of our official sponsor, KAPIDHWAJH.",
+    "But here's the catch: a boring logo in the footer won't save your website. The sponsor must become a meaningful part of your world.",
+    "Your task is to creatively integrate the official Kapidhwajh Instagram page into your website in a way that fits your assigned character, your chosen problem statement, and your UI/UX aesthetic.",
+    "You have 35 minutes remaining. The Phantom is watching. Your interface must evolve.",
+    "MISSION UPDATE: ALLIANCE PROTOCOL ACTIVATED.",
+    "Make the sponsor part of the story. Make the integration part of the experience. Now get back to building!"
+  ];
+
   // Canvas Modes
   var MODE = {
     PORTAL: 1,
@@ -270,7 +282,7 @@
 
     resetVisuals: function () {
       if (this.layer) {
-        this.layer.classList.remove("corruption-mode", "shutdown-mode");
+        this.layer.classList.remove("corruption-mode", "shutdown-mode", "alliance-mode");
       }
       if (this.rig) {
         this.rig.className = "cutscene-rig";
@@ -315,7 +327,7 @@
     },
 
     play: function (type) {
-      this.cutsceneType = (type === "hex" || type === "corruption" || type === "fiveMin" || type === "zeroHour") ? type : "entry";
+      this.cutsceneType = (type === "hex" || type === "corruption" || type === "fiveMin" || type === "zeroHour" || type === "alliance") ? type : "entry";
       this.isActive = true;
       this.clearTimers();
       if (!this.layer) this.init();
@@ -447,6 +459,37 @@
         }
 
         this.showEndCard();
+        return;
+      }
+
+      if (this.cutsceneType === "alliance") {
+        // ========================================================
+        // ALLIANCE PROTOCOL CUTSCENE: COMPULSORY SPONSOR TRANSMISSION
+        // ========================================================
+        this.canvasMode = MODE.DARK_VOID;
+        if (this.layer) this.layer.classList.add("alliance-mode");
+        this.startRenderLoop();
+
+        if (this.voidFigures) {
+          this.voidFigures.hidden = false;
+          void this.voidFigures.offsetWidth;
+          this.voidFigures.classList.add("revealed");
+        }
+
+        if (this.cinemaTextKicker) {
+          this.cinemaTextKicker.hidden = false;
+          this.cinemaTextKicker.textContent = "🌀 SYSTEM TRANSMISSION · THE ALLIANCE PROTOCOL";
+        }
+
+        if (S.cutsceneImpact) S.cutsceneImpact();
+        if (S.whisper) S.whisper();
+
+        this.delay(function () {
+          if (!self.isActive) return;
+          if (self.cinemaWrap) self.cinemaWrap.hidden = false;
+          self.playCinematicNarrative();
+        }, 650);
+
         return;
       }
 
@@ -902,6 +945,7 @@
       if (this.cutsceneType === "hex") lines = NARRATIVE_LINES_HEX;
       else if (this.cutsceneType === "corruption") lines = NARRATIVE_LINES_CORRUPTION;
       else if (this.cutsceneType === "fiveMin") lines = NARRATIVE_LINES_FIVE_MIN;
+      else if (this.cutsceneType === "alliance") lines = NARRATIVE_LINES_ALLIANCE;
 
       function escapeHtml(str) {
         return String(str || "")
@@ -1115,6 +1159,30 @@
           if (this.endcardTitle) this.endcardTitle.innerHTML = 'SYSTEM SHUTDOWN IN 05:00<br><span class="highlight-glitch">SUBMISSION WINDOW CLOSING</span>';
           if (this.endcardDesc) this.endcardDesc.innerHTML = 'Check your links. Check your interactions. Make sure your website actually works.<br>Five minutes remaining. Finish strong.';
           if (this.proceedBtnText) this.proceedBtnText.textContent = "RETURN TO SUBMISSIONS →";
+        } else if (this.cutsceneType === "alliance") {
+          if (this.endcardKicker) this.endcardKicker.textContent = "🌀 COMPULSORY SPONSOR TWIST · ROUND 2 BUILD";
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'THE ALLIANCE PROTOCOL<br><span class="highlight-glitch">KAPIDHWAJH INTEGRATION</span>';
+          if (this.endcardDesc) {
+            this.endcardDesc.innerHTML =
+              '<div class="endcard-sponsor-badge">' +
+                '<img src="assets/sponsor/kapidhwajh.png" alt="Kapidhwajh Logo" class="endcard-sponsor-logo">' +
+                '<div class="endcard-sponsor-info">' +
+                  '<strong>Official Sponsor: KAPIDHWAJH</strong>' +
+                  '<p>A boring footer logo won\'t save your website. Creatively integrate Kapidhwajh\'s official Instagram into your character\'s world.</p>' +
+                  '<a href="https://www.instagram.com/kapidhwajh/" target="_blank" rel="noopener" class="endcard-ig-link">📸 View @kapidhwajh on Instagram ↗</a>' +
+                '</div>' +
+              '</div>' +
+              '<div class="endcard-sponsor-rules">' +
+                '<strong>Rules of the Alliance:</strong>' +
+                '<ul>' +
+                  '<li>1. Feature the official Kapidhwajh Instagram account.</li>' +
+                  '<li>2. Include a clickable link to @kapidhwajh.</li>' +
+                  '<li>3. Visually match your website\'s aesthetic & character theme.</li>' +
+                  '<li>4. Must feel intentional and creative — not an unrelated ad.</li>' +
+                '</ul>' +
+              '</div>';
+          }
+          if (this.proceedBtnText) this.proceedBtnText.textContent = "ENTER MISSION WORKSPACE →";
         } else if (this.cutsceneType === "zeroHour") {
           if (this.endcardKicker) this.endcardKicker.textContent = "DEADLINE REACHED · WINDOW CLOSED";
           if (this.endcardTitle) this.endcardTitle.innerHTML = 'BUILD WINDOW CLOSED!<br><span class="highlight-glitch">SUBMISSIONS LOCKED!</span>';
@@ -1193,6 +1261,20 @@
             var tabMission2 = document.getElementById("tabMission");
             if (tabMission2) tabMission2.click();
           }
+        } else if (completedType === "alliance") {
+          // Alliance Protocol completed: smooth handoff to Mission Workspace
+          if (window.App && typeof window.App.onAllianceCutsceneComplete === "function") {
+            window.App.onAllianceCutsceneComplete();
+          } else {
+            var tabMissionA = document.getElementById("tabMission");
+            if (tabMissionA) tabMissionA.click();
+            var allianceCard = document.getElementById("allianceProtocolCard");
+            if (allianceCard) allianceCard.scrollIntoView({ behavior: "smooth", block: "start" });
+            else {
+              var submissionCardA = document.getElementById("submissionCard");
+              if (submissionCardA) submissionCardA.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
         } else if (completedType === "zeroHour") {
           // Zero Hour completed: lock down submissions permanently
           if (window.App && typeof window.App.onZeroHourComplete === "function") {
@@ -1227,6 +1309,10 @@
 
     playZeroHourCutscene: function () {
       this.play("zeroHour");
+    },
+
+    playAllianceCutscene: function () {
+      this.play("alliance");
     },
 
     delay: function (fn, ms) {

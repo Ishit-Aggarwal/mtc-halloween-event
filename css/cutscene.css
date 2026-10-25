@@ -46,6 +46,20 @@
   background: radial-gradient(ellipse at center, rgba(140, 10, 0, 0.25) 0%, rgba(50, 2, 4, 0.75) 60%, rgba(5, 0, 1, 0.98) 100%);
 }
 
+.cutscene-layer.alliance-mode {
+  background: #090206;
+}
+
+.cutscene-layer.alliance-mode .cutscene-vignette {
+  background: radial-gradient(ellipse at center, rgba(255, 140, 0, 0.16) 0%, rgba(180, 25, 10, 0.42) 50%, rgba(8, 1, 4, 0.96) 100%);
+  animation: allianceSunStrobe 2.8s ease-in-out infinite alternate;
+}
+
+@keyframes allianceSunStrobe {
+  0% { opacity: 0.75; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); filter: brightness(1.2); }
+}
+
 /* ---------- 3D Camera Rig (Trauma Shakes & Dimensional Plunge) ---------- */
 .cutscene-rig {
   position: absolute;
@@ -1099,4 +1113,83 @@
   border-color: #ff2216;
   background: rgba(45, 2, 5, 0.95);
   color: #ff6655;
+}
+
+/* ---------- Alliance Protocol Endcard Sponsor Badge ---------- */
+.endcard-sponsor-badge {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(25, 8, 4, 0.88);
+  border: 1px solid rgba(255, 140, 0, 0.45);
+  box-shadow: 0 0 24px rgba(255, 100, 0, 0.25), inset 0 0 14px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin: 14px 0;
+  text-align: left;
+}
+
+.endcard-sponsor-logo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 16px rgba(255, 140, 0, 0.6);
+  border: 2px solid #ffaa00;
+  flex-shrink: 0;
+}
+
+.endcard-sponsor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.endcard-sponsor-info strong {
+  color: #ffaa00;
+  font-family: var(--f-pixel, monospace);
+  font-size: 14px;
+  letter-spacing: 0.08em;
+}
+
+.endcard-sponsor-info p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #fae4e1;
+}
+
+.endcard-ig-link {
+  display: inline-block;
+  color: #ffaa00;
+  font-weight: 600;
+  text-decoration: underline;
+  margin-top: 4px;
+  font-size: 12.5px;
+}
+
+.endcard-sponsor-rules {
+  background: rgba(14, 2, 4, 0.85);
+  border-left: 3px solid #ffaa00;
+  padding: 10px 14px;
+  border-radius: 0 6px 6px 0;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.endcard-sponsor-rules strong {
+  display: block;
+  color: #ffbb33;
+  font-size: 12.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.endcard-sponsor-rules ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #f7deda;
 }

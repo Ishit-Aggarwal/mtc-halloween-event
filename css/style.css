@@ -1257,7 +1257,7 @@ body.lit .circuit-grid {
 }
 .wheel-panel.view-mission .fate-list {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 16px;
   align-items: stretch;
 }
@@ -1751,6 +1751,219 @@ body.lit .circuit-grid {
   .wheel-panel.view-mission .fate-list {
     grid-template-columns: 1fr;
   }
+}
+
+/* =========================================================
+   ALLIANCE PROTOCOL SPONSOR CARD & SEAL V
+   ========================================================= */
+
+.alliance-protocol-banner {
+  background: radial-gradient(ellipse at 50% 0%, rgba(55, 18, 5, 0.95), rgba(16, 3, 5, 0.98) 75%);
+  border: 1px solid rgba(255, 140, 0, 0.45);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 120, 0, 0.2);
+  border-radius: 8px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.alliance-protocol-banner::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff4520, #ffaa00, #ff4520);
+}
+
+.ap-header {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.ap-emblem-wrap {
+  flex-shrink: 0;
+}
+
+.ap-emblem {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffaa00;
+  box-shadow: 0 0 18px rgba(255, 140, 0, 0.55);
+}
+
+.ap-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ap-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--f-type, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffaa00;
+  background: rgba(255, 140, 0, 0.15);
+  border: 1px solid rgba(255, 140, 0, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.ap-title {
+  margin: 0;
+  font-family: var(--f-title, serif);
+  font-size: clamp(20px, 3.2vw, 26px);
+  color: #fff;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 12px rgba(255, 120, 0, 0.4);
+}
+
+.ap-subtitle {
+  margin: 0;
+  font-size: 14px;
+  color: #f7deda;
+}
+
+.ap-quote {
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.45);
+  border-left: 3px solid #ff4520;
+  border-radius: 0 4px 4px 0;
+  margin-bottom: 16px;
+  font-style: italic;
+  font-size: 13.5px;
+  color: #ffe0d6;
+}
+
+.ap-quote p {
+  margin: 0;
+}
+
+.ap-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 768px) {
+  .ap-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ap-rules-col, .ap-ideas-col {
+  background: rgba(10, 2, 4, 0.85);
+  border: 1px solid rgba(255, 120, 0, 0.25);
+  border-radius: 6px;
+  padding: 14px 16px;
+}
+
+.ap-col-title {
+  margin: 0 0 10px;
+  font-family: var(--f-type, monospace);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffaa00;
+}
+
+.ap-rules-list, .ap-ideas-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #f5ddd7;
+}
+
+.ap-rules-list li strong {
+  color: #ffaa00;
+}
+
+.ap-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-ap-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #c13584, #e1306c, #fd1d1d, #f56040);
+  color: #ffffff;
+  padding: 9px 18px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.45);
+  transition: all 0.2s ease;
+}
+
+.btn-ap-ig:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(225, 48, 108, 0.65);
+  color: #ffffff;
+}
+
+.btn-ap-replay {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(30, 8, 12, 0.95);
+  border: 1px solid rgba(255, 140, 0, 0.5);
+  color: #ffe6dc;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ap-replay:hover {
+  background: rgba(55, 14, 20, 0.98);
+  border-color: #ffaa00;
+  color: #ffffff;
+}
+
+/* Grimoire Seal V Sponsor Styling */
+.fate.fate-sponsor {
+  border-color: rgba(255, 140, 0, 0.45);
+  background: rgba(24, 6, 8, 0.92);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(255, 120, 0, 0.12);
+}
+
+.fate-sponsor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.fate-compulsory-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(255, 140, 0, 0.2);
+  color: #ffaa00;
+  border: 1px solid rgba(255, 140, 0, 0.4);
 }
 
 /* =========================================================

@@ -440,5 +440,30 @@ window.CURSE_DATA = {
     { t: "Lost a Limb", glyph: "🦴", d: "Delete your navigation bar. Visitors must still be able to get everywhere." },
     { t: "Idle Haunting", glyph: "⏳", d: "If the visitor does nothing for 10 seconds, something creepy must happen." },
     { t: "The Curse Spreads", glyph: "🩸", d: "You've been hit by a second UI curse: \"{randomCurse}\". Apply it on top of your first one." }
-  ]
+  ],
+
+  // Compulsory Second Twist for all teams — The Alliance Protocol
+  sponsorTwist: {
+    id: "alliance",
+    title: "The Alliance Protocol",
+    sponsor: "KAPIDHWAJH",
+    glyph: "🌀",
+    logo: "assets/sponsor/kapidhwajh.png",
+    instagramHandle: "@kapidhwajh",
+    instagramUrl: "https://www.instagram.com/kapidhwajh/",
+    shortDesc: "Compulsory Sponsor Twist: Creatively integrate the official Kapidhwajh Instagram page into your character's world, problem statement, and UI aesthetic.",
+    rules: [
+      "The official Kapidhwajh Instagram account (@kapidhwajh) must be clearly featured.",
+      "Include a clickable link to the official Instagram page.",
+      "The integration must visually match your website's theme and character aesthetic.",
+      "It must feel intentional and creative — not like an unrelated advertisement."
+    ],
+    ideas: [
+      "A fictional partnership or collaboration section.",
+      "A themed Instagram card styled to match your assigned aesthetic.",
+      "A 'Trusted Allies' or 'Join Our Alliance' section.",
+      "An interactive sponsor portal or a creative call-to-action linking to Kapidhwajh's Instagram page.",
+      "A character-themed story explaining why Kapidhwajh belongs in your world."
+    ]
+  }
 };
