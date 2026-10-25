@@ -557,6 +557,8 @@
 
   var Sound = {
     get enabled() { return enabled; },
+    /** True on the dev machine (localhost): media elements stay muted too. */
+    get silent() { return SILENT; },
 
     /** True when this browser lets the page make sound before anyone has tapped. */
     canAutoplay: function () {
