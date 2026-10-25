@@ -219,13 +219,17 @@
 
     <!-- View Switcher (Active when Round 2 Build is unlocked) -->
     <nav class="view-tabs" id="viewTabs" aria-label="Ritual views" hidden>
-      <button class="view-tab is-active" id="tabMission" type="button" data-view="mission">
-        <span class="tab-icon">🚀</span>
-        <span class="tab-label">Round 2 · The Build</span>
+      <button class="view-tab is-active" id="tabGrimoire" type="button" data-view="grimoire">
+        <span class="tab-icon">📜</span>
+        <span class="tab-label">Your Grimoire</span>
       </button>
-      <button class="view-tab" id="tabWheel" type="button" data-view="wheel">
-        <span class="tab-icon">🎡</span>
-        <span class="tab-label">Wheel of Fate</span>
+      <button class="view-tab" id="tabSubmit" type="button" data-view="submit">
+        <span class="tab-icon">🚀</span>
+        <span class="tab-label">Submit Your Project</span>
+      </button>
+      <button class="view-tab" id="tabFaqs" type="button" data-view="faqs">
+        <span class="tab-icon">❓</span>
+        <span class="tab-label">FAQ's</span>
       </button>
     </nav>
 
@@ -410,8 +414,8 @@
         </div>
       </div>
 
-      <!-- ===== The grimoire — collected fate ===== -->
-      <aside class="grimoire" aria-labelledby="grimoireTitle">
+      <!-- ===== VIEW 1: THE GRIMOIRE & ALLIANCE PROTOCOL ===== -->
+      <aside class="grimoire view-pane view-pane-grimoire" id="paneGrimoire" aria-labelledby="grimoireTitle">
         <div class="grimoire-inner">
           <p class="grimoire-team" id="grimoireTeam"></p>
           <p class="grimoire-roster" id="grimoireRoster" hidden></p>
@@ -458,164 +462,238 @@
           <p class="egg-count" id="eggCount" hidden></p>
           <div class="grimoire-foot" id="grimoireFoot" hidden>
             <p class="sealed-msg">Your fate is sealed. The ritual is complete.</p>
-            <p class="sealed-sub">This phone is bound to your team. There is no going back.</p>
+            <p class="sealed-sub">This phone is bound to your team. Craft your world and establish the alliance below.</p>
+          </div>
 
-            <!-- ============ SUBMISSION PANEL ============ -->
-            <div class="sub-panel" id="submissionCard">
-              <div class="sub-header">
-                <span class="sub-tag">Round 2 · The Build</span>
-                <h3 class="sub-title">Submit Your Project</h3>
+          <!-- ============ THE ALLIANCE PROTOCOL (KAPIDHWAJ SHOWCASE) ============ -->
+          <div class="alliance-protocol-banner" id="allianceProtocolCard">
+            <div class="ap-header">
+              <div class="ap-emblem-wrap">
+                <div class="ap-sun-halo" aria-hidden="true"></div>
+                <img src="assets/sponsor/kapidhwaj.png" alt="Kapidhwaj Official Emblem" class="ap-emblem">
+              </div>
+              <div class="ap-title-wrap">
+                <div class="ap-badge-row">
+                  <span class="ap-badge">🌀 COMPULSORY SPONSOR TWIST · ROUND 2 BUILD</span>
+                  <span class="ap-tier-badge">OFFICIAL EVENT PARTNER</span>
+                </div>
+                <h4 class="ap-title">THE ALLIANCE PROTOCOL · KAPIDHWAJ</h4>
+                <p class="ap-subtitle">Your website must creatively integrate our official sponsor, <strong>KAPIDHWAJ</strong>.</p>
+              </div>
+            </div>
+
+            <div class="ap-body">
+              <div class="ap-quote">
+                <p>“A boring logo in the footer won't save your website. The sponsor must become a meaningful part of your world.”</p>
               </div>
 
-              <div class="sub-body">
-                <div class="sub-left">
-                  <!-- Compulsory Sponsor Twist: The Alliance Protocol Banner -->
-                  <div class="alliance-protocol-banner" id="allianceProtocolCard">
-                    <div class="ap-header">
-                      <div class="ap-emblem-wrap">
-                        <img src="assets/sponsor/kapidhwaj.png" alt="Kapidhwaj Emblem" class="ap-emblem">
-                      </div>
-                      <div class="ap-title-wrap">
-                        <span class="ap-badge">🌀 COMPULSORY SPONSOR TWIST · ROUND 2 BUILD</span>
-                        <h4 class="ap-title">THE ALLIANCE PROTOCOL · KAPIDHWAJ</h4>
-                        <p class="ap-subtitle">Your website must creatively integrate our official sponsor, <strong>KAPIDHWAJ</strong>.</p>
-                      </div>
-                    </div>
-
-                    <div class="ap-body">
-                      <div class="ap-quote">
-                        <p>“A boring logo in the footer won't save your website. The sponsor must become a meaningful part of your world.”</p>
-                      </div>
-
-                      <div class="ap-grid">
-                        <div class="ap-rules-col">
-                          <h5 class="ap-col-title">📜 Rules of the Alliance</h5>
-                          <ul class="ap-rules-list">
-                            <li><strong>1.</strong> The official Kapidhwaj Instagram account must be clearly featured.</li>
-                            <li><strong>2.</strong> Include a clickable link to the official Instagram page (<a href="https://www.instagram.com/kapidhwaj.innovations/" target="_blank" rel="noopener">@kapidhwaj.innovations ↗</a>).</li>
-                            <li><strong>3.</strong> The integration must visually match your website's theme and character aesthetic.</li>
-                            <li><strong>4.</strong> It must feel intentional and creative — not like an unrelated advertisement.</li>
-                          </ul>
-                        </div>
-
-                        <div class="ap-ideas-col">
-                          <h5 class="ap-col-title">💡 Creative Integration Ideas</h5>
-                          <ul class="ap-ideas-list">
-                            <li>A fictional partnership or collaboration section.</li>
-                            <li>A themed Instagram card styled to match your assigned aesthetic.</li>
-                            <li>A ‘Trusted Allies’ or ‘Join Our Alliance’ interactive section.</li>
-                            <li>An interactive sponsor portal or creative call-to-action linking to Kapidhwaj.</li>
-                            <li>A character-themed story explaining why Kapidhwaj belongs in your world.</li>
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div class="ap-actions">
-                        <a href="https://www.instagram.com/kapidhwaj.innovations/" target="_blank" rel="noopener" class="btn btn-ap-ig">
-                          <span class="ig-icon">📸</span> View @kapidhwaj.innovations on Instagram ↗
-                        </a>
-                        <button type="button" class="btn btn-ap-replay" id="replayAllianceCutsceneBtn">
-                          <span>📽️</span> Replay Alliance Protocol Transmission
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="sub-instructions">
-                    <p class="sub-notice">⚡ <b>The Twist is Announced!</b> You have received all four seals of fate.</p>
-                    <ol class="sub-steps">
-                      <li><strong>Build:</strong> Craft your web experience incorporating your Soul, Curse, Hex, and Twist.</li>
-                      <li><strong>Host:</strong> Deploy your website online and ensure it is publicly accessible.</li>
-                      <li><strong>Submit:</strong> Paste your live hosted link and provide your source code (GitHub repo, .zip upload, or Drive link) below so judges can evaluate your project.</li>
-                    </ol>
-                    <button class="gh-open" type="button" data-guide="github">🐙 Never used GitHub? Set up an account and push your code, step by step</button>
-                    <button class="gh-open" type="button" data-guide="git">💻 Already on GitHub? How to update your code (commit &amp; push)</button>
-                    <button class="gh-open" type="button" data-guide="start">🌐 How do I put my site online? Open the hosting guide</button>
-                    <div class="sub-platforms">
-                      <span class="sub-platforms-title">Recommended Free Hosting Platforms: <span class="sub-platforms-hint">tap one for a step-by-step guide</span></span>
-                      <div class="host-badges">
-                        <button class="host-pill" type="button" data-guide="vercel">▲ Vercel</button>
-                        <button class="host-pill" type="button" data-guide="netlify">💎 Netlify</button>
-                        <button class="host-pill" type="button" data-guide="github" data-guide-section="ghPagesStep">🐙 GitHub Pages</button>
-                        <button class="host-pill" type="button" data-guide="render">⚡ Render</button>
-                        <button class="host-pill" type="button" data-guide="cloudflare">☁️ Cloudflare</button>
-                      </div>
-                    </div>
-                  </div>
+              <div class="ap-grid">
+                <div class="ap-rules-col">
+                  <h5 class="ap-col-title">📜 Rules of the Alliance</h5>
+                  <ul class="ap-rules-list">
+                    <li><strong>1.</strong> The official Kapidhwaj Instagram account must be clearly featured.</li>
+                    <li><strong>2.</strong> Include a clickable link to the official Instagram page (<a href="https://www.instagram.com/kapidhwaj.innovations/" target="_blank" rel="noopener">@kapidhwaj.innovations ↗</a>).</li>
+                    <li><strong>3.</strong> The integration must visually match your website's theme and character aesthetic.</li>
+                    <li><strong>4.</strong> It must feel intentional and creative — not like an unrelated advertisement.</li>
+                  </ul>
                 </div>
 
-                <div class="sub-right">
-                  <!-- Form for entering links & code -->
-                  <form class="sub-form" id="submissionForm" novalidate autocomplete="off">
-                    <label class="sub-label">
-                      <span class="sub-label-text">🌐 Live Hosted Website URL <span class="sub-req">*</span> <button class="sub-help" type="button" data-guide="start">? How do I get this</button></span>
-                      <input type="url" id="subUrl" class="sub-input" placeholder="https://your-team.vercel.app" required spellcheck="false" autocomplete="off">
-                    </label>
-                    <label class="sub-label">
-                      <span class="sub-label-text">📁 GitHub Repository URL <span class="sub-opt">(optional)</span> <button class="sub-help" type="button" data-guide="github">? How do I get this</button></span>
-                      <input type="url" id="subRepo" class="sub-input" placeholder="https://github.com/username/project" spellcheck="false" autocomplete="off">
-                    </label>
-
-                    <!-- Source code zip archive & cloud link -->
-                    <div class="sub-zip-section">
-                      <div class="sub-zip-header">
-                        <span class="sub-label-text">📦 Source Code Archive (.zip) <span class="sub-opt">(optional)</span></span>
-                      </div>
-
-                      <div class="sub-dropzone" id="subDropzone" tabindex="0" role="button" aria-label="Upload source code zip file">
-                        <input type="file" id="subZipFile" accept=".zip,application/zip,application/x-zip-compressed" class="sr-only">
-                        <div class="sub-dropzone-content" id="subDropzoneContent">
-                          <span class="sub-dropzone-icon" aria-hidden="true">🗜️</span>
-                          <div class="sub-dropzone-text">
-                            <p class="sub-dropzone-title"><b>Choose a .zip file</b> or drag &amp; drop</p>
-                            <p class="sub-dropzone-desc">Max 50MB · Attach project source code</p>
-                          </div>
-                        </div>
-                        <div class="sub-file-chosen" id="subFileChosen" hidden>
-                          <span class="sub-file-icon" aria-hidden="true">📦</span>
-                          <div class="sub-file-info">
-                            <span class="sub-file-name" id="subFileName">project.zip</span>
-                            <span class="sub-file-size" id="subFileSize">0 KB</span>
-                          </div>
-                          <button type="button" class="sub-file-remove" id="subFileRemove" title="Remove attached zip" aria-label="Remove attached zip file">✕</button>
-                        </div>
-                      </div>
-
-                      <label class="sub-label sub-label-inline">
-                        <span class="sub-label-text">☁️ Or Drive / Cloud ZIP Link <span class="sub-opt">(Google Drive, OneDrive, etc.)</span></span>
-                        <input type="url" id="subZipLink" class="sub-input" placeholder="https://drive.google.com/file/d/... or direct zip link" spellcheck="false" autocomplete="off">
-                      </label>
-                    </div>
-
-                    <p class="sub-error" id="subError" role="alert" hidden></p>
-                    <button type="submit" class="btn btn-blood sub-btn" id="subSubmitBtn">
-                      <span id="subSubmitLabel">Submit Project</span>
-                    </button>
-                  </form>
-
-                  <!-- State when project has been submitted -->
-                  <div class="sub-result" id="subResult" hidden>
-                    <div class="sub-result-card">
-                      <div class="sub-result-icon" aria-hidden="true">⚡</div>
-                      <div class="sub-result-details">
-                        <p class="sub-result-status">Project Submitted</p>
-                        <p class="sub-result-time" id="subResultTime"></p>
-                        <div class="sub-result-links">
-                          <a class="sub-live-link" id="subLiveLink" href="#" target="_blank" rel="noopener">🌐 Open Live Site ↗</a>
-                          <a class="sub-repo-link" id="subRepoLink" href="#" target="_blank" rel="noopener" hidden>📁 View Code ↗</a>
-                          <a class="sub-zip-download" id="subZipDownload" href="#" download="project-source.zip" hidden>📦 Download ZIP ⤓</a>
-                          <a class="sub-zip-link" id="subZipCloudLink" href="#" target="_blank" rel="noopener" hidden>☁️ Cloud ZIP ↗</a>
-                        </div>
-                      </div>
-                    </div>
-                    <button type="button" class="btn btn-ghost btn-sm sub-edit-btn" id="subEditBtn">Update Submission</button>
-                  </div>
+                <div class="ap-ideas-col">
+                  <h5 class="ap-col-title">💡 Creative Integration Blueprints</h5>
+                  <ul class="ap-ideas-list">
+                    <li><strong>Fictional Partnership:</strong> A dedicated allies section matching your character's universe.</li>
+                    <li><strong>Themed Instagram Card:</strong> Styled with your character's colors, fonts, and dark aesthetic.</li>
+                    <li><strong>In-Universe Lore:</strong> An ancient guild, high-tech weapon dealer, or containment ward supplier.</li>
+                    <li><strong>Interactive Portal:</strong> A creative call-to-action linking to @kapidhwaj.innovations.</li>
+                    <li><strong>Character Shoutout:</strong> Fourth-wall break or in-universe story honoring the alliance.</li>
+                  </ul>
                 </div>
+              </div>
+
+              <div class="ap-actions">
+                <a href="https://www.instagram.com/kapidhwaj.innovations/" target="_blank" rel="noopener" class="btn btn-ap-ig" id="apIgLink">
+                  <span class="ig-icon">📸</span> View @kapidhwaj.innovations on Instagram ↗
+                </a>
+                <button type="button" class="btn btn-ap-copy" id="apCopyHandleBtn" title="Copy Instagram handle">
+                  <span>📋</span> Copy Handle
+                </button>
+                <button type="button" class="btn btn-ap-replay" id="replayAllianceCutsceneBtn">
+                  <span>📽️</span> Replay Alliance Protocol Transmission
+                </button>
               </div>
             </div>
           </div>
         </div>
       </aside>
+
+      <!-- ===== VIEW 2: SUBMIT YOUR PROJECT ===== -->
+      <section class="view-pane view-pane-submit" id="paneSubmit" hidden>
+        <div class="sub-panel" id="submissionCard">
+          <div class="sub-header">
+            <div class="sub-header-text">
+              <span class="sub-tag">Round 2 · The Build</span>
+              <h3 class="sub-title">Submit Your Project</h3>
+              <p class="sub-lead">Deploy your web application online and provide your live link and code repository for the judges.</p>
+            </div>
+            <div class="sub-status-pill" id="subStatusPill">
+              <span class="status-pulse-dot" aria-hidden="true"></span>
+              <span id="subStatusText">Awaiting Submission</span>
+            </div>
+          </div>
+
+          <div class="sub-body">
+            <!-- Left Column: Hosting Cheatsheet & Platform Badges -->
+            <div class="sub-left">
+              <div class="sub-instructions">
+                <p class="sub-notice">⚡ <b>The Submission Window is Active!</b> Check your links and verify your build before sealing your fate.</p>
+                <ol class="sub-steps">
+                  <li><strong>Build:</strong> Craft your web experience incorporating your Soul, Curse, Hex, and Twist.</li>
+                  <li><strong>Host:</strong> Deploy your website online and ensure it is publicly accessible via HTTPS.</li>
+                  <li><strong>Submit:</strong> Paste your live hosted link and provide your source code (GitHub repo, .zip upload, or Drive link) below.</li>
+                </ol>
+                <div class="sub-guide-buttons">
+                  <button class="gh-open" type="button" data-guide="github">🐙 Never used GitHub? Step-by-step account &amp; push guide</button>
+                  <button class="gh-open" type="button" data-guide="git">💻 Already on GitHub? How to commit and push updates</button>
+                  <button class="gh-open" type="button" data-guide="start">🌐 How do I put my site online? Open the hosting guide</button>
+                </div>
+                <div class="sub-platforms">
+                  <span class="sub-platforms-title">Recommended Free Hosting Platforms: <span class="sub-platforms-hint">tap one for a step-by-step guide</span></span>
+                  <div class="host-badges">
+                    <button class="host-pill" type="button" data-guide="vercel">▲ Vercel</button>
+                    <button class="host-pill host-pill-highlight" type="button" data-guide="netlify">💎 Netlify (Drag &amp; Drop)</button>
+                    <button class="host-pill" type="button" data-guide="github" data-guide-section="ghPagesStep">🐙 GitHub Pages</button>
+                    <button class="host-pill" type="button" data-guide="render">⚡ Render</button>
+                    <button class="host-pill" type="button" data-guide="cloudflare">☁️ Cloudflare</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Form for entering links & code -->
+            <div class="sub-right">
+              <form class="sub-form" id="submissionForm" novalidate autocomplete="off">
+                <label class="sub-label">
+                  <span class="sub-label-text">🌐 Live Hosted Website URL <span class="sub-req">*</span> <button class="sub-help" type="button" data-guide="start">? How do I get this</button></span>
+                  <input type="url" id="subUrl" class="sub-input" placeholder="https://your-team.vercel.app" required spellcheck="false" autocomplete="off">
+                </label>
+                <label class="sub-label">
+                  <span class="sub-label-text">📁 GitHub Repository URL <span class="sub-opt">(optional)</span> <button class="sub-help" type="button" data-guide="github">? How do I get this</button></span>
+                  <input type="url" id="subRepo" class="sub-input" placeholder="https://github.com/username/project" spellcheck="false" autocomplete="off">
+                </label>
+
+                <!-- Source code zip archive & cloud link -->
+                <div class="sub-zip-section">
+                  <div class="sub-zip-header">
+                    <span class="sub-label-text">📦 Source Code Archive (.zip) <span class="sub-opt">(optional)</span></span>
+                  </div>
+
+                  <div class="sub-dropzone" id="subDropzone" tabindex="0" role="button" aria-label="Upload source code zip file">
+                    <input type="file" id="subZipFile" accept=".zip,application/zip,application/x-zip-compressed" class="sr-only">
+                    <div class="sub-dropzone-content" id="subDropzoneContent">
+                      <span class="sub-dropzone-icon" aria-hidden="true">🗜️</span>
+                      <div class="sub-dropzone-text">
+                        <p class="sub-dropzone-title"><b>Choose a .zip file</b> or drag &amp; drop</p>
+                        <p class="sub-dropzone-desc">Max 50MB · Attach project source code</p>
+                      </div>
+                    </div>
+                    <div class="sub-file-chosen" id="subFileChosen" hidden>
+                      <span class="sub-file-icon" aria-hidden="true">📦</span>
+                      <div class="sub-file-info">
+                        <span class="sub-file-name" id="subFileName">project.zip</span>
+                        <span class="sub-file-size" id="subFileSize">0 KB</span>
+                      </div>
+                      <button type="button" class="sub-file-remove" id="subFileRemove" title="Remove attached zip" aria-label="Remove attached zip file">✕</button>
+                    </div>
+                  </div>
+
+                  <label class="sub-label sub-label-inline">
+                    <span class="sub-label-text">☁️ Or Drive / Cloud ZIP Link <span class="sub-opt">(Google Drive, OneDrive, etc.)</span></span>
+                    <input type="url" id="subZipLink" class="sub-input" placeholder="https://drive.google.com/file/d/... or direct zip link" spellcheck="false" autocomplete="off">
+                  </label>
+                </div>
+
+                <p class="sub-error" id="subError" role="alert" hidden></p>
+                <button type="submit" class="btn btn-blood sub-btn" id="subSubmitBtn">
+                  <span id="subSubmitLabel">Submit Project</span>
+                </button>
+              </form>
+
+              <!-- State when project has been submitted -->
+              <div class="sub-result" id="subResult" hidden>
+                <div class="sub-result-card">
+                  <div class="sub-result-icon" aria-hidden="true">⚡</div>
+                  <div class="sub-result-details">
+                    <p class="sub-result-status">Project Submitted</p>
+                    <p class="sub-result-time" id="subResultTime"></p>
+                    <div class="sub-result-links">
+                      <a class="sub-live-link" id="subLiveLink" href="#" target="_blank" rel="noopener">🌐 Open Live Site ↗</a>
+                      <a class="sub-repo-link" id="subRepoLink" href="#" target="_blank" rel="noopener" hidden>📁 View Code ↗</a>
+                      <a class="sub-zip-download" id="subZipDownload" href="#" download="project-source.zip" hidden>📦 Download ZIP ⤓</a>
+                      <a class="sub-zip-link" id="subZipCloudLink" href="#" target="_blank" rel="noopener" hidden>☁️ Cloud ZIP ↗</a>
+                    </div>
+                  </div>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm sub-edit-btn" id="subEditBtn">Update Submission</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== VIEW 3: FAQ'S ===== -->
+      <section class="view-pane view-pane-faqs" id="paneFaqs" hidden>
+        <div class="faq-hub" id="faqCard">
+          <header class="faq-header">
+            <span class="faq-kicker">Exorcist's Codex · Knowledge Base</span>
+            <h3 class="faq-title">Frequently Asked Questions</h3>
+            <p class="faq-sub">Everything you need to know about rules, AI policies, UI hexes, twists, Kapidhwaj alliance, and project submissions.</p>
+
+            <!-- Search Bar -->
+            <div class="faq-search-wrap">
+              <span class="faq-search-glyph" aria-hidden="true">🔍</span>
+              <input type="text" id="faqSearchInput" class="faq-search-input" placeholder="Search questions, rules, hexes, alliance, hosting..." aria-label="Search FAQs">
+              <button type="button" id="faqSearchClear" class="faq-search-clear" hidden aria-label="Clear search">✕</button>
+            </div>
+
+            <!-- Category Filter Chips -->
+            <div class="faq-category-chips" id="faqCategoryChips" role="tablist" aria-label="FAQ Categories">
+              <button type="button" class="faq-chip is-active" data-cat="all" role="tab" aria-selected="true">
+                <span class="chip-glyph">✨</span> All Questions
+              </button>
+              <button type="button" class="faq-chip" data-cat="event-rules" role="tab" aria-selected="false">
+                <span class="chip-glyph">⚔️</span> Event &amp; Rules
+              </button>
+              <button type="button" class="faq-chip" data-cat="ai-tools" role="tab" aria-selected="false">
+                <span class="chip-glyph">🤖</span> AI &amp; Tech Stack
+              </button>
+              <button type="button" class="faq-chip" data-cat="hex-twist" role="tab" aria-selected="false">
+                <span class="chip-glyph">🔮</span> Hexes &amp; Twists
+              </button>
+              <button type="button" class="faq-chip" data-cat="alliance" role="tab" aria-selected="false">
+                <span class="chip-glyph">🌀</span> Kapidhwaj Alliance
+              </button>
+              <button type="button" class="faq-chip" data-cat="submission-hosting" role="tab" aria-selected="false">
+                <span class="chip-glyph">🚀</span> Submissions &amp; Hosting
+              </button>
+              <button type="button" class="faq-chip" data-cat="judging-scoring" role="tab" aria-selected="false">
+                <span class="chip-glyph">⚖️</span> Judging &amp; Evaluation
+              </button>
+            </div>
+          </header>
+
+          <!-- Accordion Container -->
+          <div class="faq-list" id="faqList" aria-live="polite">
+            <!-- Populated dynamically via js/app.js from FAQ_DATA -->
+          </div>
+
+          <div class="faq-empty" id="faqEmpty" hidden>
+            <span class="faq-empty-icon">🕯️</span>
+            <p class="faq-empty-title">No answers found in the crypt</p>
+            <p class="faq-empty-sub">Try searching with a different keyword or reset the filter.</p>
+            <button type="button" class="btn btn-ghost btn-sm" id="faqResetBtn">Show All Questions</button>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -1541,7 +1619,11 @@ git push</code></pre>
 
   <div class="sr-only" id="announcer" aria-live="polite"></div>
 
+  <!-- Animation & Motion Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
   <script src="js/data.js"></script>
+  <script src="js/faqs-data.js"></script>
   <script src="js/audio.js"></script>
   <script src="js/store.js"></script>
   <script src="js/firebase-config.js"></script>

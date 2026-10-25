@@ -51,7 +51,12 @@
     subLiveLink: $("subLiveLink"), subRepoLink: $("subRepoLink"),
     subZipDownload: $("subZipDownload"), subZipCloudLink: $("subZipCloudLink"),
     subEditBtn: $("subEditBtn"),
-    viewTabs: $("viewTabs"), tabMission: $("tabMission"), tabWheel: $("tabWheel"),
+    subStatusPill: $("subStatusPill"), subStatusText: $("subStatusText"),
+    viewTabs: $("viewTabs"), tabGrimoire: $("tabGrimoire"), tabSubmit: $("tabSubmit"), tabFaqs: $("tabFaqs"),
+    paneGrimoire: $("paneGrimoire"), paneSubmit: $("paneSubmit"), paneFaqs: $("paneFaqs"),
+    faqCard: $("faqCard"), faqSearchInput: $("faqSearchInput"), faqSearchClear: $("faqSearchClear"),
+    faqCategoryChips: $("faqCategoryChips"), faqList: $("faqList"), faqEmpty: $("faqEmpty"), faqResetBtn: $("faqResetBtn"),
+    apCopyHandleBtn: $("apCopyHandleBtn"), apIgLink: $("apIgLink"),
     systemShutdownBanner: $("systemShutdownBanner"),
     shutdownCountdown: $("shutdownCountdown"),
     shutdownBannerText: $("shutdownBannerText"),
@@ -73,22 +78,43 @@
   var session = window.Store.session();
   var timerId = null, lastBpm = 0;
   var busy = false, replaying = false, cardSeq = 0;
-  var activeView = "mission";
+  var activeView = "grimoire";
   var baseTitle = document.title;
 
   function setView(view, smoothScroll) {
-    if (view !== "mission" && view !== "wheel") view = "mission";
+    var validViews = ["grimoire", "submit", "faqs"];
+    if (validViews.indexOf(view) === -1) {
+      if (view === "mission") view = "grimoire";
+      else if (view === "wheel") view = "grimoire";
+      else view = "grimoire";
+    }
     activeView = view;
     if (!el.wheelPanel) return;
-    el.wheelPanel.classList.toggle("view-mission", view === "mission");
-    el.wheelPanel.classList.toggle("view-wheel", view === "wheel");
-    if (el.tabMission) el.tabMission.classList.toggle("is-active", view === "mission");
-    if (el.tabWheel) el.tabWheel.classList.toggle("is-active", view === "wheel");
-    if (view === "wheel" && wheel) {
-      setTimeout(function () {
-        if (session && typeof session.twist === "number") wheel.show(session.twist);
-      }, 60);
+
+    el.wheelPanel.classList.toggle("view-grimoire", view === "grimoire");
+    el.wheelPanel.classList.toggle("view-submit", view === "submit");
+    el.wheelPanel.classList.toggle("view-faqs", view === "faqs");
+    el.wheelPanel.classList.add("view-mission");
+
+    if (el.tabGrimoire) el.tabGrimoire.classList.toggle("is-active", view === "grimoire");
+    if (el.tabSubmit) el.tabSubmit.classList.toggle("is-active", view === "submit");
+    if (el.tabFaqs) el.tabFaqs.classList.toggle("is-active", view === "faqs");
+
+    if (el.paneGrimoire) el.paneGrimoire.hidden = (view !== "grimoire");
+    if (el.paneSubmit) el.paneSubmit.hidden = (view !== "submit");
+    if (el.paneFaqs) {
+      el.paneFaqs.hidden = (view !== "faqs");
+      if (view === "faqs" && typeof initFaqsHub === "function") {
+        initFaqsHub();
+      }
     }
+
+    if (view === "submit" && typeof renderSubmissionState === "function") {
+      renderSubmissionState();
+    }
+
+    if (window.Sound && window.Sound.tick) window.Sound.tick(0.4);
+
     if (smoothScroll && el.viewTabs) {
       el.viewTabs.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -293,6 +319,16 @@
     el.subError.hidden = true;
     el.subError.textContent = "";
 
+    if (el.subStatusPill && el.subStatusText) {
+      if (hasSub) {
+        el.subStatusPill.classList.add("is-submitted");
+        el.subStatusText.textContent = "Project Submitted & Verified ✓";
+      } else {
+        el.subStatusPill.classList.remove("is-submitted");
+        el.subStatusText.textContent = "Awaiting Submission";
+      }
+    }
+
     if (hasSub) {
       el.subLiveLink.href = session.submissionUrl;
       var timeStr = session.submittedAt
@@ -476,10 +512,13 @@
 
     if (stage === "done") {
       if (el.viewTabs) el.viewTabs.hidden = false;
-      setView(activeView || "mission");
+      setView(activeView || "grimoire");
     } else {
       if (el.viewTabs) el.viewTabs.hidden = true;
-      el.wheelPanel.classList.remove("view-mission", "view-wheel");
+      el.wheelPanel.classList.remove("view-mission", "view-grimoire", "view-submit", "view-faqs", "view-wheel");
+      if (el.paneGrimoire) el.paneGrimoire.hidden = false;
+      if (el.paneSubmit) el.paneSubmit.hidden = true;
+      if (el.paneFaqs) el.paneFaqs.hidden = true;
     }
 
     el.chains.hidden = stage !== "wait";
@@ -1199,24 +1238,26 @@
 
   /* ---------- controls ---------- */
 
-  if (el.tabMission) {
-    el.tabMission.addEventListener("click", function () {
-      setView("mission", true);
-      if (window.Sound && window.Sound.tick) window.Sound.tick(0.5);
+  if (el.tabGrimoire) {
+    el.tabGrimoire.addEventListener("click", function () {
+      setView("grimoire", true);
     });
   }
-  if (el.tabWheel) {
-    el.tabWheel.addEventListener("click", function () {
-      setView("wheel", true);
-      if (window.Sound && window.Sound.tick) window.Sound.tick(0.5);
+  if (el.tabSubmit) {
+    el.tabSubmit.addEventListener("click", function () {
+      setView("submit", true);
+    });
+  }
+  if (el.tabFaqs) {
+    el.tabFaqs.addEventListener("click", function () {
+      setView("faqs", true);
     });
   }
 
   el.spinBtn.addEventListener("click", function () {
     if (session && session.stage === "done") {
-      setView("mission");
-      el.submissionCard.scrollIntoView({ behavior: "smooth", block: "start" });
-      if (!session.submissionUrl) {
+      setView("submit", true);
+      if (el.subUrl && !session.submissionUrl) {
         setTimeout(function () { el.subUrl.focus(); }, 350);
       }
       return;
@@ -2072,6 +2113,209 @@
   if (window.Creatures.scaresOn && window.Sound.canAutoplay()) {
     if (document.readyState === "complete") autoWelcome();
     else window.addEventListener("load", autoWelcome, { once: true });
+  }
+
+  /* ---------- FAQ Hub Engine ---------- */
+  var faqsInitialized = false;
+  var currentFaqCat = "all";
+  var currentFaqQuery = "";
+
+  function initFaqsHub() {
+    if (!el.faqCard || !window.FAQ_DATA) return;
+    if (!faqsInitialized) {
+      faqsInitialized = true;
+      setupFaqControls();
+    }
+    renderFaqList();
+  }
+
+  function setupFaqControls() {
+    if (el.faqCategoryChips) {
+      el.faqCategoryChips.addEventListener("click", function (e) {
+        var chip = e.target.closest(".faq-chip");
+        if (!chip) return;
+        var cat = chip.dataset.cat || "all";
+        if (cat === currentFaqCat) return;
+        currentFaqCat = cat;
+        var chips = el.faqCategoryChips.querySelectorAll(".faq-chip");
+        chips.forEach(function (c) {
+          var isAct = c === chip;
+          c.classList.toggle("is-active", isAct);
+          c.setAttribute("aria-selected", isAct ? "true" : "false");
+        });
+        if (window.Sound && window.Sound.tick) window.Sound.tick(0.4);
+        renderFaqList();
+      });
+    }
+
+    if (el.faqSearchInput) {
+      var debounceTimer = null;
+      el.faqSearchInput.addEventListener("input", function () {
+        var q = this.value.trim().toLowerCase();
+        if (el.faqSearchClear) el.faqSearchClear.hidden = !q;
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function () {
+          currentFaqQuery = q;
+          renderFaqList();
+        }, 120);
+      });
+    }
+
+    if (el.faqSearchClear) {
+      el.faqSearchClear.addEventListener("click", function () {
+        if (el.faqSearchInput) {
+          el.faqSearchInput.value = "";
+          el.faqSearchInput.focus();
+        }
+        this.hidden = true;
+        currentFaqQuery = "";
+        renderFaqList();
+      });
+    }
+
+    if (el.faqResetBtn) {
+      el.faqResetBtn.addEventListener("click", function () {
+        currentFaqCat = "all";
+        currentFaqQuery = "";
+        if (el.faqSearchInput) el.faqSearchInput.value = "";
+        if (el.faqSearchClear) el.faqSearchClear.hidden = true;
+        if (el.faqCategoryChips) {
+          var chips = el.faqCategoryChips.querySelectorAll(".faq-chip");
+          chips.forEach(function (c) {
+            var isAll = c.dataset.cat === "all";
+            c.classList.toggle("is-active", isAll);
+            c.setAttribute("aria-selected", isAll ? "true" : "false");
+          });
+        }
+        renderFaqList();
+      });
+    }
+  }
+
+  function highlightMatch(text, query) {
+    if (!query || !text) return text || "";
+    var regex = new RegExp("(" + query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+    return text.replace(regex, "<mark class='faq-highlight'>$1</mark>");
+  }
+
+  function renderFaqList() {
+    if (!el.faqList || !window.FAQ_DATA) return;
+    var categories = window.FAQ_DATA.categories || [];
+    var allFaqs = [];
+
+    categories.forEach(function (cat) {
+      if (!cat.faqs) return;
+      cat.faqs.forEach(function (f) {
+        allFaqs.push({
+          id: f.id,
+          q: f.q,
+          a: f.a,
+          tags: f.tags || [],
+          catId: cat.id,
+          catName: cat.name,
+          glyph: cat.glyph
+        });
+      });
+    });
+
+    var filtered = allFaqs.filter(function (f) {
+      if (currentFaqCat !== "all" && f.catId !== currentFaqCat) return false;
+      if (currentFaqQuery) {
+        var inQ = f.q.toLowerCase().indexOf(currentFaqQuery) !== -1;
+        var inA = f.a.toLowerCase().indexOf(currentFaqQuery) !== -1;
+        var inTags = f.tags.some(function (t) { return t.toLowerCase().indexOf(currentFaqQuery) !== -1; });
+        if (!inQ && !inA && !inTags) return false;
+      }
+      return true;
+    });
+
+    if (el.faqEmpty) el.faqEmpty.hidden = filtered.length > 0;
+    el.faqList.innerHTML = "";
+
+    filtered.forEach(function (f) {
+      var item = document.createElement("article");
+      item.className = "faq-item";
+      item.dataset.id = f.id;
+      item.dataset.cat = f.catId;
+
+      var qHtml = currentFaqQuery ? highlightMatch(f.q, currentFaqQuery) : f.q;
+      var aHtml = currentFaqQuery ? highlightMatch(f.a, currentFaqQuery) : f.a;
+
+      item.innerHTML = [
+        '<button type="button" class="faq-question" aria-expanded="false" id="faq-q-' + f.id + '">',
+        '  <span class="faq-cat-tag"><span class="tag-glyph">' + f.glyph + '</span> ' + f.catName + '</span>',
+        '  <span class="faq-q-text">' + qHtml + '</span>',
+        '  <span class="faq-arrow-icon" aria-hidden="true">',
+        '    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>',
+        '  </span>',
+        '</button>',
+        '<div class="faq-answer" role="region" aria-labelledby="faq-q-' + f.id + '">',
+        '  <div class="faq-answer-inner">',
+        '    <div class="faq-answer-content">' + aHtml + '</div>',
+        '  </div>',
+        '</div>'
+      ].join("");
+
+      var btn = item.querySelector(".faq-question");
+      btn.addEventListener("click", function () {
+        var wasOpen = item.classList.contains("is-open");
+        item.classList.toggle("is-open", !wasOpen);
+        btn.setAttribute("aria-expanded", wasOpen ? "false" : "true");
+        if (window.Sound && window.Sound.tick) window.Sound.tick(0.35);
+      });
+
+      el.faqList.appendChild(item);
+    });
+  }
+
+  /* ---------- 3D Tilt on Fate Cards & Panels ---------- */
+  function init3DTiltFX() {
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
+    var targets = document.querySelectorAll(".fate, .alliance-protocol-banner, .sub-panel");
+    targets.forEach(function (card) {
+      var rect = null;
+      var raf = null;
+      card.addEventListener("pointerenter", function () { rect = card.getBoundingClientRect(); });
+      card.addEventListener("pointermove", function (e) {
+        if (!rect) rect = card.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        var cx = rect.width / 2;
+        var cy = rect.height / 2;
+        var rx = -((y - cy) / cy) * 5;
+        var ry = ((x - cx) / cx) * 5;
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(function () {
+          card.style.transform = "perspective(900px) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg) scale3d(1.015, 1.015, 1.015)";
+        });
+      }, { passive: true });
+      card.addEventListener("pointerleave", function () {
+        if (raf) cancelAnimationFrame(raf);
+        rect = null;
+        card.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)";
+      });
+    });
+  }
+  setTimeout(init3DTiltFX, 1000);
+
+  /* ---------- Kapidhwaj Copy Handle Button ---------- */
+  if (el.apCopyHandleBtn) {
+    el.apCopyHandleBtn.addEventListener("click", function () {
+      var handle = "@kapidhwaj.innovations";
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(handle).then(function () {
+          el.apCopyHandleBtn.innerHTML = "<span>✓</span> Copied!";
+          if (window.Sound && window.Sound.tick) window.Sound.tick(0.6);
+          setTimeout(function () {
+            el.apCopyHandleBtn.innerHTML = "<span>📋</span> Copy Handle";
+          }, 2000);
+        }).catch(function () {
+          window.prompt("Copy Kapidhwaj Instagram Handle:", handle);
+        });
+      } else {
+        window.prompt("Copy Kapidhwaj Instagram Handle:", handle);
+      }
+    });
   }
 
   function resumePending() {
