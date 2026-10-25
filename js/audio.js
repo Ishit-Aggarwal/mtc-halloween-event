@@ -15,9 +15,18 @@
   var Ctx = window.AudioContext || window.webkitAudioContext;
   var ctx = null, master = null, fxBus = null, musicBus = null, reverb = null, noiseBuf = null;
   var enabled = false;
-  // On the dev machine (localhost) everything still runs, but nothing reaches the speakers.
-  // The deployed site and phones on the network keep their sound.
-  var SILENT = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  // Local testing only: a browser opened once at localhost/?silent stays muted
+  // (everything still runs, nothing reaches the speakers); ?silent=off undoes it.
+  // Other browsers, and the deployed site, keep their sound.
+  var SILENT = (function () {
+    if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return false;
+    var m = /[?&]silent(?:=([^&]*))?/.exec(location.search);
+    var on = !!m && m[1] !== "off" && m[1] !== "0";
+    try {
+      if (m) { if (on) localStorage.setItem("woc.silent", "1"); else localStorage.removeItem("woc.silent"); }
+      return localStorage.getItem("woc.silent") === "1";
+    } catch (e) { return on; }
+  })();
   var droneNodes = null, musicTimer = null, heartTimer = null;
 
   /* ---------- setup ---------- */
@@ -557,7 +566,7 @@
 
   var Sound = {
     get enabled() { return enabled; },
-    /** True on the dev machine (localhost): media elements stay muted too. */
+    /** True in a browser muted for local testing (see SILENT): media elements stay muted too. */
     get silent() { return SILENT; },
 
     /** True when this browser lets the page make sound before anyone has tapped. */

@@ -444,7 +444,7 @@
     }
 
     var soundEnabled = (!window.Sound || window.Sound.enabled !== false);
-    video.muted = !soundEnabled || !!(window.Sound && window.Sound.silent); // silent on localhost
+    video.muted = !soundEnabled || !!(window.Sound && window.Sound.silent);
     video.volume = 1.0;
 
     video.onended = function () {
