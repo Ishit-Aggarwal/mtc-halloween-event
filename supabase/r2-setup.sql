@@ -155,7 +155,6 @@ declare
 begin
   select pass_hash into h from public.r2_hosts where email = lower(btrim(p_email));
   if h is null or extensions.crypt(coalesce(p_password, ''), h) <> h then
-    perform pg_sleep(1); -- slows down password guessing
     return null;
   end if;
   delete from public.r2_host_sessions where expires_at < now();
