@@ -1348,7 +1348,26 @@ body.lit .circuit-grid {
   text-shadow: 0 0 16px rgba(255, 60, 30, .4);
 }
 
-/* Layout modes for Round 2: Grimoire, Submission & FAQs */
+/* Layout modes for Round 2: Wheel, Grimoire, Submission & FAQs */
+.wheel-panel.view-wheel {
+  grid-template-columns: minmax(0, 1fr) !important;
+  max-width: 720px;
+  margin: 0 auto;
+}
+.wheel-panel.view-wheel .wheel-col {
+  display: flex !important;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+  align-items: center;
+  animation: fadeInPane 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.wheel-panel.view-wheel .grimoire,
+.wheel-panel.view-wheel #paneSubmit,
+.wheel-panel.view-wheel #paneFaqs {
+  display: none !important;
+}
+
 .wheel-panel.view-mission,
 .wheel-panel.view-grimoire,
 .wheel-panel.view-submit,

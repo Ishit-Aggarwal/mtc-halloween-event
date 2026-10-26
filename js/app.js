@@ -52,7 +52,7 @@
     subZipDownload: $("subZipDownload"), subZipCloudLink: $("subZipCloudLink"),
     subEditBtn: $("subEditBtn"),
     subStatusPill: $("subStatusPill"), subStatusText: $("subStatusText"),
-    viewTabs: $("viewTabs"), tabGrimoire: $("tabGrimoire"), tabSubmit: $("tabSubmit"), tabFaqs: $("tabFaqs"),
+    viewTabs: $("viewTabs"), tabWheel: $("tabWheel"), tabGrimoire: $("tabGrimoire"), tabSubmit: $("tabSubmit"), tabFaqs: $("tabFaqs"),
     paneGrimoire: $("paneGrimoire"), paneSubmit: $("paneSubmit"), paneFaqs: $("paneFaqs"),
     faqCard: $("faqCard"), faqSearchInput: $("faqSearchInput"), faqSearchClear: $("faqSearchClear"),
     faqCategoryChips: $("faqCategoryChips"), faqList: $("faqList"), faqEmpty: $("faqEmpty"), faqResetBtn: $("faqResetBtn"),
@@ -84,20 +84,22 @@
   var baseTitle = document.title;
 
   function setView(view, smoothScroll) {
-    var validViews = ["grimoire", "submit", "faqs"];
+    var isTwistPending = session && (session.stage === "wait" || session.stage === "twist") && typeof session.twist !== "number";
+    var validViews = isTwistPending ? ["wheel", "grimoire"] : ["grimoire", "submit", "faqs"];
+    if (view === "mission") view = "grimoire";
     if (validViews.indexOf(view) === -1) {
-      if (view === "mission") view = "grimoire";
-      else if (view === "wheel") view = "grimoire";
-      else view = "grimoire";
+      view = "grimoire";
     }
     activeView = view;
     if (!el.wheelPanel) return;
 
+    el.wheelPanel.classList.toggle("view-wheel", view === "wheel");
     el.wheelPanel.classList.toggle("view-grimoire", view === "grimoire");
     el.wheelPanel.classList.toggle("view-submit", view === "submit");
     el.wheelPanel.classList.toggle("view-faqs", view === "faqs");
-    el.wheelPanel.classList.add("view-mission");
+    el.wheelPanel.classList.toggle("view-mission", view !== "wheel");
 
+    if (el.tabWheel) el.tabWheel.classList.toggle("is-active", view === "wheel");
     if (el.tabGrimoire) el.tabGrimoire.classList.toggle("is-active", view === "grimoire");
     if (el.tabSubmit) el.tabSubmit.classList.toggle("is-active", view === "submit");
     if (el.tabFaqs) el.tabFaqs.classList.toggle("is-active", view === "faqs");
@@ -109,6 +111,12 @@
       if (view === "faqs" && typeof initFaqsHub === "function") {
         initFaqsHub();
       }
+    }
+
+    if (view === "wheel") {
+      requestAnimationFrame(function () {
+        if (wheel && typeof wheel.draw === "function") wheel.draw();
+      });
     }
 
     if (view === "submit" && typeof renderSubmissionState === "function") {
@@ -514,11 +522,25 @@
     picker.hidden = !choosing;
     if (choosing) renderPicker();
 
+    var isTwistPending = session && (stage === "wait" || stage === "twist") && typeof session.twist !== "number";
+
     if (stage === "done") {
       if (el.viewTabs) el.viewTabs.hidden = false;
+      if (el.tabWheel) el.tabWheel.hidden = true;
+      if (el.tabGrimoire) el.tabGrimoire.hidden = false;
+      if (el.tabSubmit) el.tabSubmit.hidden = false;
+      if (el.tabFaqs) el.tabFaqs.hidden = false;
       setView(activeView || "grimoire");
+    } else if (isTwistPending) {
+      if (el.viewTabs) el.viewTabs.hidden = false;
+      if (el.tabWheel) el.tabWheel.hidden = false;
+      if (el.tabGrimoire) el.tabGrimoire.hidden = false;
+      if (el.tabSubmit) el.tabSubmit.hidden = true;
+      if (el.tabFaqs) el.tabFaqs.hidden = true;
+      setView((activeView === "wheel" || activeView === "grimoire") ? activeView : "grimoire");
     } else {
       if (el.viewTabs) el.viewTabs.hidden = true;
+      if (el.tabWheel) el.tabWheel.hidden = true;
       el.wheelPanel.classList.remove("view-mission", "view-grimoire", "view-submit", "view-faqs", "view-wheel");
       if (el.paneGrimoire) el.paneGrimoire.hidden = false;
       if (el.paneSubmit) el.paneSubmit.hidden = true;
@@ -641,6 +663,7 @@
     el.chains.classList.add("breaking");
     el.stage.classList.add("shake");
     announce("The twist wheel has awakened. Spin it now.");
+    setView("wheel");
     setTimeout(function () {
       el.stage.classList.remove("shake");
       render(false);
@@ -1302,6 +1325,11 @@
 
   /* ---------- controls ---------- */
 
+  if (el.tabWheel) {
+    el.tabWheel.addEventListener("click", function () {
+      setView("wheel", true);
+    });
+  }
   if (el.tabGrimoire) {
     el.tabGrimoire.addEventListener("click", function () {
       setView("grimoire", true);
