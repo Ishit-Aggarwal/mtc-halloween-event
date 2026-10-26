@@ -60,6 +60,8 @@
     systemShutdownBanner: $("systemShutdownBanner"),
     shutdownCountdown: $("shutdownCountdown"),
     shutdownBannerText: $("shutdownBannerText"),
+    topbarTimer: $("topbarTimer"),
+    topbarTimerDigits: $("topbarTimerDigits"),
     hostTriggerCorruption: $("hostTriggerCorruption"),
     hostTriggerFiveMin: $("hostTriggerFiveMin"),
     hostTriggerZeroHour: $("hostTriggerZeroHour")
@@ -492,11 +494,13 @@
       el.wheelPanel.classList.remove("view-mission", "view-wheel");
       setSeals(0);
       stopTimer();
+      stopBuildTimer();
       document.title = baseTitle;
       return;
     }
     el.ledgerPanel.hidden = true;
     el.wheelPanel.hidden = false;
+    startBuildTimer();
 
     var stage = session.stage;
     setSeals(STAGES[stage]);
@@ -566,6 +570,65 @@
   }
   function stopTimer() { if (timerId) clearInterval(timerId); timerId = null; }
 
+  /* ---------- 60-Minute Build Countdown Timer ---------- */
+  var buildTimerInterval = null;
+  var BUILD_DURATION_MS = 60 * 60 * 1000; // 60 minutes
+
+  function updateBuildTimer() {
+    if (!el.topbarTimer || !el.topbarTimerDigits) return;
+    if (!session || !session.startedAt) {
+      el.topbarTimer.hidden = true;
+      if (buildTimerInterval) { clearInterval(buildTimerInterval); buildTimerInterval = null; }
+      return;
+    }
+    el.topbarTimer.hidden = false;
+    var elapsed = Date.now() - session.startedAt;
+    var rem = BUILD_DURATION_MS - elapsed;
+    var labelEl = el.topbarTimer.querySelector(".topbar-timer-label");
+
+    if (rem <= 0) {
+      el.topbarTimerDigits.textContent = "00:00";
+      el.topbarTimer.classList.add("is-expired");
+      el.topbarTimer.classList.remove("is-warning", "is-critical");
+      if (labelEl) labelEl.textContent = "TIME EXPIRED";
+      return;
+    }
+
+    el.topbarTimer.classList.remove("is-expired");
+    if (labelEl) labelEl.textContent = "BUILD TIMER";
+    var totalSec = Math.floor(rem / 1000);
+    var m = Math.floor(totalSec / 60);
+    var s = totalSec % 60;
+    var mStr = m < 10 ? "0" + m : "" + m;
+    var sStr = s < 10 ? "0" + s : "" + s;
+    el.topbarTimerDigits.textContent = mStr + ":" + sStr;
+
+    if (m < 5) {
+      el.topbarTimer.classList.add("is-critical");
+      el.topbarTimer.classList.remove("is-warning");
+    } else if (m < 10) {
+      el.topbarTimer.classList.add("is-warning");
+      el.topbarTimer.classList.remove("is-critical");
+    } else {
+      el.topbarTimer.classList.remove("is-warning", "is-critical");
+    }
+  }
+
+  function startBuildTimer() {
+    updateBuildTimer();
+    if (!buildTimerInterval && session && session.startedAt) {
+      buildTimerInterval = setInterval(updateBuildTimer, 1000);
+    }
+  }
+
+  function stopBuildTimer() {
+    if (buildTimerInterval) {
+      clearInterval(buildTimerInterval);
+      buildTimerInterval = null;
+    }
+    if (el.topbarTimer) el.topbarTimer.hidden = true;
+  }
+
   function unlockTwist() {
     session.stage = "twist";
     save();
@@ -622,6 +685,7 @@
   function saveProgress() {
     if (!session || !session.teamKey) return;
     var p = { stage: session.pending ? session.pending + "-spun" : session.stage };
+    if (session.startedAt) p.startedAt = session.startedAt;
     if (session.leader) p.leader = session.leader;
     if (session.members && session.members.length) p.members = session.members.slice();
     if (session.charId) p.charId = session.charId;
@@ -2356,11 +2420,11 @@
         teamKey: t.key,
         leader: t.leader || (lock && lock.leader) || null,
         members: t.members || (lock && lock.members) || [],
-        startedAt: t.at || Date.now(),
+        startedAt: t.startedAt || t.at || Date.now(),
         stage: t.stage || "soul",
         eggs: (t.eggs || []).slice()
       };
-      ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "zipUrl", "zipName", "zipSize", "zipCloudUrl", "submittedAt", "leader", "members"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
+      ["charId", "problem", "hex", "hexAt", "unlockAt", "twist", "twistExtra", "submissionUrl", "repoUrl", "zipUrl", "zipName", "zipSize", "zipCloudUrl", "submittedAt", "leader", "members", "startedAt"].forEach(function (k) { if (t[k] != null) restored[k] = t[k]; });
       // "<stage>-spun" = the wheel had stopped but the card wasn't accepted yet
       var m = /^(soul|curse|hex|twist)-spun$/.exec(restored.stage);
       if (m) { restored.stage = m[1]; restored.pending = m[1]; }

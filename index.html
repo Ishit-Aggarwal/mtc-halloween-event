@@ -10,6 +10,8 @@
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%83%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
   <!-- the shared ledger (Supabase): open these connections early so phones don't wait on them -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://fnubekbfadspsctsmdwl.supabase.co" crossorigin>
@@ -169,11 +171,19 @@
   <!-- ============ TOP BAR ============ -->
   <header class="topbar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <i></i><i></i><i></i><i></i>
-      </span>
+      <img class="brand-logo" src="assets/brand/mlsa-shield.png" alt="Microsoft Student Ambassador Shield" width="36" height="38">
       <span class="brand-text">Microsoft Tech Community<small>Amity Noida</small></span>
     </div>
+
+    <!-- 60-Minute Build Countdown Timer (visible once registered in ledger) -->
+    <div class="topbar-timer" id="topbarTimer" hidden role="timer" aria-live="off" title="Round 2 Build Window: 60 Minutes Remaining">
+      <span class="topbar-timer-icon" aria-hidden="true">⏱️</span>
+      <div class="topbar-timer-wrap">
+        <span class="topbar-timer-digits" id="topbarTimerDigits">60:00</span>
+        <span class="topbar-timer-label">BUILD TIMER</span>
+      </div>
+    </div>
+
     <div class="topbar-actions">
       <button class="icon-btn" id="githubTopBtn" type="button" data-guide="start" aria-label="Help: GitHub and hosting guide" title="Help: GitHub and hosting guide">
         <span class="help-mark">?</span>
