@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/creepy.css">
   <link rel="stylesheet" href="css/cutscene.css">
+  <link rel="preload" as="video" href="portal%20animation.mp4" type="video/mp4">
   <link rel="preload" as="image" href="assets/scares/face.jpg">
 </head>
 <body>
@@ -1505,46 +1506,19 @@ git push</code></pre>
 
   <!-- ============ THE OTHER SIDE: HORROR CUTSCENE ============ -->
   <div class="cutscene-layer" id="cutsceneLayer" aria-hidden="true" hidden>
-    <!-- Camera Rig: Handles camera shudder, violent drag plunge, and perspective zoom -->
+    <!-- Camera Rig: Handles camera shudder, perspective zoom, and wormhole plunge -->
     <div class="cutscene-rig" id="cutsceneRig">
       <!-- Background Occult Void & Wormhole Canvas -->
       <canvas class="cutscene-canvas" id="cutsceneCanvas"></canvas>
+
+      <!-- Portal Video: Replaces former procedural portal & hands dragging animation -->
+      <video class="cutscene-portal-video" id="cutscenePortalVideo" playsinline preload="auto" src="portal%20animation.mp4" hidden></video>
 
       <!-- Distortion & Post-Processing Overlays -->
       <div class="cutscene-vortex" id="cutsceneVortex"></div>
       <div class="cutscene-scanlines"></div>
       <div class="cutscene-chroma" id="cutsceneChroma"></div>
       <div class="cutscene-vignette"></div>
-
-      <!-- Realistic Human Zombie Hands Layer (Photorealistic organic human anatomy) -->
-      <div class="cutscene-claws-layer" id="cutsceneClawsLayer">
-        <!-- Left Realistic Zombie Hand Gripping Bezel -->
-        <div class="claw-wrap claw-left" id="clawLeft">
-          <img src="assets/figures/zombie-hand-left.webp" id="handLeftImg" fetchpriority="low" decoding="async" class="hand-img hand-img-left" alt="" draggable="false">
-        </div>
-
-        <!-- Right Realistic Zombie Hand Gripping Bezel -->
-        <div class="claw-wrap claw-right" id="clawRight">
-          <img src="assets/figures/zombie-hand-right.webp" id="handRightImg" fetchpriority="low" decoding="async" class="hand-img hand-img-right" alt="" draggable="false">
-        </div>
-
-        <!-- Center Realistic Zombie Hand Thrusting Forward in 3D Perspective -->
-        <div class="claw-wrap claw-center" id="clawCenter">
-          <img src="assets/figures/zombie-hand-center.webp" id="handCenterImg" fetchpriority="low" decoding="async" class="hand-img hand-img-center" alt="" draggable="false">
-        </div>
-      </div>
-
-      <!-- Glass Impact Fractures Overlay -->
-      <div class="cutscene-glass" id="cutsceneGlass">
-        <svg class="glass-cracks-svg" id="glassCracksSvg" viewBox="0 0 1000 1000" preserveAspectRatio="none">
-          <g id="glassImpactLeft" class="impact-fracture" hidden>
-            <path d="M 0,380 L 140,370 L 210,340 M 140,370 L 175,420 L 255,445 M 140,370 L 80,310 L 125,265 M 210,340 L 290,330 L 360,365 M 210,340 L 245,280 L 310,250 M 0,340 L 90,350 M 0,420 L 110,395" />
-          </g>
-          <g id="glassImpactRight" class="impact-fracture" hidden>
-            <path d="M 1000,420 L 860,410 L 790,380 M 860,410 L 825,460 L 745,485 M 860,410 L 920,350 L 875,305 M 790,380 L 710,370 L 640,405 M 790,380 L 755,320 L 690,290 M 1000,380 L 910,390 M 1000,460 L 890,435" />
-          </g>
-        </svg>
-      </div>
 
       <!-- Stage Container: Spooky Darkness & Figures + Big Glowing Cinema Text -->
       <div class="cutscene-stage" id="cutsceneStage">

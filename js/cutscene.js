@@ -108,6 +108,7 @@
       this.glassLeft = document.getElementById("glassImpactLeft");
       this.glassRight = document.getElementById("glassImpactRight");
       this.flash = document.getElementById("cutsceneFlash");
+      this.portalVideo = document.getElementById("cutscenePortalVideo");
 
       // Spooky Void & Cinema Typography Elements
       this.voidFigures = document.getElementById("voidFigures");
@@ -290,6 +291,15 @@
         this.cinemaTextLine.textContent = "";
         this.cinemaTextLine.className = "cinema-text-line";
       }
+      if (this.portalVideo) {
+        this.portalVideo.pause();
+        this.portalVideo.currentTime = 0;
+        this.portalVideo.classList.remove("is-playing", "is-fading");
+        this.portalVideo.hidden = true;
+        this.portalVideo.onended = null;
+        this.portalVideo.ontimeupdate = null;
+        this.portalVideo.onplaying = null;
+      }
       if (this.endcard) this.endcard.hidden = true;
 
       this.bloodDrips = [];
@@ -465,111 +475,20 @@
       }
 
       // ========================================================
-      // ENTRY CUTSCENE: FULL HORROR PORTAL & WORMHOLE PIPELINE
+      // ENTRY CUTSCENE: PORTAL VIDEO -> SUPERFAST WORMHOLE WARP PIPELINE
+      // (Replaces former procedural canvas portal & zombie hands dragging)
       // ========================================================
-      this.canvasMode = MODE.PORTAL;
-
-      // ========================================================
-      // PHASE 1: BLOODY PORTAL TEARS OPEN (0.0s - 2.0s)
-      // ========================================================
-      if (S.cutsceneFleshRip) S.cutsceneFleshRip();
-      if (S.cutsceneVortexHum) S.cutsceneVortexHum(true);
-      if (this.vortex) this.vortex.classList.add("pull");
-      if (this.chroma) this.chroma.classList.add("glitching");
-
-      // Initial dripping blood seeds
-      for (var d = 0; d < 20; d++) {
-        this.bloodDrips.push({
-          x: self.width * (0.38 + Math.random() * 0.24),
-          y: self.height * (0.50 + Math.random() * 0.15),
-          vy: 2.5 + Math.random() * 4.5,
-          r: 2 + Math.random() * 3.5,
-          alpha: 0.85,
-          length: 5 + Math.random() * 14
-        });
+      this.canvasMode = null;
+      if (this.ctx) {
+        this.ctx.fillStyle = "#020002";
+        this.ctx.fillRect(0, 0, this.width, this.height);
       }
 
-      // Start unified 60fps render loop
-      this.startRenderLoop();
+      var transitioned = false;
 
-      // ========================================================
-      // PHASE 2: REALISTIC HANDS EMERGE IN 3D PERSPECTIVE (2.0s - 3.4s)
-      // ========================================================
-      this.delay(function () {
-        if (!self.isActive) return;
-        if (S.cutsceneDemonicScreech) S.cutsceneDemonicScreech();
-        if (S.whisper) S.whisper();
-
-        if (self.clawLeft) self.clawLeft.classList.add("emerge");
-        if (self.clawRight) self.clawRight.classList.add("emerge");
-        if (self.clawTop) self.clawTop.classList.add("emerge");
-        if (self.clawCenter) self.clawCenter.classList.add("lunge");
-      }, 2000);
-
-      // ========================================================
-      // PHASE 3: SCREEN-EDGE SLAM & GRAB (3.4s - 4.6s)
-      // ========================================================
-      this.delay(function () {
-        if (!self.isActive) return;
-        if (S.cutsceneClawGrab) S.cutsceneClawGrab();
-        if (S.cutsceneGlassCrack) S.cutsceneGlassCrack();
-
-        // Screen impact tremor
-        if (self.rig) self.rig.classList.add("claw-slam-shake");
-
-        // Glass fractures snap open at contact points
-        if (self.glassLeft) self.glassLeft.hidden = false;
-        if (self.glassRight) self.glassRight.hidden = false;
-
-        // Realistic hand fingers wrap and grip tightly
-        [self.clawLeft, self.clawRight, self.clawTop].forEach(function (c) {
-          if (c) c.classList.add("gripping");
-        });
-
-        // Blood impact drops
-        for (var b = 0; b < 24; b++) {
-          var isLeft = Math.random() > 0.5;
-          self.bloodDrips.push({
-            x: isLeft ? Math.random() * 110 : self.width - Math.random() * 110,
-            y: self.height * (0.32 + Math.random() * 0.38),
-            vy: 2 + Math.random() * 3.8,
-            r: 2.2 + Math.random() * 3,
-            alpha: 0.9,
-            length: 8 + Math.random() * 18
-          });
-        }
-      }, 3400);
-
-      // ========================================================
-      // PHASE 4: VIOLENT ABYSS DRAG PLUNGE (4.6s - 5.8s)
-      // ========================================================
-      this.delay(function () {
-        if (!self.isActive) return;
-        if (S.cutsceneDragRoar) S.cutsceneDragRoar();
-        if (S.scream) S.scream();
-
-        if (self.rig) {
-          self.rig.classList.remove("claw-slam-shake");
-          void self.rig.offsetWidth;
-          self.rig.classList.add("drag-plunge");
-        }
-      }, 4600);
-
-      // ========================================================
-      // PHASE 5: HYPERSPEED 3D WORMHOLE WARP (5.8s - 8.4s) — 60FPS ZERO LAG
-      // ========================================================
-      this.delay(function () {
-        if (!self.isActive) return;
-        if (S.cutsceneVortexHum) S.cutsceneVortexHum(false);
-        if (S.cutsceneWarpEngine) S.cutsceneWarpEngine(true);
-
-        // Reset rig transform & hide claws for wormhole flight
-        if (self.rig) self.rig.className = "cutscene-rig";
-        [self.clawLeft, self.clawRight, self.clawTop, self.clawCenter].forEach(function (claw) {
-          if (claw) claw.classList.remove("emerge", "lunge", "gripping");
-        });
-        if (self.glassLeft) self.glassLeft.hidden = true;
-        if (self.glassRight) self.glassRight.hidden = true;
+      function transitionToWormhole() {
+        if (transitioned || !self.isActive) return;
+        transitioned = true;
 
         // Dispel portal vortex & chromatic aberration overlay so wormhole has 100% clear view
         if (self.vortex) {
@@ -580,7 +499,14 @@
           self.chroma.classList.remove("glitching");
         }
 
-        // Clean slate clear for wormhole tunnel
+        // 1. Seamless forward-scale crossfade of portal video into wormhole
+        if (self.portalVideo) {
+          self.portalVideo.classList.add("is-fading");
+        }
+
+        // 2. Start Wormhole Sound & Warp Tunnel Canvas
+        if (S.cutsceneWarpEngine) S.cutsceneWarpEngine(true);
+
         if (self.ctx) {
           self.ctx.fillStyle = "#020002";
           self.ctx.fillRect(0, 0, self.width, self.height);
@@ -589,55 +515,108 @@
         self.canvasMode = MODE.WARP_TUNNEL;
         self.warpSpeed = 1.0;
         self.targetWarpSpeed = 2.0;
-      }, 5800);
+        self.startRenderLoop();
 
-      // Smooth acceleration ramps
-      this.delay(function () {
-        if (self.isActive) self.targetWarpSpeed = 4.5;
-      }, 6500);
+        // 3. Smooth acceleration ramps (existing superfast wormhole travel)
+        self.delay(function () {
+          if (self.isActive) self.targetWarpSpeed = 4.5;
+        }, 700);
 
-      this.delay(function () {
-        if (self.isActive) self.targetWarpSpeed = 8.5;
-      }, 7400);
+        self.delay(function () {
+          if (self.isActive) self.targetWarpSpeed = 8.5;
+        }, 1600);
 
-      // ========================================================
-      // PHASE 6: SUPERNOVA FLASHBANG CRASH LAND (8.4s - 9.0s)
-      // ========================================================
-      this.delay(function () {
-        if (!self.isActive) return;
-        if (S.cutsceneWarpEngine) S.cutsceneWarpEngine(false);
-        if (S.cutsceneFlashBang) S.cutsceneFlashBang();
+        // 4. Supernova Flashbang & Crash Landing into Dark Void (after 2.6s of wormhole travel)
+        self.delay(function () {
+          if (!self.isActive) return;
+          if (S.cutsceneWarpEngine) S.cutsceneWarpEngine(false);
+          if (S.cutsceneFlashBang) S.cutsceneFlashBang();
 
-        if (self.flash) {
-          self.flash.classList.add("bang");
-          setTimeout(function () {
-            if (self.flash) {
-              self.flash.classList.remove("bang");
-              self.flash.classList.add("fade");
+          if (self.portalVideo) {
+            self.portalVideo.pause();
+            self.portalVideo.hidden = true;
+            self.portalVideo.classList.remove("is-playing", "is-fading");
+          }
+
+          if (self.flash) {
+            self.flash.classList.add("bang");
+            setTimeout(function () {
+              if (self.flash) {
+                self.flash.classList.remove("bang");
+                self.flash.classList.add("fade");
+              }
+            }, 100);
+          }
+
+          // Switch to Dark Void Mode with Spooky Figures & Drifting Mist
+          self.canvasMode = MODE.DARK_VOID;
+
+          // Reveal spooky figures lurking in the shadows & glowing eyes
+          if (self.voidFigures) {
+            self.voidFigures.hidden = false;
+            void self.voidFigures.offsetWidth;
+            self.voidFigures.classList.add("revealed");
+          }
+        }, 2600);
+
+        // 5. Big Cinematic Glowing Narrative Text (after crash landing)
+        self.delay(function () {
+          if (!self.isActive) return;
+          if (self.cinemaWrap) self.cinemaWrap.hidden = false;
+          self.playCinematicNarrative();
+        }, 3400);
+      }
+
+      // Play the portal animation video
+      var videoStarted = false;
+      var transitionTimer = null;
+
+      function scheduleTransitionTimer(delayMs) {
+        if (transitionTimer) clearTimeout(transitionTimer);
+        transitionTimer = setTimeout(function () {
+          transitionToWormhole();
+        }, delayMs);
+        self.timerIds.push(transitionTimer);
+      }
+
+      if (this.portalVideo) {
+        var isMuted = !window.Sound || !window.Sound.enabled || !!window.Sound.silent;
+        this.portalVideo.muted = isMuted;
+        this.portalVideo.volume = 1.0;
+        this.portalVideo.currentTime = 0;
+        this.portalVideo.hidden = false;
+        this.portalVideo.classList.remove("is-fading");
+        this.portalVideo.classList.add("is-playing");
+
+        this.portalVideo.onplaying = function () {
+          videoStarted = true;
+          // Video is playing! Duration is 10.0s, begin wormhole transition at 9.3s
+          scheduleTransitionTimer(9300);
+        };
+        this.portalVideo.onended = function () {
+          transitionToWormhole();
+        };
+        this.portalVideo.ontimeupdate = function () {
+          if (self.portalVideo && self.portalVideo.currentTime >= 9.3) {
+            transitionToWormhole();
+          }
+        };
+
+        var playPromise = this.portalVideo.play();
+        if (playPromise && playPromise.catch) {
+          playPromise.catch(function () {
+            if (self.portalVideo) {
+              self.portalVideo.muted = true;
+              self.portalVideo.play().catch(function () {});
             }
-          }, 100);
+          });
         }
+      }
 
-        // Switch to Dark Void Mode with Spooky Figures & Drifting Mist
-        self.canvasMode = MODE.DARK_VOID;
-
-        // Reveal spooky figures lurking in the shadows & glowing eyes
-        if (self.voidFigures) {
-          self.voidFigures.hidden = false;
-          void self.voidFigures.offsetWidth;
-          self.voidFigures.classList.add("revealed");
-        }
-      }, 8400);
-
-      // ========================================================
-      // PHASE 7: BIG CINEMATIC GLOWING NARRATIVE TEXT (9.2s)
-      // Leads automatically into Phase 8 (Mission 02 End Card)
-      // ========================================================
+      // Safety fallback: if video stalls or fails to fire events, transition at 12s anyway
       this.delay(function () {
-        if (!self.isActive) return;
-        if (self.cinemaWrap) self.cinemaWrap.hidden = false;
-        self.playCinematicNarrative();
-      }, 9200);
+        if (!videoStarted) transitionToWormhole();
+      }, 12000);
     },
 
     startRenderLoop: function () {
@@ -1186,6 +1165,16 @@
       var S = window.Sound || {};
       if (S.cutsceneVortexHum) S.cutsceneVortexHum(false);
       if (S.cutsceneWarpEngine) S.cutsceneWarpEngine(false);
+
+      if (this.portalVideo) {
+        this.portalVideo.pause();
+        this.portalVideo.currentTime = 0;
+        this.portalVideo.classList.remove("is-playing", "is-fading");
+        this.portalVideo.hidden = true;
+        this.portalVideo.onended = null;
+        this.portalVideo.ontimeupdate = null;
+        this.portalVideo.onplaying = null;
+      }
 
       var self = this;
       if (this.layer) {
