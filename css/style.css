@@ -1185,13 +1185,13 @@ body.lit .circuit-grid {
 .ps-option {
   display: grid; gap: 6px; width: 100%; padding: 18px 20px; text-align: left; cursor: pointer;
   color: var(--bone); background: linear-gradient(160deg, var(--dusk), var(--ink));
-  border: 1px solid color-mix(in srgb, var(--accent) 55%, transparent); border-left: 4px solid var(--accent); border-radius: 10px;
+  border: 1px solid rgba(240, 90, 70, .3); border-radius: 10px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .45);
   transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
 .ps-option:hover:not(:disabled), .ps-option:focus-visible {
-  transform: translateY(-2px); outline: none; border-color: var(--accent);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .55), 0 0 22px color-mix(in srgb, var(--accent) 45%, transparent);
+  transform: translateY(-2px); outline: none; border-color: rgba(255, 90, 42, .7);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .55), 0 0 20px rgba(255, 60, 30, .3);
 }
 .ps-option:disabled { cursor: default; }
 .ps-num { font-family: var(--f-pixel); font-size: 12px; letter-spacing: .14em; color: var(--gold); }
@@ -1920,31 +1920,30 @@ body.lit .circuit-grid {
    ========================================================= */
 
 .alliance-protocol-banner {
-  background: radial-gradient(ellipse at 50% 0%, rgba(55, 18, 5, 0.95), rgba(16, 3, 5, 0.98) 75%);
-  border: 1.5px solid rgba(255, 179, 0, 0.45);
-  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.75), 0 0 24px rgba(255, 179, 0, 0.2);
+  background: radial-gradient(ellipse at 50% 0%, rgba(55, 10, 8, 0.95), rgba(16, 3, 5, 0.98) 75%);
+  border: 1px solid rgba(240, 90, 70, 0.35);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.75);
   border-radius: 12px;
-  padding: clamp(20px, 3.5vw, 28px);
-  margin-top: 24px;
-  margin-bottom: 24px;
+  padding: clamp(18px, 3.5vw, 28px);
   position: relative;
-  overflow: hidden;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  min-width: 0;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .alliance-protocol-banner:hover {
-  transform: translateY(-3px);
-  border-color: #ffb300;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 35px rgba(255, 179, 0, 0.4);
+  border-color: rgba(255, 90, 42, 0.6);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 22px rgba(255, 60, 30, 0.22);
 }
 
-.alliance-protocol-banner::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #ff4520, #ffaa00, #ff4520);
+/* wheel phase: the card sits under the wheel / spin button, the grimoire stays alone on the right */
+@media (min-width: 980px) {
+  .wheel-panel:not(.view-mission) .wheel-col { grid-column: 1; grid-row: 1; }
+  .wheel-panel:not(.view-mission) .grimoire { grid-column: 2; grid-row: 1 / span 2; }
+  .wheel-panel:not(.view-mission) .alliance-protocol-banner { grid-column: 1; grid-row: 2; }
 }
+.wheel-panel:not(.view-mission) .alliance-protocol-banner { width: 100%; max-width: 720px; justify-self: center; }
+.wheel-panel.view-submit .alliance-protocol-banner,
+.wheel-panel.view-faqs .alliance-protocol-banner { display: none; }
 
 .ap-header {
   display: flex;
@@ -1954,36 +1953,26 @@ body.lit .circuit-grid {
 }
 
 .ap-emblem-wrap {
-  position: relative;
-  width: 76px;
-  height: 76px;
+  width: 84px;
+  height: 84px;
   flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.ap-sun-halo {
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 1.5px dashed #ffb300;
-  box-shadow: 0 0 14px rgba(255, 179, 0, 0.6);
-  animation: apSpinHalo 24s linear infinite;
-}
-
-@keyframes apSpinHalo {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  filter: drop-shadow(0 0 12px rgba(255, 90, 40, 0.35));
 }
 
 .ap-emblem {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* the Kapidhwaj PNG is a round badge on a dark square: show just the badge, filling its box */
+img.sponsor-logo {
+  aspect-ratio: 1;
   object-fit: cover;
-  border: 2px solid #ffaa00;
-  box-shadow: 0 0 18px rgba(255, 140, 0, 0.55);
+  object-position: 50% 50%;
+  -webkit-clip-path: circle(47.2% at 50.8% 50.1%);
+  clip-path: circle(47.2% at 50.8% 50.1%);
+  transform: scale(1.06);
 }
 
 .ap-title-wrap {
@@ -2008,8 +1997,8 @@ body.lit .circuit-grid {
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: #ffaa00;
-  background: rgba(255, 140, 0, 0.15);
-  border: 1px solid rgba(255, 140, 0, 0.4);
+  background: rgba(255, 140, 0, 0.12);
+  border: 1px solid rgba(240, 90, 70, 0.35);
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -2024,7 +2013,7 @@ body.lit .circuit-grid {
   text-transform: uppercase;
   color: #ffd180;
   background: rgba(211, 47, 47, 0.25);
-  border: 1px solid rgba(255, 100, 100, 0.4);
+  border: 1px solid rgba(240, 90, 70, 0.35);
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -2036,6 +2025,7 @@ body.lit .circuit-grid {
   color: #fff;
   letter-spacing: 0.04em;
   text-shadow: 0 0 12px rgba(255, 120, 0, 0.4);
+  overflow-wrap: anywhere;
 }
 
 .ap-subtitle {
@@ -2047,8 +2037,8 @@ body.lit .circuit-grid {
 .ap-quote {
   padding: 10px 14px;
   background: rgba(0, 0, 0, 0.45);
-  border-left: 3px solid #ff4520;
-  border-radius: 0 4px 4px 0;
+  border: 1px solid rgba(240, 90, 70, 0.25);
+  border-radius: 6px;
   margin-bottom: 16px;
   font-style: italic;
   font-size: 13.5px;
@@ -2061,20 +2051,15 @@ body.lit .circuit-grid {
 
 .ap-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* two columns only when the card itself is wide enough, whatever the viewport */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 16px;
   margin-bottom: 18px;
 }
 
-@media (max-width: 768px) {
-  .ap-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
 .ap-rules-col, .ap-ideas-col {
   background: rgba(10, 2, 4, 0.85);
-  border: 1px solid rgba(255, 120, 0, 0.25);
+  border: 1px solid rgba(240, 90, 70, 0.25);
   border-radius: 6px;
   padding: 14px 16px;
 }
@@ -2137,7 +2122,7 @@ body.lit .circuit-grid {
   align-items: center;
   gap: 6px;
   background: rgba(20, 5, 8, 0.9);
-  border: 1px solid rgba(255, 179, 0, 0.35);
+  border: 1px solid rgba(240, 90, 70, 0.35);
   color: #ffe0b2;
   padding: 9px 16px;
   border-radius: 6px;
@@ -2148,7 +2133,7 @@ body.lit .circuit-grid {
 }
 
 .btn-ap-copy:hover {
-  border-color: #ffb300;
+  border-color: rgba(255, 90, 42, 0.7);
   color: #ffffff;
   background: rgba(45, 12, 18, 0.95);
 }
@@ -2158,7 +2143,7 @@ body.lit .circuit-grid {
   align-items: center;
   gap: 8px;
   background: rgba(30, 8, 12, 0.95);
-  border: 1px solid rgba(255, 140, 0, 0.5);
+  border: 1px solid rgba(240, 90, 70, 0.35);
   color: #ffe6dc;
   padding: 9px 16px;
   border-radius: 6px;
@@ -2169,7 +2154,7 @@ body.lit .circuit-grid {
 
 .btn-ap-replay:hover {
   background: rgba(55, 14, 20, 0.98);
-  border-color: #ffaa00;
+  border-color: rgba(255, 90, 42, 0.7);
   color: #ffffff;
 }
 
@@ -2488,9 +2473,7 @@ body.lit .circuit-grid {
 
 /* Grimoire Seal V Sponsor Styling */
 .fate.fate-sponsor {
-  border-color: rgba(255, 140, 0, 0.45);
   background: rgba(24, 6, 8, 0.92);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(255, 120, 0, 0.12);
 }
 
 .fate-sponsor-header {
@@ -2507,9 +2490,9 @@ body.lit .circuit-grid {
   letter-spacing: 0.1em;
   padding: 2px 6px;
   border-radius: 3px;
-  background: rgba(255, 140, 0, 0.2);
+  background: rgba(255, 140, 0, 0.15);
   color: #ffaa00;
-  border: 1px solid rgba(255, 140, 0, 0.4);
+  border: 1px solid rgba(240, 90, 70, 0.35);
 }
 
 /* =========================================================

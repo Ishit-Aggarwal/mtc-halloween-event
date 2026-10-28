@@ -842,7 +842,7 @@
       mustHave = "Clickable link to @kapidhwaj.innovations on Instagram + Intentional theme integration";
       portrait = "assets/sponsor/kapidhwaj.png";
       btn = "Accept the alliance";
-      accent = "#ffaa00";
+      accent = "#ff4520";
     } else {
       var t = D.twists[session.twist];
       kicker = "The twist"; glyph = t.glyph; name = t.t; desc = fillTwist(t.d); btn = "Seal my fate"; accent = "#ff3326";
@@ -873,6 +873,8 @@
       if ((stage === "soul" || stage === "sponsor") && portrait) {
         el.cardPortraitImg.src = portrait;
         el.cardPortraitImg.alt = name;
+        el.cardPortraitFrame.classList.toggle("is-logo", stage === "sponsor");
+        el.cardPortraitImg.classList.toggle("sponsor-logo", stage === "sponsor");
         if (el.cardPortraitBadge) el.cardPortraitBadge.textContent = glyph;
         el.cardPortraitFrame.hidden = false;
         el.cardGlyph.hidden = true;

@@ -897,6 +897,19 @@
   pointer-events: none;
 }
 
+/* the sponsor reveal shows the round Kapidhwaj badge as-is: no frame, no vignette, no corner glyph */
+.card-portrait-frame.is-logo {
+  width: 150px;
+  height: 150px;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
+  overflow: visible;
+}
+.card-portrait-frame.is-logo .card-portrait-vignette,
+.card-portrait-frame.is-logo .card-portrait-badge { display: none; }
+
 .card-portrait-badge {
   position: absolute;
   bottom: 6px;
@@ -1156,10 +1169,6 @@
 .endcard-sponsor-logo {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 0 16px rgba(255, 140, 0, 0.6);
-  border: 2px solid #ffaa00;
   flex-shrink: 0;
 }
 
