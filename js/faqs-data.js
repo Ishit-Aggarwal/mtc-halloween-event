@@ -18,7 +18,7 @@
     date: "29 Oct 2026, 2:30 PM Onwards",
     organizer: "Microsoft Tech Community, Amity University Noida",
     sponsor: {
-      name: "KAPIDHWAJ",
+      name: "KAPIDHWAJ INNOVATIONS",
       handle: "@kapidhwaj.innovations",
       instagramUrl: "https://www.instagram.com/kapidhwaj.innovations/"
     },
@@ -151,38 +151,38 @@
       },
       {
         id: "alliance",
-        name: "Kapidhwaj Alliance",
+        name: "Kapidhwaj Innovations Alliance",
         glyph: "🌀",
         description: "Official links, compulsory sponsor rules, and character-specific creative ideas.",
         faqs: [
           {
             id: "alliance-protocol-overview",
             q: "What is 'The Alliance Protocol', and is it compulsory for every team?",
-            a: "Yes! The Alliance Protocol is a <strong>compulsory sponsor twist for ALL teams</strong> in Round 2, running alongside your individual Wheel IV twist. You must creatively integrate our official sponsor, <strong>KAPIDHWAJ</strong>, into your web application's storyline, UI aesthetic, and interactive features.",
+            a: "Yes! The Alliance Protocol is a <strong>compulsory sponsor twist for ALL teams</strong> in Round 2, running alongside your individual Wheel IV twist. You must creatively integrate our official sponsor, <strong>KAPIDHWAJ INNOVATIONS</strong>, into your web application's storyline, UI aesthetic, and interactive features.",
             tags: ["alliance protocol", "sponsor", "kapidhwaj", "compulsory", "mandatory", "rules"]
           },
           {
             id: "official-sponsor-instagram",
-            q: "What is the official Kapidhwaj Instagram handle and link?",
+            q: "What is the official Kapidhwaj Innovations Instagram handle and link?",
             a: "The official handle is <strong>@kapidhwaj.innovations</strong> and the mandatory clickable URL is <a href='https://www.instagram.com/kapidhwaj.innovations/' target='_blank' rel='noopener'><strong>https://www.instagram.com/kapidhwaj.innovations/ ↗</strong></a>. Ensure this link is active, opens safely in a new tab (<code>target='_blank' rel='noopener'</code>), and is readily discoverable by judges.",
             tags: ["instagram", "handle", "link", "kapidhwaj.innovations", "url", "sponsor link"]
           },
           {
             id: "why-not-just-footer-logo",
-            q: "Can we just put a small Kapidhwaj logo in our website footer and call it done?",
+            q: "Can we just put a small Kapidhwaj Innovations logo in our website footer and call it done?",
             a: "NO! <em>'A boring logo in the footer won't save your website. The sponsor must become a meaningful part of your world.'</em> Slapping an unstyled logo in the footer will result in 0 or near-zero points for the Alliance Protocol. It must feel like an organic, in-universe narrative element styled to match your character's world.",
             tags: ["footer logo", "lazy integration", "rules", "grading", "branding", "mistake"]
           },
           {
             id: "alliance-protocol-rules",
             q: "What are the four official rules of The Alliance Protocol?",
-            a: "<ol class='faq-inner-list'><li><strong>1. Clear Feature:</strong> The official Kapidhwaj Instagram account (@kapidhwaj.innovations) must be clearly featured.</li><li><strong>2. Clickable Link:</strong> Must include a working link to https://www.instagram.com/kapidhwaj.innovations/.</li><li><strong>3. Visual Harmony:</strong> The integration must visually match your website's UI Hex and character aesthetic (not look like an ugly external banner ad).</li><li><strong>4. Narrative Intent:</strong> It must feel intentional, creative, and integrated into the problem you are solving.</li></ol>",
+            a: "<ol class='faq-inner-list'><li><strong>1. Clear Feature:</strong> The official Kapidhwaj Innovations Instagram account (@kapidhwaj.innovations) must be clearly featured.</li><li><strong>2. Clickable Link:</strong> Must include a working link to https://www.instagram.com/kapidhwaj.innovations/.</li><li><strong>3. Visual Harmony:</strong> The integration must visually match your website's UI Hex and character aesthetic (not look like an ugly external banner ad).</li><li><strong>4. Narrative Intent:</strong> It must feel intentional, creative, and integrated into the problem you are solving.</li></ol>",
             tags: ["rules", "criteria", "styling", "intent", "requirements", "guidelines"]
           },
           {
             id: "creative-sponsor-ideas",
             q: "What are some creative integration ideas for our character?",
-            a: "<div class='faq-inner-ideas'><strong>Valak (The Nun):</strong> Frame Kapidhwaj as the occult engineering firm forging containment wards holding Valak at bay. An interactive 'Consecrated Chamber' links to their Instagram.<br><br><strong>Lord Voldemort:</strong> Position Kapidhwaj as the shadowy dark-arts technology syndicate building the Dark Lord's Horcrux tracking dashboard.<br><br><strong>Manjulika:</strong> Weave Kapidhwaj as the royal architectural guild that constructed the secret acoustic resonance chambers.<br><br><strong>Pennywise:</strong> Depict Kapidhwaj as the carnival tech syndicate supplying holographic balloons.<br><br><strong>Deadpool / Wednesday:</strong> Fourth-wall comedic sponsored shoutouts or Nevermore forensic tech providers.</div>",
+            a: "<div class='faq-inner-ideas'><strong>Valak (The Nun):</strong> Frame Kapidhwaj Innovations as the occult engineering firm forging containment wards holding Valak at bay. An interactive 'Consecrated Chamber' links to their Instagram.<br><br><strong>Lord Voldemort:</strong> Position Kapidhwaj Innovations as the shadowy dark-arts technology syndicate building the Dark Lord's Horcrux tracking dashboard.<br><br><strong>Manjulika:</strong> Weave Kapidhwaj Innovations as the royal architectural guild that constructed the secret acoustic resonance chambers.<br><br><strong>Pennywise:</strong> Depict Kapidhwaj Innovations as the carnival tech syndicate supplying holographic balloons.<br><br><strong>Deadpool / Wednesday:</strong> Fourth-wall comedic sponsored shoutouts or Nevermore forensic tech providers.</div>",
             tags: ["ideas", "characters", "valak", "voldemort", "manjulika", "pennywise", "deadpool", "wednesday", "stree"]
           }
         ]
@@ -234,13 +234,13 @@
           {
             id: "scoring-rubric-breakdown",
             q: "What is the official evaluation rubric and score breakdown?",
-            a: "Judges score each team across 4 core pillars (25% each):<br><br>1. <strong>🎭 Storyline & Concept Creativity (25%):</strong> Depth of character immersion, narrative wit, and lore adaptation.<br>2. <strong>🎨 UI/UX Design & Aesthetic Polish (25%):</strong> Visual hierarchy, responsiveness, atmosphere, typography, and styling coherence.<br>3. <strong>⚙️ Problem Solving & Feature Completeness (25%):</strong> Does the single-page app actually solve the character's problem? Is the main interaction smooth and bug-free?<br>4. <strong>🔮 Hex, Twist & Sponsor Execution (25%):</strong> Strict fulfillment of the Hex Must-Have, seamless execution of the Wheel IV Twist, and imaginative integration of the Kapidhwaj Alliance Protocol.",
+            a: "Judges score each team across 4 core pillars (25% each):<br><br>1. <strong>🎭 Storyline & Concept Creativity (25%):</strong> Depth of character immersion, narrative wit, and lore adaptation.<br>2. <strong>🎨 UI/UX Design & Aesthetic Polish (25%):</strong> Visual hierarchy, responsiveness, atmosphere, typography, and styling coherence.<br>3. <strong>⚙️ Problem Solving & Feature Completeness (25%):</strong> Does the single-page app actually solve the character's problem? Is the main interaction smooth and bug-free?<br>4. <strong>🔮 Hex, Twist & Sponsor Execution (25%):</strong> Strict fulfillment of the Hex Must-Have, seamless execution of the Wheel IV Twist, and imaginative integration of the Kapidhwaj Innovations Alliance Protocol.",
             tags: ["judging", "rubric", "criteria", "weighting", "scores", "percentages", "evaluation"]
           },
           {
             id: "how-to-structure-pitch",
             q: "How should our team structure our 2 to 3-minute pitch to the judges?",
-            a: "Be crisp and theatrical:<br>• <strong>Minute 1 (The Dilemma):</strong> Introduce your team, reveal your character's problem, and show the live app solving it.<br>• <strong>Minute 2 (The Hex & Twist):</strong> Point out your UI Hex Must-Have in action, then demonstrate your surprise Twist.<br>• <strong>Minute 3 (The Alliance & Code):</strong> Unveil your Kapidhwaj sponsor integration, highlight any technical wizardry in your code, and answer judge questions.",
+            a: "Be crisp and theatrical:<br>• <strong>Minute 1 (The Dilemma):</strong> Introduce your team, reveal your character's problem, and show the live app solving it.<br>• <strong>Minute 2 (The Hex & Twist):</strong> Point out your UI Hex Must-Have in action, then demonstrate your surprise Twist.<br>• <strong>Minute 3 (The Alliance & Code):</strong> Unveil your Kapidhwaj Innovations sponsor integration, highlight any technical wizardry in your code, and answer judge questions.",
             tags: ["pitch", "demo", "presentation", "timing", "judging walk-through", "demo script"]
           },
           {

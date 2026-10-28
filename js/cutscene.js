@@ -57,9 +57,9 @@
     "Digital Exorcists… the Phantom has intercepted our system again.",
     "A new transmission has appeared. Your mission isn't just to rebuild the Other Side anymore. You must now establish an alliance.",
     "Introducing the ALLIANCE PROTOCOL.",
-    "Your website must now include a creative integration of our official sponsor, KAPIDHWAJ.",
+    "Your website must now include a creative integration of our official sponsor, KAPIDHWAJ INNOVATIONS.",
     "But here's the catch: a boring logo in the footer won't save your website. The sponsor must become a meaningful part of your world.",
-    "Your task is to creatively integrate the official Kapidhwaj Instagram page into your website in a way that fits your assigned character, your chosen problem statement, and your UI/UX aesthetic.",
+    "Your task is to creatively integrate the official Kapidhwaj Innovations Instagram page into your website in a way that fits your assigned character, your chosen problem statement, and your UI/UX aesthetic.",
     "You have 35 minutes remaining. The Phantom is watching. Your interface must evolve.",
     "MISSION UPDATE: ALLIANCE PROTOCOL ACTIVATED.",
     "Make the sponsor part of the story. Make the integration part of the experience. Now get back to building!"
@@ -1113,21 +1113,21 @@
           if (this.proceedBtnText) this.proceedBtnText.textContent = "RETURN TO SUBMISSIONS →";
         } else if (this.cutsceneType === "alliance") {
           if (this.endcardKicker) this.endcardKicker.textContent = "🌀 COMPULSORY SPONSOR TWIST · ROUND 2 BUILD";
-          if (this.endcardTitle) this.endcardTitle.innerHTML = 'THE ALLIANCE PROTOCOL<br><span class="highlight-glitch">KAPIDHWAJ INTEGRATION</span>';
+          if (this.endcardTitle) this.endcardTitle.innerHTML = 'THE ALLIANCE PROTOCOL<br><span class="highlight-glitch">KAPIDHWAJ INNOVATIONS INTEGRATION</span>';
           if (this.endcardDesc) {
             this.endcardDesc.innerHTML =
               '<div class="endcard-sponsor-badge">' +
-                '<img src="assets/sponsor/kapidhwaj.png" alt="Kapidhwaj Logo" class="endcard-sponsor-logo sponsor-logo">' +
+                '<img src="assets/sponsor/kapidhwaj.png" alt="Kapidhwaj Innovations Logo" class="endcard-sponsor-logo sponsor-logo">' +
                 '<div class="endcard-sponsor-info">' +
-                  '<strong>Official Sponsor: KAPIDHWAJ</strong>' +
-                  '<p>A boring footer logo won\'t save your website. Creatively integrate Kapidhwaj\'s official Instagram into your character\'s world.</p>' +
+                  '<strong>Official Sponsor: KAPIDHWAJ INNOVATIONS</strong>' +
+                  '<p>A boring footer logo won\'t save your website. Creatively integrate Kapidhwaj Innovations\' official Instagram into your character\'s world.</p>' +
                   '<a href="https://www.instagram.com/kapidhwaj.innovations/" target="_blank" rel="noopener" class="endcard-ig-link">📸 View @kapidhwaj.innovations on Instagram ↗</a>' +
                 '</div>' +
               '</div>' +
               '<div class="endcard-sponsor-rules">' +
                 '<strong>Rules of the Alliance:</strong>' +
                 '<ul>' +
-                  '<li>1. Feature the official Kapidhwaj Instagram account.</li>' +
+                  '<li>1. Feature the official Kapidhwaj Innovations Instagram account.</li>' +
                   '<li>2. Include a clickable link to @kapidhwaj.innovations.</li>' +
                   '<li>3. Visually match your website\'s aesthetic & character theme.</li>' +
                   '<li>4. Must feel intentional and creative — not an unrelated ad.</li>' +

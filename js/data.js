@@ -446,14 +446,14 @@ window.CURSE_DATA = {
   sponsorTwist: {
     id: "alliance",
     title: "The Alliance Protocol",
-    sponsor: "KAPIDHWAJ",
+    sponsor: "KAPIDHWAJ INNOVATIONS",
     glyph: "🌀",
     logo: "assets/sponsor/kapidhwaj.png",
     instagramHandle: "@kapidhwaj.innovations",
     instagramUrl: "https://www.instagram.com/kapidhwaj.innovations/",
-    shortDesc: "Compulsory Sponsor Twist: Creatively integrate the official Kapidhwaj Instagram page into your character's world, problem statement, and UI aesthetic.",
+    shortDesc: "Compulsory Sponsor Twist: Creatively integrate the official Kapidhwaj Innovations Instagram page into your character's world, problem statement, and UI aesthetic.",
     rules: [
-      "The official Kapidhwaj Instagram account (@kapidhwaj.innovations) must be clearly featured.",
+      "The official Kapidhwaj Innovations Instagram account (@kapidhwaj.innovations) must be clearly featured.",
       "Include a clickable link to the official Instagram page (https://www.instagram.com/kapidhwaj.innovations/).",
       "The integration must visually match your website's theme and character aesthetic.",
       "It must feel intentional and creative — not like an unrelated advertisement."
@@ -462,8 +462,8 @@ window.CURSE_DATA = {
       "A fictional partnership or collaboration section.",
       "A themed Instagram card styled to match your assigned aesthetic.",
       "A 'Trusted Allies' or 'Join Our Alliance' section.",
-      "An interactive sponsor portal or a creative call-to-action linking to Kapidhwaj's Instagram page.",
-      "A character-themed story explaining why Kapidhwaj belongs in your world."
+      "An interactive sponsor portal or a creative call-to-action linking to Kapidhwaj Innovations' Instagram page.",
+      "A character-themed story explaining why Kapidhwaj Innovations belongs in your world."
     ]
   }
 };

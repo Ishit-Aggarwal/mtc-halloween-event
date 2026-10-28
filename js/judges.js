@@ -90,7 +90,7 @@
       row("hex", "Hex", h && h.t, h && h.d, h && h.glyph, h && h.mustHave ? '<div class="hex-must-have-badge"><strong>Must-Have:</strong> ' + esc(h.mustHave) + '</div>' : '') +
       (typeof t.twist === "number" ?
         (row("twist", "Twist 1 (Wheel)", tw && tw.t, tw && (t.twistText || tw.d), tw && tw.glyph) +
-         row("twist-sponsor", "Twist 2 (Sponsor)", "🌀 The Alliance Protocol · KAPIDHWAJ", "Compulsory: Creatively integrate @kapidhwaj.innovations on Instagram into the world & theme.", "🌀")) :
+         row("twist-sponsor", "Twist 2 (Sponsor)", "🌀 The Alliance Protocol · KAPIDHWAJ INNOVATIONS", "Compulsory: Creatively integrate @kapidhwaj.innovations on Instagram into the world & theme.", "🌀")) :
         row("twist", "Twist", null, null, null)) +
       (t.submissionUrl ? '<div class="trow submission"><span class="trow-label">Project</span><div>' +
         '<a class="judge-live-btn" href="' + esc(t.submissionUrl) + '" target="_blank" rel="noopener">🌐 Open Live Website ↗</a>' +

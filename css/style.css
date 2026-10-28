@@ -1974,9 +1974,7 @@ body.lit .circuit-grid {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #ffaa00;
-  box-shadow: 0 0 16px rgba(255, 140, 0, 0.55);
+  object-fit: contain;
 }
 
 .sc-title-wrap {
@@ -2188,7 +2186,6 @@ body.lit .circuit-grid {
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: drop-shadow(0 0 12px rgba(255, 90, 40, 0.35));
 }
 
 .ap-emblem {
@@ -2197,14 +2194,11 @@ body.lit .circuit-grid {
   height: 100%;
 }
 
-/* the Kapidhwaj PNG is a round badge on a dark square: show just the badge, filling its box */
+/* the Kapidhwaj Innovations PNG is already a round badge on transparency: show it whole, no outline */
 img.sponsor-logo {
   aspect-ratio: 1;
-  object-fit: cover;
+  object-fit: contain;
   object-position: 50% 50%;
-  -webkit-clip-path: circle(47.2% at 50.8% 50.1%);
-  clip-path: circle(47.2% at 50.8% 50.1%);
-  transform: scale(1.06);
 }
 
 .ap-title-wrap {

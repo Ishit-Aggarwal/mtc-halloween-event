@@ -897,7 +897,7 @@
   pointer-events: none;
 }
 
-/* the sponsor reveal shows the round Kapidhwaj badge as-is: no frame, no vignette, no corner glyph */
+/* the sponsor reveal shows the round Kapidhwaj Innovations badge as-is: no frame, no vignette, no corner glyph */
 .card-portrait-frame.is-logo {
   width: 150px;
   height: 150px;
