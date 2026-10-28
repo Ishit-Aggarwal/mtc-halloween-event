@@ -20,7 +20,7 @@ The styling follows the event poster: blood red on black, the Rye headline, Oswa
 4. **Wheel III · The Hex** gives a UI constraint.
 5. **Wheel IV · The Twist** stays chained for 15 minutes after the hex, then unlocks. In the last minute a heartbeat speeds up.
 
-From wheel III onwards, **the team's own character spins the wheels**. It has its own voice lines. If a team waits 60 seconds without spinning, the character grows impatient. Its shadow looms over the screen with a laugh, and it spins the wheel itself. The wait time is `idleSpinSeconds` in `js/data.js`.
+From wheel III onwards, **the team's own character spins the wheels**. It has its own voice lines.
 
 The wheel stops slowly, like a casino wheel. The flapper arrow is knocked by every peg, and the wheel stays exactly where it lands. Every result is decided and saved *before* the wheel stops, so refreshing the page can't re-roll it. The timer also survives a refresh.
 

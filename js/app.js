@@ -474,36 +474,6 @@
     else el.spinnerLine.textContent = "I'll spin your " + WHEEL_NAMES[stage] + " wheel myself. Give the word.";
   }
 
-  /* ---------- impatience: a spirit spins for slow teams ---------- */
-
-  var idleSince = Date.now(), looming = false;
-  function resetIdle() { idleSince = Date.now(); }
-
-  setInterval(function () {
-    if (!session || busy || !el.reveal.hidden || !el.gate.classList.contains("gone")) return;
-    var stage = session.stage;
-    // the curse is the team's own choice, so nobody chooses it for them
-    if (["soul", "hex", "twist"].indexOf(stage) < 0) return;
-    var left = (D.idleSpinSeconds || 60) * 1000 - (Date.now() - idleSince);
-    if (left > 15000) return;
-    var who = spinnerFor(stage);
-    if (left <= 0) {
-      if (document.hidden || looming) return; // wait until someone is looking
-      // patience gone: the soul's shadow looms over everything… then it spins
-      looming = true;
-      el.spinnerLine.textContent = who.idle;
-      window.Creatures.impatience(who, function () { looming = false; spin(true); });
-      return;
-    }
-    el.spinner.classList.add("impatient");
-    el.spinnerLine.innerHTML = "";
-    el.spinnerLine.appendChild(document.createTextNode(who.idle + " "));
-    var cnt = document.createElement("span");
-    cnt.className = "idle-count";
-    cnt.textContent = "(" + Math.ceil(left / 1000) + "s)";
-    el.spinnerLine.appendChild(cnt);
-  }, 1000);
-
   function render(animate) {
     document.body.classList.toggle("in-ritual", !!session);
     if (!session) {
@@ -666,7 +636,6 @@
     session.stage = "twist";
     save();
     saveProgress();
-    resetIdle();
     document.title = "🔓 The twist awakens · " + baseTitle;
     window.Sound.bell();
     if (window.FX) window.FX.strike();
@@ -745,7 +714,6 @@
     if (["soul", "hex", "twist"].indexOf(stage) < 0) return;
 
     busy = true;
-    resetIdle();
     var who = spinnerFor(stage);
     updateSpinner(stage, auto === true ? who.idle : who.spin);
     el.spinner.classList.remove("grab"); void el.spinner.offsetWidth; el.spinner.classList.add("grab");
@@ -753,7 +721,6 @@
     var out = await chooseOutcome(stage);
     if (out.error) {
       busy = false;
-      resetIdle();
       updateSpinner(stage);
       setSpinState(stage);
       el.sub.textContent = out.error;
@@ -807,7 +774,6 @@
   // judges' board and the host ledger read. Other teams may choose it too.
   function chooseProblem(idx) {
     if (busy || !session || session.stage !== "curse") return;
-    resetIdle();
     session.entryId = null;
     recordOutcome("curse", idx);
     window.Sound.whoosh();
@@ -1011,7 +977,6 @@
       save();
       saveProgress();
       busy = false;
-      resetIdle();
       render(false);
       renderGrimoire(true);
       // Twist assignments complete! Trigger the compulsory Sponsor Twist: ALLIANCE PROTOCOL
@@ -1033,7 +998,6 @@
     save();
     saveProgress();
     busy = false;
-    resetIdle();
     render(stage !== "twist");
     renderGrimoire(true);
     if (stage === "hex") {
@@ -1318,7 +1282,6 @@
     window.Store.lockDevice(name, res.key, { leader: leaderObj, members: members });
     save();
     saveProgress();
-    resetIdle();
     window.Sound.whoosh();
     render(true);
     if (el.prologueModal) {
@@ -1854,7 +1817,6 @@
   function enter(withSound) {
     entered = true;
     setSound(withSound);
-    resetIdle();
     if (window.OtherSideCutscene && typeof window.OtherSideCutscene.play === "function") {
       window.OtherSideCutscene.play();
     } else {
