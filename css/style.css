@@ -1916,6 +1916,244 @@ body.lit .circuit-grid {
 }
 
 /* =========================================================
+   PRE-TWIST SPONSOR CARD (Kapidhwaj Innovations)
+   ========================================================= */
+
+.sponsor-card {
+  background: radial-gradient(ellipse at 50% 0%, rgba(45, 18, 5, 0.95), rgba(14, 3, 5, 0.98) 75%);
+  border: 1.5px solid rgba(255, 179, 0, 0.45);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.75), 0 0 22px rgba(255, 179, 0, 0.2);
+  border-radius: 12px;
+  padding: clamp(18px, 3.2vw, 24px);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 600px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  box-sizing: border-box;
+}
+
+.sponsor-card:hover {
+  transform: translateY(-3px);
+  border-color: #ffb300;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 32px rgba(255, 179, 0, 0.38);
+}
+
+.sponsor-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff4520, #ffaa00, #ff4520);
+}
+
+.sponsor-card[hidden] {
+  display: none !important;
+}
+
+.sc-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.sc-emblem-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sc-emblem {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ffaa00;
+  box-shadow: 0 0 16px rgba(255, 140, 0, 0.55);
+}
+
+.sc-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.sc-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.sc-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--f-type, monospace);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ffaa00;
+  background: rgba(255, 140, 0, 0.15);
+  border: 1px solid rgba(255, 140, 0, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.sc-tier-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--f-type, monospace);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #ffd180;
+  background: rgba(211, 47, 47, 0.25);
+  border: 1px solid rgba(255, 100, 100, 0.4);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.sc-title {
+  margin: 0;
+  font-family: var(--f-title, serif);
+  font-size: clamp(19px, 2.6vw, 24px);
+  color: #fff;
+  letter-spacing: 0.03em;
+  text-shadow: 0 0 12px rgba(255, 120, 0, 0.4);
+  line-height: 1.2;
+}
+
+.sc-subtitle {
+  margin: 0;
+  font-size: 13.5px;
+  color: #f7deda;
+  line-height: 1.4;
+}
+
+.sc-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sc-socials {
+  background: rgba(10, 2, 4, 0.85);
+  border: 1px solid rgba(255, 120, 0, 0.25);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sc-social-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sc-social-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.sc-social-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sc-social-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #ffaa00;
+  font-family: var(--f-type, monospace);
+  font-weight: 600;
+}
+
+.sc-social-link {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14.5px;
+  text-decoration: none;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
+
+.sc-social-link:hover {
+  color: #ffaa00;
+  text-shadow: 0 0 8px rgba(255, 170, 0, 0.6);
+  text-decoration: underline;
+}
+
+.sc-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-sc-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: linear-gradient(135deg, #c13584, #e1306c, #fd1d1d);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-family: var(--f-type, monospace);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.btn-sc-ig:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(225, 48, 108, 0.55);
+  filter: brightness(1.1);
+  color: #fff;
+}
+
+.btn-sc-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: rgba(30, 8, 12, 0.9);
+  color: #ffcca5;
+  border: 1px solid rgba(255, 120, 0, 0.4);
+  border-radius: 6px;
+  font-family: var(--f-type, monospace);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-sc-copy:hover {
+  background: rgba(55, 15, 22, 0.95);
+  border-color: #ffaa00;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* =========================================================
    ALLIANCE PROTOCOL SPONSOR CARD & SEAL V
    ========================================================= */
 
@@ -1935,16 +2173,6 @@ body.lit .circuit-grid {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 22px rgba(255, 60, 30, 0.22);
 }
 
-/* wheel phase: the card sits under the wheel / spin button, the grimoire stays alone on the right */
-@media (min-width: 980px) {
-  .wheel-panel:not(.view-mission) .wheel-col { grid-column: 1; grid-row: 1; }
-  .wheel-panel:not(.view-mission) .grimoire { grid-column: 2; grid-row: 1 / span 2; }
-  .wheel-panel:not(.view-mission) .alliance-protocol-banner { grid-column: 1; grid-row: 2; }
-}
-.wheel-panel:not(.view-mission) .alliance-protocol-banner { width: 100%; max-width: 720px; justify-self: center; }
-.wheel-panel.view-submit .alliance-protocol-banner,
-.wheel-panel.view-faqs .alliance-protocol-banner { display: none; }
-
 .ap-header {
   display: flex;
   align-items: center;
@@ -1953,9 +2181,13 @@ body.lit .circuit-grid {
 }
 
 .ap-emblem-wrap {
-  width: 84px;
-  height: 84px;
+  position: relative;
+  width: 76px;
+  height: 76px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   filter: drop-shadow(0 0 12px rgba(255, 90, 40, 0.35));
 }
 

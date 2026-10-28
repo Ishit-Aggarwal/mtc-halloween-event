@@ -316,6 +316,17 @@
       }
     }
 
+    // Alliance Protocol card is only revealed AFTER the twist wheel has been spun.
+    // Prior to that, show the clean "Sponsored by Kapidhwaj Innovations" card without twist spoilers.
+    var isTwistSpun = session && (typeof session.twist === "number" || stage === "done");
+    var apCard = document.getElementById("allianceProtocolCard");
+    if (apCard) apCard.hidden = !isTwistSpun;
+
+    var preSponsorCards = document.querySelectorAll(".pre-twist-sponsor");
+    preSponsorCards.forEach(function (card) {
+      card.hidden = isTwistSpun;
+    });
+
     el.grimoireFoot.hidden = stage !== "done";
     if (stage === "done") renderSubmissionState();
     renderEggs();
@@ -2365,7 +2376,7 @@
   /* ---------- 3D Tilt on Fate Cards & Panels ---------- */
   function init3DTiltFX() {
     if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return;
-    var targets = document.querySelectorAll(".fate, .alliance-protocol-banner, .sub-panel");
+    var targets = document.querySelectorAll(".fate, .alliance-protocol-banner, .sponsor-card, .sub-panel");
     targets.forEach(function (card) {
       var rect = null;
       var raf = null;
@@ -2393,15 +2404,17 @@
   setTimeout(init3DTiltFX, 1000);
 
   /* ---------- Kapidhwaj Copy Handle Button ---------- */
-  if (el.apCopyHandleBtn) {
-    el.apCopyHandleBtn.addEventListener("click", function () {
+  var copyButtons = document.querySelectorAll("#apCopyHandleBtn, .scCopyHandleBtn");
+  copyButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
       var handle = "@kapidhwaj.innovations";
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(handle).then(function () {
-          el.apCopyHandleBtn.innerHTML = "<span>✓</span> Copied!";
+          var orig = btn.innerHTML;
+          btn.innerHTML = "<span>✓</span> Copied!";
           if (window.Sound && window.Sound.tick) window.Sound.tick(0.6);
           setTimeout(function () {
-            el.apCopyHandleBtn.innerHTML = "<span>📋</span> Copy Handle";
+            btn.innerHTML = orig;
           }, 2000);
         }).catch(function () {
           window.prompt("Copy Kapidhwaj Instagram Handle:", handle);
@@ -2410,7 +2423,7 @@
         window.prompt("Copy Kapidhwaj Instagram Handle:", handle);
       }
     });
-  }
+  });
 
   function resumePending() {
     // a result was decided but the page reloaded before it was shown
