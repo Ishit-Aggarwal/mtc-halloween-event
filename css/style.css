@@ -1984,7 +1984,6 @@ body.lit .circuit-grid {
   text-transform: uppercase;
   color: #ffaa00;
   background: rgba(255, 140, 0, 0.15);
-  border: 1px solid rgba(255, 140, 0, 0.4);
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -2029,7 +2028,6 @@ body.lit .circuit-grid {
 
 .sc-socials {
   background: rgba(10, 2, 4, 0.85);
-  border: 1px solid rgba(255, 120, 0, 0.25);
   border-radius: 8px;
   padding: 12px 14px;
   display: flex;
@@ -2117,7 +2115,7 @@ body.lit .circuit-grid {
   padding: 9px 16px;
   background: rgba(30, 8, 12, 0.9);
   color: #ffcca5;
-  border: 1px solid rgba(255, 120, 0, 0.4);
+  border: 0;
   border-radius: 6px;
   font-family: var(--f-type, monospace);
   font-size: 12.5px;
@@ -2129,7 +2127,6 @@ body.lit .circuit-grid {
 
 .btn-sc-copy:hover {
   background: rgba(55, 15, 22, 0.95);
-  border-color: #ffaa00;
   color: #fff;
   transform: translateY(-2px);
 }
