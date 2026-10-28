@@ -817,7 +817,7 @@
       quote = "“Make the sponsor part of the story. Make the integration part of the experience.”";
       desc = "RULES OF THE ALLIANCE:\n1. The official Kapidhwaj Innovations Instagram account (@kapidhwaj.innovations) must be clearly featured.\n2. Include a clickable link to https://www.instagram.com/kapidhwaj.innovations/ on Instagram.\n3. The integration must visually match your website's theme.\n4. It must feel intentional and creative — not like an unrelated advertisement.";
       mustHave = "Clickable link to @kapidhwaj.innovations on Instagram + Intentional theme integration";
-      portrait = "assets/sponsor/kapidhwaj.png";
+      portrait = "assets/sponsor/kapidhwaj-innovations.png";
       btn = "Accept the alliance";
       accent = "#ff4520";
     } else {

@@ -15,11 +15,10 @@
   var Ctx = window.AudioContext || window.webkitAudioContext;
   var ctx = null, master = null, fxBus = null, musicBus = null, reverb = null, noiseBuf = null;
   var enabled = false;
-  // Local testing only: a browser opened once at localhost/?silent stays muted
-  // (everything still runs, nothing reaches the speakers); ?silent=off undoes it.
-  // Other browsers, and the deployed site, keep their sound.
+  // A browser opened once at /?silent stays muted (everything still runs,
+  // nothing reaches the speakers); /?silent=off undoes it. Only that one
+  // browser is affected: every other visitor keeps their sound.
   var SILENT = (function () {
-    if (!/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) return false;
     var m = /[?&]silent(?:=([^&]*))?/.exec(location.search);
     var on = !!m && m[1] !== "off" && m[1] !== "0";
     try {

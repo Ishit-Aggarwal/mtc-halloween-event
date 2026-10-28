@@ -448,7 +448,7 @@ window.CURSE_DATA = {
     title: "The Alliance Protocol",
     sponsor: "KAPIDHWAJ INNOVATIONS",
     glyph: "🌀",
-    logo: "assets/sponsor/kapidhwaj.png",
+    logo: "assets/sponsor/kapidhwaj-innovations.png",
     instagramHandle: "@kapidhwaj.innovations",
     instagramUrl: "https://www.instagram.com/kapidhwaj.innovations/",
     shortDesc: "Compulsory Sponsor Twist: Creatively integrate the official Kapidhwaj Innovations Instagram page into your character's world, problem statement, and UI aesthetic.",

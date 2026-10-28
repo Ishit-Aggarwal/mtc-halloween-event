@@ -1117,7 +1117,7 @@
           if (this.endcardDesc) {
             this.endcardDesc.innerHTML =
               '<div class="endcard-sponsor-badge">' +
-                '<img src="assets/sponsor/kapidhwaj.png" alt="Kapidhwaj Innovations Logo" class="endcard-sponsor-logo sponsor-logo">' +
+                '<img src="assets/sponsor/kapidhwaj-innovations.png" alt="Kapidhwaj Innovations Logo" class="endcard-sponsor-logo sponsor-logo">' +
                 '<div class="endcard-sponsor-info">' +
                   '<strong>Official Sponsor: KAPIDHWAJ INNOVATIONS</strong>' +
                   '<p>A boring footer logo won\'t save your website. Creatively integrate Kapidhwaj Innovations\' official Instagram into your character\'s world.</p>' +
