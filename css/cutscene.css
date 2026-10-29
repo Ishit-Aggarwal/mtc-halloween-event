@@ -1201,6 +1201,7 @@
 
 .endcard-sponsor-rules {
   background: rgba(14, 2, 4, 0.85);
+  border-left: 3px solid #ffaa00;
   padding: 10px 14px;
   border-radius: 0 6px 6px 0;
   text-align: left;
