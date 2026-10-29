@@ -2028,7 +2028,8 @@ body.lit .circuit-grid {
 
 .sc-socials {
   background: rgba(10, 2, 4, 0.85);
-  border-radius: 8px;
+  border-left: 3px solid #ffaa00;
+  border-radius: 0 8px 8px 0;
   padding: 12px 14px;
   display: flex;
   align-items: center;
@@ -2267,7 +2268,8 @@ img.sponsor-logo {
 .ap-rules-col, .ap-ideas-col {
   background: rgba(10, 2, 4, 0.85);
   border: 1px solid rgba(240, 90, 70, 0.25);
-  border-radius: 6px;
+  border-left: 3px solid #ffaa00;
+  border-radius: 0 6px 6px 0;
   padding: 14px 16px;
 }
 
@@ -2681,6 +2683,7 @@ img.sponsor-logo {
 /* Grimoire Seal V Sponsor Styling */
 .fate.fate-sponsor {
   background: rgba(24, 6, 8, 0.92);
+  border-left: 3px solid #ffaa00;
 }
 
 .fate-sponsor-header {
