@@ -1919,15 +1919,34 @@ body.lit .circuit-grid {
    PRE-TWIST SPONSOR CARD (Kapidhwaj Innovations)
    ========================================================= */
 
-/* no box: the sponsor content sits straight on the page, no outline, glow or top stripe */
 .sponsor-card {
-  padding: clamp(18px, 3.2vw, 24px) 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(45, 18, 5, 0.95), rgba(14, 3, 5, 0.98) 75%);
+  border: 1.5px solid rgba(255, 179, 0, 0.45);
+  box-shadow: 0 10px 36px rgba(0, 0, 0, 0.75), 0 0 22px rgba(255, 179, 0, 0.2);
+  border-radius: 12px;
+  padding: clamp(18px, 3.2vw, 24px);
   margin-top: 20px;
   margin-bottom: 20px;
   width: 100%;
   max-width: 600px;
   position: relative;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   box-sizing: border-box;
+}
+
+.sponsor-card:hover {
+  transform: translateY(-3px);
+  border-color: #ffb300;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 32px rgba(255, 179, 0, 0.38);
+}
+
+.sponsor-card::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff4520, #ffaa00, #ff4520);
 }
 
 .sponsor-card[hidden] {
@@ -1955,7 +1974,7 @@ body.lit .circuit-grid {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  object-fit: contain;
+  object-fit: cover;
   border: 2px solid #ffaa00;
   box-shadow: 0 0 16px rgba(255, 140, 0, 0.55);
 }
@@ -1984,6 +2003,7 @@ body.lit .circuit-grid {
   text-transform: uppercase;
   color: #ffaa00;
   background: rgba(255, 140, 0, 0.15);
+  border: 1px solid rgba(255, 140, 0, 0.4);
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -2028,8 +2048,8 @@ body.lit .circuit-grid {
 
 .sc-socials {
   background: rgba(10, 2, 4, 0.85);
-  border-left: 3px solid #ffaa00;
-  border-radius: 0 8px 8px 0;
+  border: 1px solid rgba(255, 120, 0, 0.25);
+  border-radius: 8px;
   padding: 12px 14px;
   display: flex;
   align-items: center;
@@ -2116,7 +2136,7 @@ body.lit .circuit-grid {
   padding: 9px 16px;
   background: rgba(30, 8, 12, 0.9);
   color: #ffcca5;
-  border: 0;
+  border: 1px solid rgba(255, 120, 0, 0.4);
   border-radius: 6px;
   font-family: var(--f-type, monospace);
   font-size: 12.5px;
@@ -2128,6 +2148,7 @@ body.lit .circuit-grid {
 
 .btn-sc-copy:hover {
   background: rgba(55, 15, 22, 0.95);
+  border-color: #ffaa00;
   color: #fff;
   transform: translateY(-2px);
 }
